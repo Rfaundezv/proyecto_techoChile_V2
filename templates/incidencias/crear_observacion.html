@@ -1,0 +1,644 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}{% if es_familia %}Nueva Observación de mi Vivienda{% else %}Nueva Observación{% endif %} - TECHO CHILE{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* FORZAR que el body permita sticky */
+    body {
+        overflow-x: hidden !important;
+    }
+    
+    /* Contenedor con layout especial para sticky */
+    .observacion-container {
+        display: flex;
+        flex-direction: column;
+        gap: 0;
+        position: relative;
+        /* Sin padding superior - el sticky se queda en su lugar */
+    }
+    
+    /* Cuadro de información sticky - Se queda pegado arriba al hacer scroll */
+    .vivienda-info-sticky-top {
+        position: sticky !important;
+        top: 60px !important; /* Pegado justo debajo del navbar */
+        z-index: 999 !important; /* Por encima de todo */
+        background: white !important; /* Fondo sólido */
+        padding: 0 !important;
+        margin: 0 0 20px 0 !important;
+        animation: fadeIn 0.5s ease-in;
+        will-change: transform; /* Optimización para sticky */
+        backface-visibility: hidden; /* Mejora rendering */
+    }
+    
+    @keyframes fadeIn {
+        from { opacity: 0; }
+        to { opacity: 1; }
+    }
+    
+    /* Diseño del cuadro de información - MÁS COMPACTO Y LLAMATIVO */
+    .vivienda-info-sticky-top .alert {
+        background: linear-gradient(135deg, #17a2b8 0%, #138496 100%) !important;
+        border: 3px solid #0c5460 !important;
+        border-radius: 10px !important;
+        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.25) !important;
+        color: white !important;
+        margin: 0 !important;
+        padding: 15px 20px !important;
+        position: relative !important;
+    }
+    
+    /* Badge "SIEMPRE VISIBLE" */
+    .vivienda-info-sticky-top .alert::before {
+        content: "📌 FIJO";
+        position: absolute;
+        top: -10px;
+        right: 20px;
+        background: #ff6b6b;
+        color: white;
+        padding: 4px 12px;
+        border-radius: 20px;
+        font-size: 0.75rem;
+        font-weight: 700;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+        animation: pulse 2s infinite;
+    }
+    
+    @keyframes pulse {
+        0%, 100% { transform: scale(1); }
+        50% { transform: scale(1.05); }
+    }
+    
+    .vivienda-info-sticky-top .alert-heading {
+        color: white !important;
+        font-weight: 700 !important;
+        font-size: 1.1rem !important;
+        margin-bottom: 12px !important;
+        text-align: center;
+        border-bottom: 2px solid rgba(255, 255, 255, 0.4);
+        padding-bottom: 10px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+    
+    .vivienda-info-sticky-top .info-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 12px;
+        margin-bottom: 12px;
+    }
+    
+    .vivienda-info-sticky-top .info-item {
+        background: rgba(255, 255, 255, 0.15);
+        padding: 10px 14px;
+        border-radius: 8px;
+        border-left: 4px solid #bee5eb;
+        transition: all 0.2s ease;
+    }
+    
+    .vivienda-info-sticky-top .info-item:hover {
+        background: rgba(255, 255, 255, 0.25);
+        transform: translateX(3px);
+    }
+    
+    .vivienda-info-sticky-top .info-item strong {
+        color: #bee5eb !important;
+        font-weight: 700;
+        font-size: 0.80rem;
+        display: block;
+        margin-bottom: 4px;
+        text-transform: uppercase;
+        letter-spacing: 0.3px;
+    }
+    
+    .vivienda-info-sticky-top .info-item span {
+        color: white !important;
+        font-size: 0.95rem;
+        font-weight: 600;
+        display: block;
+        line-height: 1.3;
+    }
+    
+    .vivienda-info-sticky-top .info-footer {
+        text-align: center;
+        padding-top: 10px;
+        border-top: 2px solid rgba(255, 255, 255, 0.3);
+        background: rgba(0, 0, 0, 0.1);
+        margin: 0 -20px -15px -20px;
+        padding: 10px 20px;
+        border-radius: 0 0 7px 7px;
+    }
+    
+    .vivienda-info-sticky-top .info-footer p {
+        color: #ffffff !important;
+        font-size: 0.85rem;
+        margin: 0 !important;
+        font-weight: 600;
+        text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
+    }
+    
+    .vivienda-info-sticky-top .bi-house-door-fill {
+        font-size: 1.3rem;
+        vertical-align: middle;
+        margin-right: 8px;
+        filter: drop-shadow(1px 1px 2px rgba(0, 0, 0, 0.3));
+    }
+    
+    .vivienda-info-sticky-top .bi-pin-angle-fill {
+        font-size: 1rem;
+        margin-right: 5px;
+        animation: wiggle 1s ease-in-out infinite;
+    }
+    
+    @keyframes wiggle {
+        0%, 100% { transform: rotate(-5deg); }
+        50% { transform: rotate(5deg); }
+    }
+    
+    /* Responsivo */
+    @media (max-width: 768px) {
+        .vivienda-info-sticky-top {
+            top: 56px !important;
+        }
+        
+        .vivienda-info-sticky-top .info-grid {
+            grid-template-columns: 1fr;
+            gap: 10px;
+        }
+        
+        .vivienda-info-sticky-top .alert-heading {
+            font-size: 0.95rem !important;
+        }
+    }
+    
+    /* Asegurar que el contenedor padre no interfiera */
+    .form-techo {
+        position: relative !important;
+        z-index: 1 !important;
+        /* Espacio superior para cuadro fijo */
+        padding-top: 0 !important;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-10">
+        <div class="observacion-container">
+            
+            {% if es_familia and mi_vivienda %}
+            <!-- Cuadro de información STICKY - Se queda pegado arriba al hacer scroll -->
+            <div class="vivienda-info-sticky-top">
+                <div class="alert mb-0">
+                    <h5 class="alert-heading">
+                        <i class="bi bi-house-door-fill"></i> TU VIVIENDA - DATOS SIEMPRE VISIBLES
+                    </h5>
+                    
+                    <div class="info-grid">
+                        <div class="info-item">
+                            <strong>📋 PROYECTO</strong>
+                            <span>{{ mi_vivienda.proyecto.nombre }}</span>
+                        </div>
+                        <div class="info-item">
+                            <strong>🏠 CÓDIGO</strong>
+                            <span>{{ mi_vivienda.codigo }}</span>
+                        </div>
+                        <div class="info-item">
+                            <strong>📍 DIRECCIÓN</strong>
+                            <span>{{ mi_vivienda.direccion|default:"No especificada" }}</span>
+                        </div>
+                        <div class="info-item">
+                            <strong>📐 TIPOLOGÍA</strong>
+                            <span>{{ mi_vivienda.tipologia.nombre }}</span>
+                        </div>
+                    </div>
+                    
+                    <div class="info-footer">
+                        <p>
+                            <i class="bi bi-pin-angle-fill"></i> 
+                            Este cuadro permanece fijo mientras completas el formulario
+                        </p>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+            
+            <div class="form-techo">
+                <h3 class="section-title mb-4">
+                    {% if es_familia %}
+                        Nueva Observación de mi Vivienda
+                    {% else %}
+                        Crear Nueva Observación
+                    {% endif %}
+                </h3>
+
+            <form method="post" enctype="multipart/form-data" novalidate>
+                {% csrf_token %}
+
+                {% if not es_familia %}
+                <!-- Campos de Proyecto y Vivienda solo para NO FAMILIA -->
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label for="{{ form.proyecto.id_for_label }}" class="form-label">Proyecto *</label>
+                            {{ form.proyecto }}
+                            {% if form.proyecto.errors %}
+                                <div class="text-danger small">{{ form.proyecto.errors.0 }}</div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label for="{{ form.vivienda.id_for_label }}" class="form-label">Vivienda *</label>
+                            {{ form.vivienda }}
+                            {% if form.vivienda.errors %}
+                                <div class="text-danger small">{{ form.vivienda.errors.0 }}</div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+                {% else %}
+                <!-- Campos ocultos para FAMILIA - Ya no necesarios, se excluyen del form -->
+                {% endif %}
+
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label for="{{ form.recinto.id_for_label }}" class="form-label">Recinto</label>
+                            {{ form.recinto }}
+                            {% if form.recinto.errors %}
+                                <div class="text-danger small">{{ form.recinto.errors.0 }}</div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label for="{{ form.elemento_select.id_for_label }}" class="form-label">{{ form.elemento_select.label }}</label>
+                            {{ form.elemento_select }}
+                            <small class="form-text text-muted">Seleccionar un elemento del recinto</small>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mb-3">
+                    <label for="{{ form.elemento.id_for_label }}" class="form-label">{{ form.elemento.label }} *</label>
+                    {{ form.elemento }}
+                    <small class="form-text text-muted">Se llenará automáticamente al seleccionar un elemento del recinto, o escribir manualmente</small>
+                    {% if form.elemento.errors %}
+                        <div class="text-danger small">{{ form.elemento.errors.0 }}</div>
+                    {% endif %}
+                </div>
+
+                <div class="mb-3">
+                    <label for="{{ form.detalle.id_for_label }}" class="form-label">Detalle de la Observación *</label>
+                    {{ form.detalle }}
+                    {% if form.detalle.errors %}
+                        <div class="text-danger small">{{ form.detalle.errors.0 }}</div>
+                    {% endif %}
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label for="{{ form.tipo.id_for_label }}" class="form-label">Tipo *</label>
+                            {{ form.tipo }}
+                            {% if form.tipo.errors %}
+                                <div class="text-danger small">{{ form.tipo.errors.0 }}</div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label for="{{ form.prioridad.id_for_label }}" class="form-label">Prioridad</label>
+                            {{ form.prioridad }}
+                            {% if form.prioridad.errors %}
+                                <div class="text-danger small">{{ form.prioridad.errors.0 }}</div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mb-3">
+                    <div class="alert alert-info">
+                        <i class="bi bi-info-circle-fill"></i>
+                        <strong>Plazos de Vencimiento:</strong>
+                        <ul class="mb-0 mt-2">
+                            <li><strong>Observaciones Normales:</strong> 120 días desde la creación</li>
+                            <li><strong>Observaciones Urgentes:</strong> 48 horas (2 días) desde la creación</li>
+                        </ul>
+                        <small class="text-muted">La fecha de vencimiento se asignará automáticamente según el tipo de observación.</small>
+                    </div>
+                </div>
+
+                <div class="mb-3">
+                    <div class="form-check">
+                        {{ form.es_urgente }}
+                        <label class="form-check-label" for="{{ form.es_urgente.id_for_label }}">
+                            <strong>{{ form.es_urgente.label }}</strong>
+                        </label>
+                        {% if form.es_urgente.help_text %}
+                            <div class="form-text">{{ form.es_urgente.help_text }}</div>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <div class="mb-3">
+                    <label for="archivos_adjuntos" class="form-label">Archivos Adjuntos</label>
+                    <div class="input-group">
+                        <input type="file" class="form-control" id="archivos_adjuntos" multiple 
+                               accept=".pdf,.doc,.docx,.jpg,.jpeg,.png,.gif,.bmp">
+                        <button type="button" class="btn btn-outline-primary" id="btn-agregar-archivos">
+                            <i class="bi bi-plus-circle"></i> Agregar
+                        </button>
+                    </div>
+                    <small class="form-text text-muted d-block mt-1">
+                        Formatos: PDF, DOC, DOCX, JPG, PNG, GIF, BMP. Tamaño máximo total: <strong>10MB</strong>
+                    </small>
+                </div>
+
+                <div id="archivos-seleccionados" class="mb-3"></div>
+
+                <div class="d-flex gap-2">
+                    <button type="submit" class="btn btn-techo-primary">Crear Observación</button>
+                    <a href="{% url 'incidencias:lista_observaciones' %}" class="btn btn-outline-secondary">Cancelar</a>
+                </div>
+            </form>
+        </div> <!-- Cierre form-techo -->
+        
+        </div> <!-- Cierre observacion-container -->
+    </div> <!-- Cierre col-lg-10 -->
+</div> <!-- Cierre row -->
+
+<script>
+// Script específico para formulario de observaciones
+document.addEventListener('DOMContentLoaded', function() {
+    const proyectoSelect = document.getElementById('id_proyecto');
+    const viviendaSelect = document.getElementById('id_vivienda');
+    const recintoSelect = document.getElementById('id_recinto');
+    const elementoSelect = document.getElementById('id_elemento_select');
+    const elementoInput = document.getElementById('id_elemento');
+
+    if (proyectoSelect) {
+        proyectoSelect.addEventListener('change', function() {
+            const proyectoId = this.value;
+
+            // Cargar viviendas
+            if (viviendaSelect) {
+                viviendaSelect.innerHTML = '<option value="">Cargando viviendas...</option>';
+                if (proyectoId) {
+                    fetch(`/incidencias/ajax/viviendas/?proyecto_id=${proyectoId}`)
+                        .then(response => response.json())
+                        .then(data => {
+                            viviendaSelect.innerHTML = '<option value="">Seleccionar vivienda</option>';
+                            data.viviendas.forEach(function(vivienda) {
+                                const option = document.createElement('option');
+                                option.value = vivienda.id;
+                                option.textContent = `Vivienda ${vivienda.codigo}`;
+                                viviendaSelect.appendChild(option);
+                            });
+                        });
+                } else {
+                    viviendaSelect.innerHTML = '<option value="">Seleccionar vivienda</option>';
+                }
+            }
+
+            // Limpiar recintos cuando cambia el proyecto
+            if (recintoSelect) {
+                recintoSelect.innerHTML = '<option value="">Primero seleccione una vivienda</option>';
+            }
+            
+            // Limpiar elementos
+            if (elementoSelect) {
+                elementoSelect.innerHTML = '<option value="">Seleccionar elemento</option>';
+            }
+        });
+    }
+
+    // Cargar recintos cuando se selecciona una vivienda (según su tipología)
+    if (viviendaSelect && recintoSelect) {
+        viviendaSelect.addEventListener('change', function() {
+            const viviendaId = this.value;
+
+            recintoSelect.innerHTML = '<option value="">Cargando recintos...</option>';
+            
+            if (viviendaId) {
+                fetch(`/incidencias/ajax/recintos-vivienda/?vivienda_id=${viviendaId}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        recintoSelect.innerHTML = '<option value="">Seleccionar recinto</option>';
+                        if (data.recintos && data.recintos.length > 0) {
+                            data.recintos.forEach(function(recinto) {
+                                const option = document.createElement('option');
+                                option.value = recinto.id;
+                                option.textContent = recinto.nombre;
+                                recintoSelect.appendChild(option);
+                            });
+                        } else {
+                            recintoSelect.innerHTML = '<option value="">No hay recintos disponibles</option>';
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error cargando recintos:', error);
+                        recintoSelect.innerHTML = '<option value="">Error al cargar recintos</option>';
+                    });
+            } else {
+                recintoSelect.innerHTML = '<option value="">Primero seleccione una vivienda</option>';
+            }
+            
+            // Limpiar elementos cuando cambia la vivienda
+            if (elementoSelect) {
+                elementoSelect.innerHTML = '<option value="">Seleccionar elemento</option>';
+            }
+        });
+    }
+
+    // Cargar elementos cuando se selecciona un recinto
+    if (recintoSelect && elementoSelect) {
+        recintoSelect.addEventListener('change', function() {
+            const recintoId = this.value;
+
+            elementoSelect.innerHTML = '<option value="">Cargando elementos...</option>';
+            
+            if (recintoId) {
+                fetch(`/incidencias/ajax/elementos/?recinto_id=${recintoId}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        elementoSelect.innerHTML = '<option value="">Seleccionar elemento</option>';
+                        if (data.elementos && data.elementos.length > 0) {
+                            data.elementos.forEach(function(elemento) {
+                                const option = document.createElement('option');
+                                option.value = elemento;
+                                option.textContent = elemento;
+                                elementoSelect.appendChild(option);
+                            });
+                        } else {
+                            elementoSelect.innerHTML = '<option value="">No hay elementos disponibles</option>';
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error cargando elementos:', error);
+                        elementoSelect.innerHTML = '<option value="">Error al cargar elementos</option>';
+                    });
+            } else {
+                elementoSelect.innerHTML = '<option value="">Seleccionar elemento</option>';
+            }
+        });
+    }
+
+    // Cuando se selecciona un elemento del select, llenar el input de texto
+    if (elementoSelect && elementoInput) {
+        elementoSelect.addEventListener('change', function() {
+            if (this.value) {
+                elementoInput.value = this.value;
+            }
+        });
+    }
+
+    // Sistema de archivos acumulativos
+    let archivosSeleccionados = [];
+    const MAX_SIZE_TOTAL = 10 * 1024 * 1024; // 10MB en bytes
+    
+    const archivosInput = document.getElementById('archivos_adjuntos');
+    const btnAgregarArchivos = document.getElementById('btn-agregar-archivos');
+    const archivosDiv = document.getElementById('archivos-seleccionados');
+    
+    if (archivosInput && btnAgregarArchivos) {
+        btnAgregarArchivos.addEventListener('click', function() {
+            const files = archivosInput.files;
+            
+            if (files.length === 0) {
+                alert('Por favor seleccione al menos un archivo');
+                return;
+            }
+            
+            // Agregar archivos a la lista
+            for (let i = 0; i < files.length; i++) {
+                archivosSeleccionados.push(files[i]);
+            }
+            
+            // Limpiar input
+            archivosInput.value = '';
+            
+            // Actualizar visualización
+            actualizarListaArchivos();
+        });
+        
+        // Permitir eliminar archivos de la lista
+        archivosDiv.addEventListener('click', function(e) {
+            if (e.target.classList.contains('btn-eliminar-archivo')) {
+                const index = parseInt(e.target.dataset.index);
+                archivosSeleccionados.splice(index, 1);
+                actualizarListaArchivos();
+            }
+        });
+    }
+    
+    function actualizarListaArchivos() {
+        if (archivosSeleccionados.length === 0) {
+            archivosDiv.innerHTML = '';
+            return;
+        }
+        
+        let sizeTotal = 0;
+        let html = '<div class="card"><div class="card-body">';
+        html += '<h6 class="card-title">Archivos seleccionados:</h6>';
+        html += '<div class="list-group list-group-flush">';
+        
+        archivosSeleccionados.forEach((file, index) => {
+            const size = (file.size / (1024 * 1024)).toFixed(2);
+            sizeTotal += file.size;
+            const icono = getFileIcon(file.name);
+            
+            html += `
+                <div class="list-group-item d-flex justify-content-between align-items-center">
+                    <div>
+                        <span>${icono}</span>
+                        <strong>${file.name}</strong>
+                        <small class="text-muted">(${size} MB)</small>
+                    </div>
+                    <button type="button" class="btn btn-sm btn-danger btn-eliminar-archivo" data-index="${index}">
+                        <i class="bi bi-trash"></i>
+                    </button>
+                </div>
+            `;
+        });
+        
+        html += '</div>';
+        
+        // Mostrar tamaño total
+        const sizeTotalMB = (sizeTotal / (1024 * 1024)).toFixed(2);
+        const porcentaje = ((sizeTotal / MAX_SIZE_TOTAL) * 100).toFixed(1);
+        
+        if (sizeTotal > MAX_SIZE_TOTAL) {
+            html += `
+                <div class="alert alert-danger mt-3 mb-0">
+                    <strong>⚠️ Tamaño total: ${sizeTotalMB} MB / 10 MB (${porcentaje}%)</strong><br>
+                    ¡El tamaño total excede el límite de 10MB! Por favor elimine algunos archivos.
+                </div>
+            `;
+        } else {
+            const alertClass = sizeTotal > MAX_SIZE_TOTAL * 0.8 ? 'alert-warning' : 'alert-info';
+            html += `
+                <div class="alert ${alertClass} mt-3 mb-0">
+                    Tamaño total: <strong>${sizeTotalMB} MB / 10 MB</strong> (${porcentaje}%)
+                </div>
+            `;
+        }
+        
+        html += '</div></div>';
+        archivosDiv.innerHTML = html;
+    }
+    
+    // Transferir archivos al formulario antes de enviar
+    const form = document.querySelector('form');
+    if (form) {
+        form.addEventListener('submit', function(e) {
+            // Validar tamaño total
+            let sizeTotal = 0;
+            archivosSeleccionados.forEach(file => {
+                sizeTotal += file.size;
+            });
+            
+            if (sizeTotal > MAX_SIZE_TOTAL) {
+                e.preventDefault();
+                alert('El tamaño total de los archivos excede el límite de 10MB. Por favor elimine algunos archivos.');
+                return false;
+            }
+            
+            if (archivosSeleccionados.length > 0) {
+                // Crear un DataTransfer para transferir los archivos al input
+                const dataTransfer = new DataTransfer();
+                archivosSeleccionados.forEach(file => {
+                    dataTransfer.items.add(file);
+                });
+                
+                // Crear un input hidden con los archivos
+                const inputHidden = document.createElement('input');
+                inputHidden.type = 'file';
+                inputHidden.name = 'archivos_adjuntos';
+                inputHidden.multiple = true;
+                inputHidden.files = dataTransfer.files;
+                inputHidden.style.display = 'none';
+                
+                form.appendChild(inputHidden);
+            }
+        });
+    }
+    
+    function getFileIcon(filename) {
+        const ext = filename.toLowerCase().split('.').pop();
+        const icons = {
+            'pdf': '📄',
+            'doc': '📝',
+            'docx': '📝',
+            'jpg': '🖼️',
+            'jpeg': '🖼️',
+            'png': '🖼️',
+            'gif': '🖼️',
+            'bmp': '🖼️'
+        };
+        return icons[ext] || '📁';
+    }
+});
+</script>
+{% endblock %}

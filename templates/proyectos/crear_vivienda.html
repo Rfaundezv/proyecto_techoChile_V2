@@ -1,0 +1,142 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}Agregar Vivienda - {{ proyecto.codigo }}{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-8">
+        <div class="form-techo">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <div>
+                    <h3 class="section-title">Agregar Nueva Vivienda</h3>
+                    <p class="section-subtitle">Proyecto: <strong>{{ proyecto.codigo }} - {{ proyecto.nombre }}</strong></p>
+                </div>
+                <div>
+                    <span class="badge bg-info">{{ proyecto.comuna.nombre }}, {{ proyecto.region.nombre }}</span>
+                </div>
+            </div>
+
+            <form method="post" novalidate>
+                {% csrf_token %}
+
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="mb-3">
+                            <label for="{{ form.codigo.id_for_label }}" class="form-label">
+                                <strong>Código de la Vivienda</strong> *
+                            </label>
+                            {{ form.codigo }}
+                            {% if form.codigo.errors %}
+                                <div class="text-danger small mt-1">{{ form.codigo.errors.0 }}</div>
+                            {% endif %}
+                            <small class="form-text text-muted">Ejemplo: A01, B02, C03</small>
+                        </div>
+                    </div>
+                    <div class="col-md-8">
+                        <div class="mb-3">
+                            <label for="{{ form.familia_beneficiaria.id_for_label }}" class="form-label">
+                                <strong>Beneficiario / Familia</strong> *
+                            </label>
+                            {% if vivienda and vivienda.beneficiario %}
+                                <p class="mb-1">{{ vivienda.beneficiario.nombre }}{% if vivienda.beneficiario.rut %} (RUT: {{ vivienda.beneficiario.rut }}){% endif %}</p>
+                                {{ form.familia_beneficiaria }}
+                            {% else %}
+                                {{ form.familia_beneficiaria }}
+                            {% endif %}
+                            {% if form.familia_beneficiaria.errors %}
+                                <div class="text-danger small mt-1">{{ form.familia_beneficiaria.errors.0 }}</div>
+                            {% endif %}
+                            <small class="form-text text-muted">Nombre completo de la familia</small>
+                        </div>
+                        <div class="mb-3">
+                            <label for="{{ form.beneficiario.id_for_label }}" class="form-label">
+                                <strong>Beneficiario (opcional)</strong>
+                            </label>
+                            {{ form.beneficiario }}
+                            {% if form.beneficiario.errors %}
+                                <div class="text-danger small mt-1">{{ form.beneficiario.errors.0 }}</div>
+                            {% endif %}
+                            <small class="form-text text-muted">Seleccionar beneficiario existente si corresponde</small>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label for="{{ form.tipologia.id_for_label }}" class="form-label">
+                                <strong>Tipología de Vivienda</strong> *
+                            </label>
+                            {{ form.tipologia }}
+                            {% if form.tipologia.errors %}
+                                <div class="text-danger small mt-1">{{ form.tipologia.errors.0 }}</div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label for="{{ form.estado.id_for_label }}" class="form-label">
+                                <strong>Estado de la Vivienda</strong>
+                            </label>
+                            {{ form.estado }}
+                            {% if form.estado.errors %}
+                                <div class="text-danger small mt-1">{{ form.estado.errors.0 }}</div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mb-3">
+                    <label for="{{ form.fecha_entrega.id_for_label }}" class="form-label">
+                        <strong>Fecha de Entrega Estimada</strong>
+                    </label>
+                    {{ form.fecha_entrega }}
+                    {% if form.fecha_entrega.errors %}
+                        <div class="text-danger small mt-1">{{ form.fecha_entrega.errors.0 }}</div>
+                    {% endif %}
+                    <small class="form-text text-muted">Fecha estimada de entrega de la vivienda</small>
+                </div>
+
+                <div class="mb-4">
+                    <label for="{{ form.observaciones_generales.id_for_label }}" class="form-label">
+                        <strong>Observaciones Generales</strong>
+                    </label>
+                    {{ form.observaciones_generales }}
+                    {% if form.observaciones_generales.errors %}
+                        <div class="text-danger small mt-1">{{ form.observaciones_generales.errors.0 }}</div>
+                    {% endif %}
+                    <small class="form-text text-muted">Notas adicionales sobre la vivienda</small>
+                </div>
+
+                <!-- Información del proyecto -->
+                <div class="alert alert-info">
+                    <h6><strong>📍 Información del Proyecto</strong></h6>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <small><strong>Constructora:</strong> {{ proyecto.constructora }}</small><br>
+                            <small><strong>Fecha Entrega Proyecto:</strong> {{ proyecto.fecha_entrega|date:"d/m/Y" }}</small>
+                        </div>
+                        <div class="col-md-6">
+                            <small><strong>Estado Postventa:</strong> 
+                                <span class="badge {% if proyecto.estado_postventa == 'Vigente' %}bg-success{% elif proyecto.estado_postventa == 'Por vencer' %}bg-warning{% else %}bg-danger{% endif %}">
+                                    {{ proyecto.estado_postventa }}
+                                </span>
+                            </small><br>
+                            <small><strong>Días restantes:</strong> {{ proyecto.dias_restantes_postventa }} días</small>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="d-flex gap-2">
+                    <button type="submit" class="btn btn-techo-primary">
+                        <i class="bi bi-house-add"></i> Crear Vivienda
+                    </button>
+                    <a href="{% url 'proyectos:detalle' proyecto.pk %}" class="btn btn-outline-secondary">
+                        <i class="bi bi-arrow-left"></i> Cancelar
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}TECHO CHILE - Sistema de Gestión{% endblock %}</title>
+    {% load static %}
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    <link href="{% static 'css/techo_style.css' %}?v={{ timestamp }}" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <!-- Header Principal -->
+    {% if user.is_authenticated %}
+    <header class="techo-header sticky-top">
+        <div class="container-fluid">
+            <!-- Fila principal con hamburguesa, título y estadísticas -->
+            <div class="d-flex justify-content-between align-items-center py-2">
+                <!-- Botón hamburguesa (solo móvil) -->
+                <button class="navbar-toggler d-lg-none" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                    <i class="bi bi-list fs-3"></i>
+                </button>
+                
+                <!-- Título (solo desktop) -->
+                <div class="d-none d-lg-block">
+                    <h1 class="header-title mb-0">TECHO CHILE - SEGUIMIENTO DE INCIDENTES</h1>
+                </div>
+                
+                <!-- Estadísticas con botón de tema integrado -->
+                <div class="d-flex gap-2 align-items-center flex-grow-1 justify-content-center justify-content-lg-end">
+                    <div class="header-stats d-flex gap-2 gap-md-3 flex-wrap justify-content-center">
+                        <div class="stat-item">
+                            <span class="stat-label">Proyectos:</span>
+                            <span class="stat-value">{{ total_proyectos }}</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-label">Observaciones:</span>
+                            <span class="stat-value">{{ obs_total }}</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-label">Viviendas:</span>
+                            <span class="stat-value">{{ viviendas_total }}</span>
+                        </div>
+                    </div>
+                    
+                    <!-- Toggle de tema oscuro/claro -->
+                    <button id="theme-toggle" class="btn btn-sm btn-outline-light flex-shrink-0" title="Cambiar tema" style="min-width: 40px;">
+                        🌙
+                    </button>
+                </div>
+            </div>
+        </div>
+    </header>
+    {% else %}
+    <!-- Toggle de tema para página de login -->
+    <button id="theme-toggle" class="theme-toggle" title="Cambiar tema">
+        🌙
+    </button>
+    {% endif %}
+
+    <!-- Navigation Tabs (solo visible después de login) -->
+    {% if user.is_authenticated %}
+    <nav class="techo-nav">
+        <div class="container-fluid">
+            <div class="collapse navbar-collapse d-lg-block" id="navbarNav">
+                <ul class="nav nav-tabs flex-column flex-lg-row">
+                    <li class="nav-item">
+                        <a class="nav-link {% if request.resolver_match.url_name == 'dashboard' %}active{% endif %}" 
+                           href="{% url 'dashboard' %}">
+                            <i class="bi bi-speedometer2"></i> Mi dashboard
+                        </a>
+                    </li>
+                    
+                    {% if user.is_superuser or is_admin %}
+                    <li class="nav-item">
+                        <a class="nav-link {% if 'proyectos' in request.resolver_match.namespace %}active{% endif %}" 
+                           href="{% url 'proyectos:lista' %}">
+                            <i class="bi bi-building"></i> Proyectos
+                        </a>
+                    </li>
+                    {% endif %}
+                    
+                    {% if not es_familia %}
+                    <li class="nav-item">
+                        <a class="nav-link {% if 'incidencias' in request.resolver_match.namespace %}active{% endif %}" 
+                           href="{% url 'incidencias:lista_observaciones' %}">
+                            <i class="bi bi-exclamation-triangle"></i> Observaciones
+                        </a>
+                    </li>
+                    {% endif %}
+                    
+                    {% if es_familia %}
+                    <li class="nav-item">
+                        <a class="nav-link {% if 'incidencias' in request.resolver_match.namespace %}active{% endif %}" 
+                           href="{% url 'incidencias:lista_observaciones' %}">
+                            <i class="bi bi-exclamation-triangle"></i> Mis Observaciones
+                        </a>
+                    </li>
+                    {% endif %}
+                    
+                    {% if user.is_superuser or is_admin %}
+                    <li class="nav-item">
+                        <a class="nav-link {% if request.resolver_match.url_name == 'maestro_index' %}active{% endif %}"
+                           href="{% url 'maestro_index' %}">
+                            <i class="bi bi-gear"></i> <b>Panel Maestro</b>
+                        </a>
+                    </li>
+                    {% endif %}
+                    
+                    {% if not es_familia %}
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">
+                            <i class="bi bi-file-earmark-text"></i> Reportes
+                        </a>
+                    </li>
+                    {% endif %}
+                    
+                    <li class="nav-item ms-lg-auto">
+                            <span class="nav-link text-muted small">
+                                <i class="bi bi-person-badge"></i> {{ user.username }}
+                            </span>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'logout' %}">
+                            <i class="bi bi-box-arrow-right"></i> Cerrar Sesión
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+    {% endif %}
+
+    <!-- Messages -->
+    {% if messages %}
+    <div class="container-fluid mt-3">
+        {% for message in messages %}
+        <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <div class="container-fluid py-4">
+            {% block content %}{% endblock %}
+        </div>
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="{% load static %}{% static 'js/techo_dashboard.js' %}"></script>
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

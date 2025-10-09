@@ -1,0 +1,478 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Mi Dashboard - TECHO CHILE{% endblock %}
+
+{% block content %}
+<style>
+/* Estilos específicos para las métricas del dashboard */
+.metric-number {
+    font-size: 2rem !important;
+    font-weight: bold !important;
+    margin: 0 !important;
+    line-height: 1 !important;
+}
+
+.metric-card:hover {
+    transform: translateY(-5px) !important;
+    box-shadow: 0 8px 25px rgba(0,0,0,0.1) !important;
+}
+
+/* Efectos hover específicos por color */
+.metric-card.success:hover { 
+    background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%) !important;
+    color: white !important;
+}
+.metric-card.warning:hover { 
+    background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%) !important;
+    color: white !important;
+}
+.metric-card.danger:hover { 
+    background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%) !important;
+    color: white !important;
+}
+.metric-card:hover { 
+    background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%) !important;
+    color: white !important;
+}
+
+/* Hover para tarjetas enlazadas */
+a .metric-card.success:hover { 
+    background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%) !important;
+    color: white !important;
+}
+a .metric-card.warning:hover { 
+    background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%) !important;
+    color: white !important;
+}
+a .metric-card.danger:hover { 
+    background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%) !important;
+    color: white !important;
+}
+a .metric-card:hover { 
+    background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%) !important;
+    color: white !important;
+}
+
+/* Texto en hover */
+.metric-card:hover .metric-number,
+.metric-card:hover .metric-label,
+a .metric-card:hover .metric-number,
+a .metric-card:hover .metric-label {
+    color: white !important;
+}
+</style>
+
+{% if es_familia %}
+<!-- ================================ -->
+<!-- DASHBOARD ESPECIAL PARA FAMILIA -->
+<!-- ================================ -->
+<div class="section-header">
+    <h2 class="section-title">Mi Vivienda</h2>
+    {% if mi_vivienda %}
+    <p class="section-subtitle">Información y seguimiento de tu vivienda - {{ mi_vivienda.proyecto.nombre }}</p>
+    {% else %}
+    <p class="section-subtitle text-warning">No se encontró una vivienda asignada a tu cuenta</p>
+    {% endif %}
+</div>
+
+{% if sin_vivienda %}
+<div class="alert alert-warning">
+    <i class="bi bi-exclamation-triangle"></i> 
+    <strong>Atención:</strong> No tienes una vivienda asignada en el sistema. 
+    Por favor contacta con el administrador.
+</div>
+{% else %}
+
+<!-- Información de la vivienda -->
+{% if mi_vivienda %}
+<div class="chart-container mb-4">
+    <h4><i class="bi bi-house-door"></i> Datos de mi vivienda</h4>
+    <div class="row g-3">
+        <div class="col-md-6">
+            <p><strong>Código:</strong> {{ mi_vivienda.codigo }}</p>
+            <p><strong>Proyecto:</strong> {{ mi_vivienda.proyecto.nombre }}</p>
+            <p><strong>Dirección:</strong> {{ mi_vivienda.direccion }}</p>
+        </div>
+        <div class="col-md-6">
+            <p><strong>Comuna:</strong> {{ mi_vivienda.proyecto.comuna.nombre }}</p>
+            <p><strong>Estado:</strong> 
+                <span class="badge bg-{% if mi_vivienda.estado == 'entregada' %}success{% else %}warning{% endif %}">
+                    {{ mi_vivienda.estado|title }}
+                </span>
+            </p>
+            <p><strong>Tipología:</strong> {{ mi_vivienda.tipologia.nombre|default:"No especificada" }}</p>
+        </div>
+    </div>
+</div>
+{% endif %}
+
+<!-- Métricas de observaciones -->
+<div class="chart-container mb-4">
+    <h4><i class="bi bi-exclamation-triangle"></i> Mis Observaciones</h4>
+    <div class="row g-3 g-md-4">
+        <div class="col-6 col-lg-3">
+            <div class="metric-card text-center">
+                <h3 class="metric-number display-3">{{ obs_total|default:"0" }}</h3>
+                <p class="metric-label">Total</p>
+            </div>
+        </div>
+        <div class="col-6 col-lg-3">
+            <div class="metric-card warning text-center">
+                <h3 class="metric-number display-3">{{ obs_abiertas|default:"0" }}</h3>
+                <p class="metric-label">Abiertas</p>
+            </div>
+        </div>
+        <div class="col-6 col-lg-3">
+            <div class="metric-card danger text-center">
+                <h3 class="metric-number display-3">{{ obs_urgentes|default:"0" }}</h3>
+                <p class="metric-label">Urgentes</p>
+            </div>
+        </div>
+        <div class="col-6 col-lg-3">
+            <div class="metric-card success text-center">
+                <h3 class="metric-number display-3">{{ obs_cerradas|default:"0" }}</h3>
+                <p class="metric-label">Resueltas</p>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Barra de progreso -->
+    {% if obs_total > 0 %}
+    <div class="techo-progress mb-3 mt-4">
+        <div class="progress-bar bg-success" style="width: {{ porc_cerradas }}%">
+            {{ obs_cerradas }} resueltas
+        </div>
+        <div class="progress-bar bg-warning" style="width: {{ porc_abiertas }}%">
+            {{ obs_abiertas }} abiertas
+        </div>
+        {% if obs_vencidas > 0 %}
+        <div class="progress-bar bg-danger" style="width: {{ porc_vencidas }}%">
+            {{ obs_vencidas }} vencidas
+        </div>
+        {% endif %}
+    </div>
+    <div class="text-center">
+        <span class="badge bg-success fs-6 px-3 py-2">{{ porc_cerradas }}%</span>
+        <div class="small text-muted mt-2">{{ porc_cerradas }}% de tus observaciones han sido resueltas</div>
+    </div>
+    {% endif %}
+</div>
+
+<!-- Últimas observaciones de SU vivienda -->
+{% if ultimas_observaciones %}
+<div class="chart-container">
+    <h4><i class="bi bi-clock-history"></i> Últimas observaciones de mi vivienda</h4>
+    <div class="table-responsive">
+        <table class="table table-hover">
+            <thead>
+                <tr>
+                    <th>Fecha</th>
+                    <th>Elemento</th>
+                    <th>Detalle</th>
+                    <th>Estado</th>
+                    <th>Días restantes</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for obs in ultimas_observaciones %}
+                <tr>
+                    <td>{{ obs.fecha_creacion|date:"d/m/Y" }}</td>
+                    <td><strong>{{ obs.elemento }}</strong></td>
+                    <td>{{ obs.detalle|truncatewords:10 }}</td>
+                    <td>
+                        <span class="badge 
+                            {% if obs.estado.nombre == 'Abierta' %}bg-warning
+                            {% elif obs.estado.nombre == 'Cerrada' %}bg-success
+                            {% else %}bg-secondary{% endif %}">
+                            {{ obs.estado.nombre }}
+                        </span>
+                    </td>
+                    <td>
+                        {% if obs.dias_para_vencer %}
+                            {% if obs.dias_para_vencer > 0 %}
+                                <span class="text-success">{{ obs.dias_para_vencer }} días</span>
+                            {% else %}
+                                <span class="text-danger">Vencida</span>
+                            {% endif %}
+                        {% else %}
+                            <span class="text-muted">-</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        <a href="{% url 'incidencias:detalle_observacion' obs.pk %}" class="btn btn-sm btn-outline-primary">
+                            <i class="bi bi-eye"></i> Ver
+                        </a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    <div class="text-center mt-3">
+        <a href="{% url 'incidencias:lista_observaciones' %}" class="btn btn-primary">
+            <i class="bi bi-list-ul"></i> Ver todas mis observaciones
+        </a>
+    </div>
+</div>
+{% else %}
+<div class="alert alert-info">
+    <i class="bi bi-info-circle"></i> No tienes observaciones registradas todavía.
+    {% if mi_vivienda %}
+    <br><a href="{% url 'incidencias:crear_observacion' %}" class="btn btn-sm btn-primary mt-2">
+        <i class="bi bi-plus-circle"></i> Crear primera observación
+    </a>
+    {% endif %}
+</div>
+{% endif %}
+
+{% endif %}
+
+{% else %}
+<!-- ====================================== -->
+<!-- DASHBOARD NORMAL PARA OTROS ROLES -->
+<!-- ====================================== -->
+<div class="section-header">
+    <h2 class="section-title">Resumen de mi gestión</h2>
+    <p class="section-subtitle">Panel de control con métricas clave de Techo Chile</p>
+</div>
+
+<div class="chart-container" style="border-radius: 0 0 12px 12px; margin-top: 0;">
+    <div class="row g-3 g-md-4 mb-4">
+        <!-- Tarjetas de métricas de Techo Chile -->
+        <div class="col-6 col-lg-3">
+            <a href="{% url 'proyectos:lista' %}" class="text-decoration-none">
+                <div class="metric-card text-center" style="cursor: pointer; transition: transform 0.2s;">
+                    <h3 class="metric-number display-2">{{ total_proyectos|default:"8" }}</h3>
+                    <p class="metric-label">Proyectos<br class="d-none d-sm-inline">asignados</p>
+                </div>
+            </a>
+        </div>
+        <div class="col-6 col-lg-3">
+            <a href="{% url 'incidencias:lista_observaciones' %}?estado_nombre=Abierta" class="text-decoration-none">
+                <div class="metric-card warning text-center" style="cursor: pointer; transition: transform 0.2s;">
+                    <h3 class="metric-number display-2">{{ obs_abiertas|default:"15" }}</h3>
+                    <p class="metric-label">Observaciones<br class="d-none d-sm-inline">abiertas</p>
+                </div>
+            </a>
+        </div>
+        <div class="col-6 col-lg-3">
+            <a href="{% url 'incidencias:lista_observaciones' %}?es_urgente=1&estado_nombre=Abierta" class="text-decoration-none">
+                <div class="metric-card danger text-center" style="cursor: pointer; transition: transform 0.2s;">
+                    <h3 class="metric-number display-2">{{ obs_urgentes|default:"3" }}</h3>
+                    <p class="metric-label">Observaciones<br class="d-none d-sm-inline">urgentes</p>
+                </div>
+            </a>
+        </div>
+        <div class="col-6 col-lg-3">
+            <a href="{% url 'incidencias:lista_observaciones' %}?estado_nombre=Cerrada" class="text-decoration-none">
+                <div class="metric-card success text-center" style="cursor: pointer; transition: transform 0.2s;">
+                    <h3 class="metric-number display-2">{{ obs_cerradas|default:"142" }}</h3>
+                    <p class="metric-label">Observaciones<br class="d-none d-sm-inline">cerradas</p>
+                </div>
+            </a>
+        </div>
+    </div>
+
+    <!-- Barra de progreso de observaciones -->
+    <div class="row">
+        <div class="col-12">
+            <div class="techo-progress mb-3">
+                <div class="progress-bar bg-success" style="width: {{ porc_cerradas|default:"87.2" }}%">
+                    {{ obs_cerradas|default:"142" }} observaciones cerradas
+                </div>
+                <div class="progress-bar bg-warning" style="width: {{ porc_abiertas|default:"9.2" }}%">
+                    {{ obs_abiertas|default:"15" }} abiertas
+                </div>
+                <div class="progress-bar bg-danger" style="width: {{ porc_vencidas|default:"3.6" }}%">
+                    {{ obs_vencidas|default:"6" }} vencidas
+                </div>
+            </div>
+
+            <div class="text-center">
+                <span class="badge bg-success fs-6 px-3 py-2">{{ porc_cerradas|default:"87.2" }}%</span>
+                <div class="small text-muted mt-2">{{ porc_cerradas|default:"87.2" }}% de avance total de tu gestión</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Panel lateral de avance -->
+<div class="row g-4 mt-4">
+    <div class="col-lg-8">
+        <div class="chart-container">
+            <h4>Últimas observaciones</h4>
+            
+            <!-- Vista de tabla para desktop -->
+            <div class="table-responsive d-none d-md-block">
+                <table class="table table-techo">
+                    <thead>
+                        <tr>
+                            <th>Proyecto</th>
+                            <th>Vivienda</th>
+                            <th>Elemento</th>
+                            <th>Estado</th>
+                            <th>Fecha</th>
+                            <th>Acción</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for obs in ultimas_observaciones %}
+                        <tr>
+                            <td><strong>{{ obs.proyecto.codigo }}</strong></td>
+                            <td>{{ obs.vivienda.codigo }}</td>
+                            <td>{{ obs.elemento|truncatechars:30 }}</td>
+                            <td><span class="badge badge-{{ obs.estado.nombre|lower }}">{{ obs.estado.nombre }}</span></td>
+                            <td>{{ obs.fecha_creacion|date:"d/m/Y" }}</td>
+                            <td>
+                                <a href="{% url 'incidencias:detalle_observacion' obs.pk %}" class="btn btn-sm btn-outline-info">Ver</a>
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="6" class="text-center text-muted">No hay observaciones recientes</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Vista de tarjetas para móvil -->
+            <div class="d-md-none">
+                {% for obs in ultimas_observaciones %}
+                <div class="obs-card-mobile mb-3">
+                    <div class="d-flex justify-content-between align-items-start mb-2">
+                        <div>
+                            <strong class="text-primary">{{ obs.proyecto.codigo }}</strong>
+                            <span class="text-muted ms-2">Viv. {{ obs.vivienda.codigo }}</span>
+                        </div>
+                        <span class="badge badge-{{ obs.estado.nombre|lower }}">{{ obs.estado.nombre }}</span>
+                    </div>
+                    <div class="mb-2">
+                        <i class="bi bi-tools text-muted"></i>
+                        <strong>{{ obs.elemento }}</strong>
+                    </div>
+                    <div class="d-flex justify-content-between align-items-center">
+                        <small class="text-muted">
+                            <i class="bi bi-calendar3"></i> {{ obs.fecha_creacion|date:"d/m/Y" }}
+                        </small>
+                        <a href="{% url 'incidencias:detalle_observacion' obs.pk %}" class="btn btn-sm btn-techo-primary">
+                            Ver detalle
+                        </a>
+                    </div>
+                </div>
+                {% empty %}
+                <div class="text-center text-muted py-4">No hay observaciones recientes</div>
+                {% endfor %}
+            </div>
+
+            <div class="text-center mt-3">
+                <a href="{% url 'incidencias:lista_observaciones' %}" class="btn btn-techo-primary">Ver todas las observaciones</a>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-4">
+        <div class="avance-panel">
+            <h5>Avance por estado</h5>
+
+            <div class="text-center mb-4">
+                <canvas id="statusChart" width="150" height="150"></canvas>
+            </div>
+
+            <ul class="avance-stats">
+                <li>
+                    <div>
+                        <div class="avance-percentage">{{ porc_cerradas|default:"87.2" }}%</div>
+                        <div class="avance-description">Observaciones cerradas</div>
+                    </div>
+                    <div class="text-end">
+                        <div class="small">Llevas <strong>{{ obs_cerradas|default:"142" }} de {{ obs_total|default:"163" }}</strong></div>
+                        <div class="small text-success">Observaciones del plan</div>
+                    </div>
+                </li>
+                <li>
+                    <div>
+                        <div class="avance-percentage">{{ porc_abiertas|default:"9.2" }}%</div>
+                        <div class="avance-description">Observaciones abiertas</div>
+                    </div>
+                    <div class="text-end">
+                        <div class="small">Llevas <strong>{{ obs_abiertas|default:"15" }} de {{ obs_total|default:"163" }}</strong></div>
+                        <div class="small text-warning">Observaciones pendientes</div>
+                    </div>
+                </li>
+            </ul>
+
+            <div class="avance-summary">
+                <h6 class="text-success">{{ obs_cerradas|default:"142" }} observaciones resueltas</h6>
+                <h6 class="text-primary">+{{ obs_abiertas|default:"15" }} observaciones abiertas</h6>
+                <p class="small">{{ porc_cerradas|default:"87.2" }}% de avance total de tu gestión</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Acciones rápidas de Techo Chile -->
+<div class="row mt-5">
+    <div class="col-12">
+        <div class="chart-container">
+            <h4 class="mb-4">Acciones rápidas</h4>
+            <div class="row g-3">
+                <div class="col-md-3">
+                    <a href="{% url 'proyectos:crear' %}" class="btn btn-techo-primary w-100">
+                    Nuevo Proyecto
+                    </a>
+                </div>
+                <div class="col-md-3">
+                    <a href="{% url 'incidencias:crear_observacion' %}" class="btn btn-techo-orange w-100">
+                        Nueva Observación
+                    </a>
+                </div>
+                <div class="col-md-3">
+                    <a href="{% url 'proyectos:lista' %}" class="btn btn-outline-primary w-100">
+                        Ver Proyectos
+                    </a>
+                </div>
+                <div class="col-md-3">
+                    <a href="{% url 'incidencias:lista_observaciones' %}" class="btn btn-outline-secondary w-100">
+                        Ver Observaciones
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// Inicializar gráfico circular de Techo Chile
+document.addEventListener('DOMContentLoaded', function() {
+    const ctx = document.getElementById('statusChart').getContext('2d');
+    new Chart(ctx, {
+        type: 'doughnut',
+        data: {
+            labels: ['Cerradas', 'Abiertas', 'Vencidas'],
+            datasets: [{
+                data: [{{ obs_cerradas|default:"142" }}, {{ obs_abiertas|default:"15" }}, {{ obs_vencidas|default:"6" }}],
+                backgroundColor: ['#22c55e', '#fbbf24', '#ef4444'],
+                borderWidth: 0,
+                cutout: '70%'
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    display: false
+                }
+            }
+        }
+    });
+});
+</script>
+
+{% endif %}
+<!-- FIN DEL BLOQUE PARA OTROS ROLES -->
+
+{% endblock %}

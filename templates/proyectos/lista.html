@@ -1,0 +1,145 @@
+{% extends 'base.html' %}
+{% block title %}Proyectos - TECHO CHILE{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2 class="section-title">Gestión de Proyectos</h2>
+    <a href="{% url 'proyectos:crear' %}" class="btn btn-techo-primary">
+        ➕ Nuevo Proyecto
+    </a>
+</div>
+
+<!-- Filtros -->
+<div class="chart-container mb-4">
+    <form method="get" class="row g-3">
+        <div class="col-md-6">
+            <input type="text" class="form-control" name="search" placeholder="Buscar proyectos..." value="{{ search }}">
+        </div>
+        <div class="col-md-3">
+            <button type="submit" class="btn btn-outline-primary">🔍 Buscar</button>
+            <a href="{% url 'proyectos:lista' %}" class="btn btn-outline-secondary">Limpiar</a>
+        </div>
+    </form>
+</div>
+
+<!-- Lista de proyectos -->
+<div class="chart-container">
+    <!-- Vista Desktop: Tabla -->
+    <div class="table-responsive d-none d-md-block">
+        <table class="table table-techo">
+            <thead>
+                <tr>
+                    <th>Código</th>
+                    <th>Nombre</th>
+                    <th>Constructora</th>
+                    <th>Ubicación</th>
+                    <th>Fecha Entrega</th>
+                    <th>Estado Postventa</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for proyecto in proyectos %}
+                <tr>
+                    <td><strong>{{ proyecto.codigo }}</strong></td>
+                    <td>{{ proyecto.nombre }}</td>
+                    <td>{{ proyecto.constructora }}</td>
+                    <td>{{ proyecto.comuna.nombre }}, {{ proyecto.region.nombre }}</td>
+                    <td>{{ proyecto.fecha_entrega|date:"d/m/Y" }}</td>
+                    <td>
+                        <span class="badge {% if proyecto.estado_postventa == 'Vigente' %}bg-success{% elif proyecto.estado_postventa == 'Por vencer' %}bg-warning{% else %}bg-danger{% endif %}">
+                            {{ proyecto.estado_postventa }}
+                        </span>
+                    </td>
+                    <td>
+                        <a href="{% url 'proyectos:detalle' proyecto.pk %}" class="btn btn-sm btn-outline-info">Ver</a>
+                        <a href="{% url 'proyectos:editar' proyecto.pk %}" class="btn btn-sm btn-outline-warning">Editar</a>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="7" class="text-center text-muted">No se encontraron proyectos</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Vista Móvil: Tarjetas -->
+    <div class="d-md-none">
+        {% for proyecto in proyectos %}
+        <div class="obs-card-mobile mb-3">
+            <!-- Encabezado: Código y Estado -->
+            <div class="d-flex justify-content-between align-items-start mb-2">
+                <div>
+                    <strong style="font-size: 1.1rem;">{{ proyecto.codigo }}</strong>
+                </div>
+                <span class="badge {% if proyecto.estado_postventa == 'Vigente' %}bg-success{% elif proyecto.estado_postventa == 'Por vencer' %}bg-warning{% else %}bg-danger{% endif %}">
+                    {{ proyecto.estado_postventa }}
+                </span>
+            </div>
+
+            <!-- Nombre del proyecto -->
+            <div class="mb-2">
+                <strong style="color: var(--techo-blue);">{{ proyecto.nombre }}</strong>
+            </div>
+
+            <!-- Constructora -->
+            <div class="mb-2">
+                <i class="bi bi-building"></i>
+                <span>{{ proyecto.constructora }}</span>
+            </div>
+
+            <!-- Ubicación -->
+            <div class="mb-2">
+                <i class="bi bi-geo-alt"></i>
+                <small class="text-muted">{{ proyecto.comuna.nombre }}, {{ proyecto.region.nombre }}</small>
+            </div>
+
+            <!-- Fecha de entrega -->
+            <div class="mb-3">
+                <i class="bi bi-calendar3"></i>
+                <small class="text-muted">Entrega: {{ proyecto.fecha_entrega|date:"d/m/Y" }}</small>
+            </div>
+
+            <!-- Botones de acción -->
+            <div class="d-flex gap-2">
+                <a href="{% url 'proyectos:detalle' proyecto.pk %}" class="btn btn-sm btn-techo-primary flex-grow-1">
+                    Ver detalle
+                </a>
+                <a href="{% url 'proyectos:editar' proyecto.pk %}" class="btn btn-sm btn-outline-warning">
+                    Editar
+                </a>
+            </div>
+        </div>
+        {% empty %}
+        <div class="text-center text-muted py-4">
+            <p>No se encontraron proyectos</p>
+        </div>
+        {% endfor %}
+    </div>
+
+    <!-- Paginación -->
+    {% if proyectos.has_other_pages %}
+    <nav>
+        <ul class="pagination justify-content-center">
+            {% if proyectos.has_previous %}
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ proyectos.previous_page_number }}{% if search %}&search={{ search }}{% endif %}">Anterior</a>
+                </li>
+            {% endif %}
+
+            <li class="page-item active">
+                <span class="page-link">Página {{ proyectos.number }} de {{ proyectos.paginator.num_pages }}</span>
+            </li>
+
+            {% if proyectos.has_next %}
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ proyectos.next_page_number }}{% if search %}&search={{ search }}{% endif %}">Siguiente</a>
+                </li>
+            {% endif %}
+        </ul>
+    </nav>
+    {% endif %}
+</div>
+{% endblock %}

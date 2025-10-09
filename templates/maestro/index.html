@@ -1,0 +1,124 @@
+{% extends "base.html" %}
+
+{% block title %}Panel Maestro - {{ block.super }}{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row mb-4">
+        <div class="col-12">
+            <h2>Panel Maestro</h2>
+            <p class="lead">Accesos directos para la creación y gestión de elementos clave en el sistema.</p>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- Gestión de Roles -->
+        <div class="col-md-4 mb-4">
+            <div class="card h-100 shadow-sm">
+                <div class="card-body d-flex flex-column">
+                    <h5 class="card-title">Roles</h5>
+                    <p class="card-text">Administrar los roles de usuario.</p>
+                    <div class="mt-auto">
+                        <a href="{% url 'maestro_rol_list' %}" class="btn btn-primary">Gestionar Roles</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Gestión de Constructoras -->
+        <div class="col-md-4 mb-4">
+            <div class="card h-100 shadow-sm">
+                <div class="card-body d-flex flex-column">
+                    <h5 class="card-title">Constructoras</h5>
+                    <p class="card-text">Administrar las empresas constructoras.</p>
+                    <div class="mt-auto">
+                        <a href="{% url 'maestro_constructora_list' %}" class="btn btn-primary">Gestionar Constructoras</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Gestión de Beneficiarios -->
+        <div class="col-md-4 mb-4">
+            <div class="card h-100 shadow-sm">
+                <div class="card-body d-flex flex-column">
+                    <h5 class="card-title">Beneficiarios</h5>
+                    <p class="card-text">Administrar beneficiarios del sistema.</p>
+                    <div class="mt-auto">
+                        <a href="{% url 'maestro_beneficiario_list' %}" class="btn btn-primary">Gestionar Beneficiarios</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Gestión de Usuarios -->
+        <div class="col-md-4 mb-4">
+            <div class="card h-100 shadow-sm">
+                <div class="card-body d-flex flex-column">
+                    <h5 class="card-title">Usuarios</h5>
+                    <p class="card-text">Administrar usuarios del sistema.</p>
+                    <div class="mt-auto">
+                        <a href="{% url 'maestro_usuario_list' %}" class="btn btn-primary">Gestionar Usuarios</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Gestión de Proyectos -->
+        <div class="col-md-4 mb-4">
+            <div class="card h-100 shadow-sm">
+                <div class="card-body d-flex flex-column">
+                    <h5 class="card-title">Proyectos</h5>
+                    <p class="card-text">Administrar proyectos del sistema.</p>
+                    <div class="mt-auto">
+                        <a href="{% url 'maestro_proyecto_list' %}" class="btn btn-primary">Gestionar Proyectos</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Gestión de Viviendas -->
+        <div class="col-md-4 mb-4">
+            <div class="card h-100 shadow-sm">
+                <div class="card-body d-flex flex-column">
+                    <h5 class="card-title">Viviendas</h5>
+                    <p class="card-text">Administrar viviendas del sistema.</p>
+                    <div class="mt-auto">
+                        <a href="{% url 'maestro_vivienda_list' %}" class="btn btn-primary">Gestionar Viviendas</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Gestión de Observaciones -->
+        <div class="col-md-4 mb-4">
+            <div class="card h-100 shadow-sm">
+                <div class="card-body d-flex flex-column">
+                    <h5 class="card-title">Observaciones</h5>
+                    <p class="card-text">Administrar observaciones e incidencias.</p>
+                     <div class="mt-auto">
+                        <a href="{% url 'maestro_observacion_list' %}" class="btn btn-primary">Gestionar Observaciones</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Configuración de Observaciones -->
+        <div class="col-md-4 mb-4">
+            <div class="card h-100 shadow-sm border-warning">
+                <div class="card-body d-flex flex-column">
+                    <h5 class="card-title">
+                        <i class="bi bi-gear-fill"></i> Configuración de Observaciones
+                    </h5>
+                    <p class="card-text">Configurar tiempos de vencimiento por defecto.</p>
+                     <div class="mt-auto">
+                        <a href="{% url 'maestro_configuracion_observacion' %}" class="btn btn-warning">
+                            <i class="bi bi-clock"></i> Configurar Tiempos
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

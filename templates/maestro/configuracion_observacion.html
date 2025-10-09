@@ -1,0 +1,152 @@
+{% extends "base.html" %}
+
+{% block title %}{{ titulo }} - {{ block.super }}{% endblock %}
+
+{% block extra_css %}
+<style>
+    .form-control:focus, .form-select:focus {
+        border-color: #00a7e1;
+        box-shadow: 0 0 0 0.2rem rgba(0, 167, 225, 0.25);
+    }
+    .info-card {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border-radius: 10px;
+        padding: 20px;
+        margin-bottom: 20px;
+    }
+    .config-value {
+        font-size: 2rem;
+        font-weight: bold;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-md-8 offset-md-2">
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h4 class="mb-0">
+                        <i class="bi bi-gear-fill"></i> {{ titulo }}
+                    </h4>
+                </div>
+                <div class="card-body">
+                    <!-- Información actual -->
+                    <div class="row mb-4">
+                        <div class="col-md-6">
+                            <div class="info-card">
+                                <h6 class="mb-2">Observaciones Normales</h6>
+                                <div class="config-value">{{ config.dias_vencimiento_normal }} días</div>
+                                <small>Tiempo por defecto</small>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="info-card">
+                                <h6 class="mb-2">Observaciones Urgentes</h6>
+                                <div class="config-value">{{ config.horas_vencimiento_urgente }} horas</div>
+                                <small>Tiempo por defecto</small>
+                            </div>
+                        </div>
+                    </div>
+
+                    {% if config.fecha_modificacion %}
+                    <div class="alert alert-info">
+                        <i class="bi bi-info-circle-fill"></i>
+                        <strong>Última modificación:</strong> {{ config.fecha_modificacion|date:"d/m/Y H:i" }}
+                        {% if config.modificado_por %}
+                            por {{ config.modificado_por.nombre }}
+                        {% endif %}
+                    </div>
+                    {% endif %}
+
+                    <hr>
+
+                    <!-- Formulario de edición -->
+                    <h5 class="mb-3">Modificar Configuración</h5>
+                    
+                    {% if form.errors %}
+                        <div class="alert alert-danger">
+                            <strong>Por favor corrija los siguientes errores:</strong>
+                            <ul class="mb-0">
+                                {% for field in form %}
+                                    {% for error in field.errors %}
+                                        <li>{{ field.label }}: {{ error }}</li>
+                                    {% endfor %}
+                                {% endfor %}
+                                {% for error in form.non_field_errors %}
+                                    <li>{{ error }}</li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                    {% endif %}
+
+                    <form method="post" id="configForm">
+                        {% csrf_token %}
+                        
+                        <div class="mb-4">
+                            <label for="{{ form.dias_vencimiento_normal.id_for_label }}" class="form-label">
+                                <i class="bi bi-calendar-check"></i> {{ form.dias_vencimiento_normal.label }}
+                            </label>
+                            {{ form.dias_vencimiento_normal }}
+                            <div class="form-text">{{ form.dias_vencimiento_normal.help_text }}</div>
+                            {% if form.dias_vencimiento_normal.errors %}
+                                <div class="text-danger small">{{ form.dias_vencimiento_normal.errors.0 }}</div>
+                            {% endif %}
+                        </div>
+
+                        <div class="mb-4">
+                            <label for="{{ form.horas_vencimiento_urgente.id_for_label }}" class="form-label">
+                                <i class="bi bi-clock-fill"></i> {{ form.horas_vencimiento_urgente.label }}
+                            </label>
+                            {{ form.horas_vencimiento_urgente }}
+                            <div class="form-text">{{ form.horas_vencimiento_urgente.help_text }}</div>
+                            {% if form.horas_vencimiento_urgente.errors %}
+                                <div class="text-danger small">{{ form.horas_vencimiento_urgente.errors.0 }}</div>
+                            {% endif %}
+                        </div>
+
+                        <div class="alert alert-warning">
+                            <i class="bi bi-exclamation-triangle-fill"></i>
+                            <strong>Importante:</strong> Estos valores se aplicarán automáticamente a todas las nuevas observaciones que se creen. Las observaciones existentes no se verán afectadas.
+                        </div>
+
+                        <div class="d-flex justify-content-between mt-4">
+                            <a href="{% url 'maestro_index' %}" class="btn btn-secondary">
+                                <i class="bi bi-arrow-left"></i> Volver al Panel
+                            </a>
+                            <button type="submit" class="btn btn-primary btn-lg">
+                                <i class="bi bi-save"></i> Guardar Configuración
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Validación en tiempo real
+    const diasInput = document.getElementById('{{ form.dias_vencimiento_normal.id_for_label }}');
+    const horasInput = document.getElementById('{{ form.horas_vencimiento_urgente.id_for_label }}');
+    
+    function validarPositivo(input) {
+        input.addEventListener('input', function() {
+            if (this.value < 1) {
+                this.classList.add('is-invalid');
+            } else {
+                this.classList.remove('is-invalid');
+            }
+        });
+    }
+    
+    if (diasInput) validarPositivo(diasInput);
+    if (horasInput) validarPositivo(horasInput);
+});
+</script>
+{% endblock %}
+{% endblock %}

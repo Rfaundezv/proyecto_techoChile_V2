@@ -1,0 +1,137 @@
+{% extends "base.html" %}
+
+{% block title %}{{ titulo }} - {{ block.super }}{% endblock %}
+
+{% block extra_css %}
+<style>
+    .form-control:focus, .form-select:focus {
+        border-color: #00a7e1;
+        box-shadow: 0 0 0 0.2rem rgba(0, 167, 225, 0.25);
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="card">
+        <div class="card-header bg-primary text-white">
+            <h4 class="mb-0">{{ titulo }}</h4>
+        </div>
+        <div class="card-body">
+            <form method="post" id="viviendaForm">
+                {% csrf_token %}
+                
+                {% if form.errors %}
+                    <div class="alert alert-danger">
+                        <strong>Por favor corrija los siguientes errores:</strong>
+                        <ul class="mb-0">
+                            {% for field in form %}
+                                {% for error in field.errors %}
+                                    <li>{{ field.label }}: {{ error }}</li>
+                                {% endfor %}
+                            {% endfor %}
+                            {% for error in form.non_field_errors %}
+                                <li>{{ error }}</li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                {% endif %}
+
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label for="{{ form.proyecto.id_for_label }}" class="form-label">Proyecto *</label>
+                        {{ form.proyecto }}
+                        {% if form.proyecto.errors %}
+                            <div class="text-danger small">{{ form.proyecto.errors.0 }}</div>
+                        {% endif %}
+                    </div>
+
+                    <div class="col-md-6 mb-3">
+                        <label for="{{ form.codigo.id_for_label }}" class="form-label">Código *</label>
+                        {{ form.codigo }}
+                        {% if form.codigo.errors %}
+                            <div class="text-danger small">{{ form.codigo.errors.0 }}</div>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label for="{{ form.familia_beneficiaria.id_for_label }}" class="form-label">Familia Beneficiaria *</label>
+                        {{ form.familia_beneficiaria }}
+                        {% if form.familia_beneficiaria.errors %}
+                            <div class="text-danger small">{{ form.familia_beneficiaria.errors.0 }}</div>
+                        {% endif %}
+                    </div>
+
+                    <div class="col-md-6 mb-3">
+                        <label for="{{ form.beneficiario.id_for_label }}" class="form-label">Beneficiario</label>
+                        {{ form.beneficiario }}
+                        {% if form.beneficiario.errors %}
+                            <div class="text-danger small">{{ form.beneficiario.errors.0 }}</div>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label for="{{ form.tipologia.id_for_label }}" class="form-label">Tipología *</label>
+                        {{ form.tipologia }}
+                        {% if form.tipologia.errors %}
+                            <div class="text-danger small">{{ form.tipologia.errors.0 }}</div>
+                        {% endif %}
+                    </div>
+
+                    <div class="col-md-6 mb-3">
+                        <label for="{{ form.estado.id_for_label }}" class="form-label">Estado *</label>
+                        {{ form.estado }}
+                        {% if form.estado.errors %}
+                            <div class="text-danger small">{{ form.estado.errors.0 }}</div>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label for="{{ form.fecha_entrega.id_for_label }}" class="form-label">Fecha de Entrega</label>
+                        {{ form.fecha_entrega }}
+                        {% if form.fecha_entrega.errors %}
+                            <div class="text-danger small">{{ form.fecha_entrega.errors.0 }}</div>
+                        {% endif %}
+                    </div>
+
+                    <div class="col-md-6 mb-3">
+                        <label for="{{ form.activa.id_for_label }}" class="form-label">Activa</label>
+                        <div class="form-check mt-2">
+                            {{ form.activa }}
+                            <label class="form-check-label" for="{{ form.activa.id_for_label }}">
+                                Marcar como activa
+                            </label>
+                        </div>
+                        {% if form.activa.errors %}
+                            <div class="text-danger small">{{ form.activa.errors.0 }}</div>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <div class="mb-3">
+                    <label for="{{ form.observaciones_generales.id_for_label }}" class="form-label">Observaciones Generales</label>
+                    {{ form.observaciones_generales }}
+                    {% if form.observaciones_generales.errors %}
+                        <div class="text-danger small">{{ form.observaciones_generales.errors.0 }}</div>
+                    {% endif %}
+                </div>
+
+                <div class="d-flex justify-content-between mt-4">
+                    <a href="{% url 'maestro_vivienda_list' %}" class="btn btn-secondary">
+                        <i class="bi bi-arrow-left"></i> Cancelar
+                    </a>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="bi bi-save"></i> Guardar
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

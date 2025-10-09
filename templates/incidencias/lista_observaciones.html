@@ -1,0 +1,511 @@
+{% extends 'base.html' %}
+{% block title %}{% if es_familia %}Mis Observaciones{% else %}Observaciones{% endif %} - TECHO CHILE{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
+    <div>
+        <h2 class="section-title mb-1">{% if es_familia %}Mis Observaciones{% else %}Observaciones{% endif %}</h2>
+        <p class="section-subtitle d-none d-md-block">
+            {% if es_familia %}
+                Seguimiento de las observaciones de tu vivienda
+            {% else %}
+                Sistema de seguimiento de incidencias
+            {% endif %}
+        </p>
+    </div>
+    <div class="d-flex gap-2 flex-wrap">
+        {% if puede_crear %}
+        <a href="{% url 'incidencias:crear_observacion' %}" class="btn btn-techo-primary">
+            <i class="bi bi-plus-circle d-md-none"></i>
+            <span class="d-none d-md-inline">Nueva Observación</span>
+            <span class="d-md-none">Nueva</span>
+        </a>
+        {% endif %}
+        {% if not es_familia %}
+        <button class="btn btn-outline-primary d-none d-sm-inline">
+            Chequeo Móvil
+        </button>
+        {% endif %}
+    </div>
+    <!-- Métricas para familias -->
+    {% if es_familia %}
+    <div class="mb-4">
+        <span class="badge bg-primary me-2">Total: {{ obs_total|default:"0" }}</span>
+        <span class="badge bg-success me-2">Abiertas: {{ obs_abiertas|default:"0" }}</span>
+        <span class="badge bg-danger me-2">Cerradas: {{ obs_cerradas|default:"0" }}</span>
+        <span class="badge bg-warning text-dark me-2">Urgentes: {{ obs_urgentes|default:"0" }}</span>
+        <span class="badge bg-secondary">Vencidas: {{ obs_vencidas|default:"0" }}</span>
+    </div>
+    {% endif %}
+</div>
+
+<!-- Filtros de Búsqueda (NO mostrar para FAMILIA) -->
+{% if not es_familia %}
+<div class="chart-container mb-4">
+    <h5 class="mb-3">Filtros de Búsqueda</h5>
+    <form method="get">
+        <div class="row g-2 g-md-3">
+            <div class="col-12 col-md-4 col-lg-3">
+                <label class="form-label">Proyecto</label>
+                {{ form.proyecto }}
+            </div>
+            <div class="col-6 col-md-4 col-lg-2">
+                <label class="form-label">N° Vivienda</label>
+                {{ form.numero_vivienda }}
+            </div>
+            <div class="col-6 col-md-4 col-lg-2">
+                <label class="form-label">Estado</label>
+                {{ form.estado }}
+            </div>
+            <div class="col-6 col-md-6 col-lg-2">
+                <label class="form-label">Tipo</label>
+                {{ form.tipo }}
+            </div>
+            <div class="col-12 col-md-6 col-lg-3">
+                <label class="form-label">Buscar</label>
+                {{ form.buscar }}
+            </div>
+        </div>
+        <div class="row mt-3">
+            <div class="col-12">
+                <button type="submit" class="btn btn-primary me-2">
+                    <i class="bi bi-search"></i> Buscar
+                </button>
+                <a href="{% url 'incidencias:lista_observaciones' %}" class="btn btn-outline-secondary">
+                    <i class="bi bi-arrow-clockwise"></i> Limpiar
+                </a>
+            </div>
+        </div>
+    </form>
+</div>
+{% endif %}
+
+<!-- Lista de Observaciones -->
+<div class="chart-container">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <div>
+            <h5>Lista de Observaciones</h5>
+            {% if request.GET.estado_nombre %}
+                <span class="badge bg-info">Filtrado por estado: {{ request.GET.estado_nombre }}</span>
+            {% endif %}
+            {% if request.GET.es_urgente %}
+                <span class="badge bg-danger">Solo urgentes</span>
+            {% endif %}
+        </div>
+        <small class="text-muted">
+            {% if observaciones.paginator.count %}
+                Mostrando {{ observaciones.start_index }}-{{ observaciones.end_index }} de {{ observaciones.paginator.count }} observaciones
+            {% endif %}
+        </small>
+    </div>
+
+    <!-- Vista Desktop: Tabla -->
+    <div class="table-responsive d-none d-md-block">
+        <table class="table table-techo">
+            <thead>
+                <tr>
+                    <th>PROYECTO</th>
+                    <th>VIVIENDA</th>
+                    <th>RECINTO</th>
+                    <th>ELEMENTO</th>
+                    <th>DETALLE</th>
+                    <th>TIPO</th>
+                    <th>PRIORIDAD</th>
+                    <th>ESTADO</th>
+                    <th>VENCIMIENTO</th>
+                    <th>CREADO</th>
+                    <th>ARCHIVO</th>
+                    <th>ACCIONES</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for obs in observaciones %}
+                <tr id="obs-{{ obs.pk }}" 
+                    {% if obs.es_urgente and obs.estado.nombre == 'Abierta' and obs.esta_vencida %}
+                        class="table-danger" style="background-color: #f8d7da !important; border-left: 4px solid #dc3545;"
+                    {% elif obs.es_urgente and obs.estado.nombre == 'Abierta' %}
+                        style="background-color: #fff3cd !important; border-left: 4px solid #ffc107;"
+                    {% endif %}
+                >
+                    <td>
+                        <strong>{{ obs.proyecto.codigo }}</strong><br>
+                        <small>{{ obs.proyecto.nombre|truncatechars:30 }}</small>
+                    </td>
+                    <td>
+                        <strong>Vivienda {{ obs.vivienda.codigo }}</strong><br>
+                        <small>{{ obs.vivienda.familia_beneficiaria|truncatechars:20 }}</small>
+                    </td>
+                    <td>{{ obs.recinto.nombre|default:"-" }}</td>
+                    <td>{{ obs.elemento }}</td>
+                    <td>
+                        {{ obs.detalle|truncatechars:50 }}
+                        {% if obs.detalle|length > 50 %}
+                        <br><small><a href="{% url 'incidencias:detalle_observacion' obs.pk %}">Ver más...</a></small>
+                        {% endif %}
+                    </td>
+                    <td>
+                        <span class="badge bg-secondary">{{ obs.tipo.nombre }}</span>
+                    </td>
+                    <td>
+                        {% if obs.prioridad == 'urgente' or obs.es_urgente %}
+                            <span class="badge" style="background-color: #dc3545; color: white; font-weight: 600;">URGENTE</span>
+                        {% elif obs.prioridad == 'alta' %}
+                            <span class="badge" style="background-color: #ff6b6b; color: white; font-weight: 600;">ALTA</span>
+                        {% elif obs.prioridad == 'media' %}
+                            <span class="badge" style="background-color: #ffa500; color: white;">MEDIA</span>
+                        {% elif obs.prioridad == 'baja' %}
+                            <span class="badge" style="background-color: #90EE90; color: #2d5016;">BAJA</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if puede_cambiar_estado %}
+                            <span id="estado-badge-{{ obs.pk }}" class="badge badge-{{ obs.estado.nombre|lower }} estado-badge" 
+                                  data-obs-id="{{ obs.pk }}" style="cursor: pointer;" 
+                                  title="Click para cambiar estado">
+                                {{ obs.estado.nombre }}
+                            </span>
+                        {% else %}
+                            <span class="badge badge-{{ obs.estado.nombre|lower }}">
+                                {{ obs.estado.nombre }}
+                            </span>
+                        {% endif %}
+                        {% if obs.estado.nombre == 'Abierta' and obs.esta_vencida %}
+                        <br><small class="text-danger">VENCIDA</small>
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if obs.fecha_vencimiento %}
+                            {{ obs.fecha_vencimiento|date:"d/m/Y" }}<br>
+                            <small>
+                                {% if obs.es_urgente %}
+                                    {% if obs.esta_vencida %}
+                                        <span class="text-danger">Vencida</span>
+                                    {% else %}
+                                        <span class="text-danger fw-bold">{{ obs.dias_para_vencer }} días restantes</span>
+                                    {% endif %}
+                                {% else %}
+                                    {% if obs.dias_para_vencer %}
+                                        {% if obs.dias_para_vencer > 0 %}
+                                            {{ obs.dias_para_vencer }} días restantes
+                                        {% else %}
+                                            Vencida hace {{ obs.dias_para_vencer|add:"-1" }} días
+                                        {% endif %}
+                                    {% endif %}
+                                {% endif %}
+                            </small>
+                        {% else %}
+                            -
+                        {% endif %}
+                    </td>
+                    <td>
+                        {{ obs.fecha_creacion|date:"d/m/Y" }}<br>
+                        <small>{{ obs.fecha_creacion|time:"H:i" }}</small><br>
+                        <small>por {{ obs.creado_por.nombre|default:obs.creado_por.email }}</small>
+                    </td>
+                    <td class="text-center">
+                        {% if obs.archivo_adjunto or obs.total_archivos > 0 %}
+                            {% with total=obs.total_archivos %}
+                                {% if obs.archivo_adjunto %}
+                                    {% with total_final=total|add:1 %}
+                                        <a href="{% url 'incidencias:detalle_observacion' obs.pk %}" class="text-decoration-none" title="Tiene {{ total_final }} archivo(s) adjunto(s)">
+                                            <i class="bi bi-paperclip fs-5" style="color: #00a7e1;"></i>
+                                            {% if total_final > 1 %}
+                                                <span class="badge bg-info ms-1">{{ total_final }}</span>
+                                            {% endif %}
+                                        </a>
+                                    {% endwith %}
+                                {% else %}
+                                    <a href="{% url 'incidencias:detalle_observacion' obs.pk %}" class="text-decoration-none" title="Tiene {{ total }} archivo(s) adjunto(s)">
+                                        <i class="bi bi-paperclip fs-5" style="color: #00a7e1;"></i>
+                                        {% if total > 1 %}
+                                            <span class="badge bg-info ms-1">{{ total }}</span>
+                                        {% endif %}
+                                    </a>
+                                {% endif %}
+                            {% endwith %}
+                        {% else %}
+                            <span class="text-muted">-</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        <div class="btn-group-vertical btn-group-sm">
+                            <a href="{% url 'incidencias:detalle_observacion' obs.pk %}" class="btn btn-outline-info btn-sm">Ver</a>
+                            <button class="btn btn-outline-warning btn-sm cambiar-estado-btn" 
+                                    data-obs-id="{{ obs.pk }}" data-bs-toggle="modal" data-bs-target="#modalCambioEstado">
+                                Cambiar Estado
+                            </button>
+                        </div>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="12" class="text-center text-muted py-4">No se encontraron observaciones</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Vista Móvil: Tarjetas -->
+    <div class="d-md-none">
+        {% for obs in observaciones %}
+        <div class="obs-card-mobile mb-3"
+             {% if obs.es_urgente and obs.estado.nombre == 'Abierta' and obs.esta_vencida %}
+                 style="border-left: 4px solid #dc3545; background-color: #f8d7da;"
+             {% elif obs.es_urgente and obs.estado.nombre == 'Abierta' %}
+                 style="border-left: 4px solid #ffc107; background-color: #fff3cd;"
+             {% endif %}>
+            
+            <!-- Encabezado: Proyecto y Estado -->
+            <div class="d-flex justify-content-between align-items-start mb-2">
+                <div>
+                    <strong>{{ obs.proyecto.codigo }}</strong>
+                    <small class="text-muted d-block">{{ obs.proyecto.nombre|truncatechars:25 }}</small>
+                </div>
+                <span id="estado-badge-{{ obs.pk }}" class="badge badge-{{ obs.estado.nombre|lower }} estado-badge" 
+                      data-obs-id="{{ obs.pk }}" style="cursor: pointer;" 
+                      title="Click para cambiar estado">
+                    {{ obs.estado.nombre }}
+                </span>
+            </div>
+
+            <!-- Vivienda -->
+            <div class="mb-2">
+                <i class="bi bi-house-door"></i>
+                <strong>Vivienda {{ obs.vivienda.codigo }}</strong>
+                <small class="text-muted d-block ms-4">{{ obs.vivienda.familia_beneficiaria|truncatechars:25 }}</small>
+            </div>
+
+            <!-- Elemento y Recinto -->
+            <div class="mb-2">
+                <i class="bi bi-tools"></i>
+                <strong>{{ obs.elemento }}</strong>
+                {% if obs.recinto %}
+                <small class="text-muted"> - {{ obs.recinto.nombre }}</small>
+                {% endif %}
+            </div>
+
+            <!-- Detalle -->
+            {% if obs.detalle %}
+            <div class="mb-2">
+                <small class="text-muted">{{ obs.detalle|truncatechars:60 }}</small>
+            </div>
+            {% endif %}
+
+            <!-- Prioridad y Tipo -->
+            <div class="mb-2">
+                {% if obs.prioridad == 'urgente' or obs.es_urgente %}
+                    <span class="badge" style="background-color: #dc3545; color: white; font-weight: 600;">URGENTE</span>
+                {% elif obs.prioridad == 'alta' %}
+                    <span class="badge" style="background-color: #ff6b6b; color: white; font-weight: 600;">ALTA</span>
+                {% elif obs.prioridad == 'media' %}
+                    <span class="badge" style="background-color: #ffa500; color: white;">MEDIA</span>
+                {% elif obs.prioridad == 'baja' %}
+                    <span class="badge" style="background-color: #90EE90; color: #2d5016;">BAJA</span>
+                {% endif %}
+                <span class="badge bg-secondary ms-1">{{ obs.tipo.nombre }}</span>
+            </div>
+
+            <!-- Fechas y Archivo -->
+            <div class="d-flex justify-content-between align-items-center mb-2">
+                <div>
+                    <small class="text-muted">
+                        <i class="bi bi-calendar3"></i> {{ obs.fecha_creacion|date:"d/m/Y" }}
+                    </small>
+                    {% if obs.fecha_vencimiento %}
+                    <small class="text-muted d-block ms-4">
+                        Vence: {{ obs.fecha_vencimiento|date:"d/m/Y" }}
+                        {% if obs.esta_vencida %}
+                            <span class="text-danger">VENCIDA</span>
+                        {% endif %}
+                    </small>
+                    {% endif %}
+                </div>
+                {% if obs.archivo_adjunto or obs.total_archivos > 0 %}
+                    {% with total=obs.total_archivos %}
+                        {% if obs.archivo_adjunto %}
+                            {% with total_final=total|add:1 %}
+                                <i class="bi bi-paperclip" style="color: #00a7e1;"></i>
+                                {% if total_final > 1 %}
+                                    <span class="badge bg-info">{{ total_final }}</span>
+                                {% endif %}
+                            {% endwith %}
+                        {% else %}
+                            <i class="bi bi-paperclip" style="color: #00a7e1;"></i>
+                            {% if total > 1 %}
+                                <span class="badge bg-info">{{ total }}</span>
+                            {% endif %}
+                        {% endif %}
+                    {% endwith %}
+                {% endif %}
+            </div>
+
+            <!-- Botones de acción -->
+            <div class="d-flex gap-2 mt-3">
+                <a href="{% url 'incidencias:detalle_observacion' obs.pk %}" class="btn btn-sm btn-techo-primary flex-grow-1">
+                    Ver detalle
+                </a>
+                <button class="btn btn-sm btn-outline-warning cambiar-estado-btn" 
+                        data-obs-id="{{ obs.pk }}" data-bs-toggle="modal" data-bs-target="#modalCambioEstado">
+                    Cambiar Estado
+                </button>
+            </div>
+        </div>
+        {% empty %}
+        <div class="text-center text-muted py-4">
+            <p>No se encontraron observaciones</p>
+        </div>
+        {% endfor %}
+    </div>
+
+    <!-- Paginación -->
+    {% if observaciones.has_other_pages %}
+    <nav class="mt-4">
+        <ul class="pagination justify-content-center">
+            {% if observaciones.has_previous %}
+                <li class="page-item">
+                    <a class="page-link" href="?{% for key, value in request.GET.items %}{% if key != 'page' %}{{ key }}={{ value }}&{% endif %}{% endfor %}page={{ observaciones.previous_page_number }}">Anterior</a>
+                </li>
+            {% endif %}
+
+            <li class="page-item active">
+                <span class="page-link">Página {{ observaciones.number }} de {{ observaciones.paginator.num_pages }}</span>
+            </li>
+
+            {% if observaciones.has_next %}
+                <li class="page-item">
+                    <a class="page-link" href="?{% for key, value in request.GET.items %}{% if key != 'page' %}{{ key }}={{ value }}&{% endif %}{% endfor %}page={{ observaciones.next_page_number }}">Siguiente</a>
+                </li>
+            {% endif %}
+        </ul>
+    </nav>
+    {% endif %}
+</div>
+
+<!-- Modal para cambio de estado -->
+<div class="modal fade" id="modalCambioEstado" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Cambiar Estado de Observación</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="formCambioEstado">
+                    {% csrf_token %}
+                    <div class="mb-3">
+                        <label for="nuevoEstado" class="form-label">Nuevo Estado:</label>
+                        <select class="form-select" id="nuevoEstado" name="estado" required>
+                            <option value="">Seleccionar estado</option>
+                            {% for estado in estados %}
+                            <option value="{{ estado.id }}">{{ estado.nombre }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="comentario" class="form-label">Comentario:</label>
+                        <textarea class="form-control" id="comentario" name="comentario" rows="3" 
+                                  placeholder="Agregar comentario sobre el cambio..."></textarea>
+                        <small class="form-text text-muted">Opcional pero recomendado para seguimiento</small>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-techo-primary" id="confirmarCambioEstado">Cambiar Estado</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    let observacionIdActual = null;
+
+    // Manejar click en botones de cambiar estado
+    document.querySelectorAll('.cambiar-estado-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            observacionIdActual = this.dataset.obsId;
+        });
+    });
+
+    // Manejar click en badges de estado (cambio rápido)
+    document.querySelectorAll('.estado-badge').forEach(badge => {
+        badge.addEventListener('click', function() {
+            observacionIdActual = this.dataset.obsId;
+            const modal = new bootstrap.Modal(document.getElementById('modalCambioEstado'));
+            modal.show();
+        });
+    });
+
+    // Confirmar cambio de estado
+    document.getElementById('confirmarCambioEstado').addEventListener('click', function() {
+        if (!observacionIdActual) return;
+
+        const estado = document.getElementById('nuevoEstado').value;
+        const comentario = document.getElementById('comentario').value;
+
+        if (!estado) {
+            alert('Debe seleccionar un estado');
+            return;
+        }
+
+        // Realizar cambio via AJAX
+        fetch(`/incidencias/${observacionIdActual}/cambiar-estado/`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+                'X-Requested-With': 'XMLHttpRequest',
+                'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+            },
+            body: new URLSearchParams({
+                estado: estado,
+                comentario: comentario
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                // Actualizar badge en la tabla
+                const badge = document.getElementById(`estado-badge-${observacionIdActual}`);
+                badge.textContent = data.nuevo_estado.nombre;
+                badge.className = `badge ${data.nuevo_estado.badge_class} estado-badge`;
+
+                // Cerrar modal y limpiar
+                const modal = bootstrap.Modal.getInstance(document.getElementById('modalCambioEstado'));
+                modal.hide();
+                document.getElementById('formCambioEstado').reset();
+
+                // Mostrar mensaje de éxito
+                showAlert('success', data.message);
+            } else {
+                showAlert('danger', data.message);
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            showAlert('danger', 'Error al cambiar el estado');
+        });
+    });
+
+    function showAlert(type, message) {
+        const alertDiv = document.createElement('div');
+        alertDiv.className = `alert alert-${type} alert-dismissible fade show position-fixed top-0 start-50 translate-middle-x mt-3`;
+        alertDiv.style.zIndex = '9999';
+        alertDiv.innerHTML = `
+            ${message}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        `;
+        document.body.appendChild(alertDiv);
+
+        // Auto remove after 5 seconds
+        setTimeout(() => {
+            if (alertDiv.parentNode) {
+                alertDiv.remove();
+            }
+        }, 5000);
+    }
+});
+</script>
+
+{% endblock %}

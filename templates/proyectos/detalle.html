@@ -1,0 +1,78 @@
+{% extends 'base.html' %}
+{% block title %}{{ proyecto.codigo }} - TECHO CHILE{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-start mb-4">
+    <div>
+        <h2 class="section-title">{{ proyecto.codigo }} - {{ proyecto.nombre }}</h2>
+        <p class="text-muted">{{ proyecto.constructora }} | {{ proyecto.comuna.nombre }}, {{ proyecto.region.nombre }}</p>
+    </div>
+    <div class="d-flex gap-2">
+        <a href="{% url 'proyectos:editar' proyecto.pk %}" class="btn btn-outline-warning">Editar Proyecto</a>
+        <a href="{% url 'proyectos:crear_vivienda' proyecto.pk %}" class="btn btn-techo-primary">+ Agregar Vivienda</a>
+    </div>
+</div>
+
+<div class="row g-4">
+    <div class="col-md-4">
+        <div class="chart-container">
+            <h5>Información del Proyecto</h5>
+            <dl class="row">
+                <dt class="col-sm-6">Código:</dt>
+                <dd class="col-sm-6">{{ proyecto.codigo }}</dd>
+                <dt class="col-sm-6">Entrega:</dt>
+                <dd class="col-sm-6">{{ proyecto.fecha_entrega|date:"d/m/Y" }}</dd>
+                <dt class="col-sm-6">Postventa:</dt>
+                <dd class="col-sm-6">
+                    <span class="badge {% if proyecto.estado_postventa == 'Vigente' %}bg-success{% elif proyecto.estado_postventa == 'Por vencer' %}bg-warning{% else %}bg-danger{% endif %}">
+                        {{ proyecto.estado_postventa }}
+                    </span>
+                </dd>
+                <dt class="col-sm-6">Viviendas:</dt>
+                <dd class="col-sm-6">{{ viviendas|length }}</dd>
+            </dl>
+        </div>
+    </div>
+    <div class="col-md-8">
+        <div class="chart-container">
+            <h5>Viviendas del Proyecto</h5>
+            {% if viviendas %}
+            <div class="table-responsive">
+                <table class="table table-sm">
+                    <thead>
+                        <tr>
+                            <th>Código</th>
+                            <th>Familia</th>
+                            <th>Tipología</th>
+                            <th>Estado</th>
+                            <th>Fecha Entrega</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for vivienda in viviendas %}
+                        <tr>
+                            <td><strong>{{ vivienda.codigo }}</strong></td>
+                            <td>
+                                {% if vivienda.beneficiario %}
+                                    {{ vivienda.beneficiario.nombre }}{% if vivienda.beneficiario.rut %} (RUT: {{ vivienda.beneficiario.rut }}){% endif %}
+                                {% else %}
+                                    {{ vivienda.familia_beneficiaria }}
+                                {% endif %}
+                            </td>
+                            <td>{{ vivienda.tipologia.nombre }}</td>
+                            <td>
+                                <span class="badge bg-secondary">{{ vivienda.get_estado_display }}</span>
+                            </td>
+                            <td>{{ vivienda.fecha_entrega|date:"d/m/Y"|default:"-" }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <p class="text-muted">No hay viviendas registradas en este proyecto.</p>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

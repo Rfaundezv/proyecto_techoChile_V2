@@ -1,0 +1,332 @@
+{% extends 'base.html' %}
+{% block title %}Observación #{{ observacion.pk }} - TECHO CHILE{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-lg-8">
+        <div class="chart-container">
+            <div class="d-flex justify-content-between align-items-start mb-4">
+                <h4>Detalle de Observación #{{ observacion.pk }}</h4>
+                <span class="badge badge-{{ observacion.estado.nombre|lower }} fs-6">{{ observacion.estado.nombre }}</span>
+            </div>
+
+            <dl class="row mt-3">
+                <dt class="col-sm-3">Proyecto:</dt>
+                <dd class="col-sm-9"><strong>{{ observacion.proyecto.codigo }}</strong> - {{ observacion.proyecto.nombre }}</dd>
+
+                <dt class="col-sm-3">Vivienda:</dt>
+                <dd class="col-sm-9">{{ observacion.vivienda.codigo }} ({{ observacion.vivienda.familia_beneficiaria }})</dd>
+
+                <dt class="col-sm-3">Recinto:</dt>
+                <dd class="col-sm-9">{{ observacion.recinto.nombre|default:"No especificado" }}</dd>
+
+                <dt class="col-sm-3">Elemento:</dt>
+                <dd class="col-sm-9">{{ observacion.elemento }}</dd>
+
+                <dt class="col-sm-3">Tipo:</dt>
+                <dd class="col-sm-9">{{ observacion.tipo.nombre }}</dd>
+
+                <dt class="col-sm-3">Prioridad:</dt>
+                <dd class="col-sm-9">
+                    <span class="badge bg-secondary">{{ observacion.get_prioridad_display }}</span>
+                    {% if observacion.es_urgente %}
+                    <span class="badge bg-danger ms-1">URGENTE</span>
+                    {% endif %}
+                </dd>
+            </dl>
+
+            <h5 class="mt-4">Descripción</h5>
+            <div class="border rounded p-3 bg-light">
+                {{ observacion.detalle|linebreaks }}
+            </div>
+
+            <!-- Archivos Adjuntos -->
+            <div class="mt-4">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h5>Archivos Adjuntos ({{ archivos.count }})</h5>
+                    <button type="button" class="btn btn-primary btn-sm" data-bs-toggle="collapse" data-bs-target="#formSubirArchivo">
+                        <i class="bi bi-plus-circle"></i> Agregar Archivo
+                    </button>
+                </div>
+
+                <!-- Formulario para subir archivo (colapsado por defecto) -->
+                <div class="collapse mb-3" id="formSubirArchivo">
+                    <div class="card card-body">
+                        <form method="post" enctype="multipart/form-data">
+                            {% csrf_token %}
+                            <div class="row">
+                                <div class="col-md-8 mb-2">
+                                    <label for="{{ archivo_form.archivo.id_for_label }}" class="form-label">{{ archivo_form.archivo.label }}</label>
+                                    {{ archivo_form.archivo }}
+                                    <small class="form-text text-muted d-block">Formatos permitidos: PDF, DOC, DOCX, JPG, PNG, GIF, BMP. Tamaño máximo: 10MB</small>
+                                    {% if archivo_form.archivo.errors %}
+                                        <div class="text-danger small">{{ archivo_form.archivo.errors.0 }}</div>
+                                    {% endif %}
+                                </div>
+                                <div class="col-md-4 mb-2">
+                                    <label for="{{ archivo_form.descripcion.id_for_label }}" class="form-label">{{ archivo_form.descripcion.label }}</label>
+                                    {{ archivo_form.descripcion }}
+                                    {% if archivo_form.descripcion.errors %}
+                                        <div class="text-danger small">{{ archivo_form.descripcion.errors.0 }}</div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <button type="submit" name="subir_archivo" class="btn btn-success btn-sm">
+                                <i class="bi bi-upload"></i> Subir Archivo
+                            </button>
+                            <button type="button" class="btn btn-secondary btn-sm" data-bs-toggle="collapse" data-bs-target="#formSubirArchivo">
+                                Cancelar
+                            </button>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Lista de archivos -->
+                {% if observacion.archivo_adjunto or archivos %}
+                <div class="mt-3">
+                    <!-- Archivo principal (si existe) -->
+                    {% if observacion.archivo_adjunto %}
+                    <div class="border rounded p-2 mb-2">
+                        <div class="d-flex align-items-center gap-3">
+                            <div class="flex-shrink-0">
+                                {% if observacion.archivo_adjunto.name|slice:"-4:" == ".pdf" %}
+                                    <i class="bi bi-file-earmark-pdf-fill text-danger" style="font-size: 2rem;"></i>
+                                {% elif observacion.archivo_adjunto.name|slice:"-4:" == ".doc" or observacion.archivo_adjunto.name|slice:"-5:" == ".docx" %}
+                                    <i class="bi bi-file-earmark-word-fill text-primary" style="font-size: 2rem;"></i>
+                                {% elif observacion.archivo_adjunto.name|slice:"-4:" == ".jpg" or observacion.archivo_adjunto.name|slice:"-5:" == ".jpeg" or observacion.archivo_adjunto.name|slice:"-4:" == ".png" or observacion.archivo_adjunto.name|slice:"-4:" == ".gif" or observacion.archivo_adjunto.name|slice:"-4:" == ".bmp" %}
+                                    <i class="bi bi-file-earmark-image-fill text-success" style="font-size: 2rem;"></i>
+                                {% else %}
+                                    <i class="bi bi-file-earmark-fill text-secondary" style="font-size: 2rem;"></i>
+                                {% endif %}
+                            </div>
+                            <div class="flex-grow-1">
+                                <h6 class="mb-0">{{ observacion.archivo_adjunto.name|slice:"19:" }} <span class="badge bg-primary">Archivo inicial</span></h6>
+                                <small class="text-muted">Tamaño: {{ observacion.archivo_adjunto.size|filesizeformat }}</small>
+                            </div>
+                            <div class="flex-shrink-0">
+                                <a href="{{ observacion.archivo_adjunto.url }}" target="_blank" class="btn btn-primary btn-sm">
+                                    <i class="bi bi-download"></i>
+                                </a>
+                            </div>
+                        </div>
+                        
+                        <!-- Vista previa de imágenes -->
+                        {% if observacion.archivo_adjunto.name|slice:"-4:" == ".jpg" or observacion.archivo_adjunto.name|slice:"-5:" == ".jpeg" or observacion.archivo_adjunto.name|slice:"-4:" == ".png" or observacion.archivo_adjunto.name|slice:"-4:" == ".gif" or observacion.archivo_adjunto.name|slice:"-4:" == ".bmp" %}
+                        <div class="mt-2">
+                            <img src="{{ observacion.archivo_adjunto.url }}" alt="Archivo adjunto" class="img-fluid rounded" style="max-height: 300px; cursor: pointer;" onclick="window.open('{{ observacion.archivo_adjunto.url }}', '_blank')">
+                        </div>
+                        {% endif %}
+                    </div>
+                    {% endif %}
+
+                    <!-- Archivos adicionales -->
+                    {% for archivo in archivos %}
+                    <div class="border rounded p-2 mb-2">
+                        <div class="d-flex align-items-center gap-3">
+                            <div class="flex-shrink-0">
+                                {% if archivo.archivo.name|slice:"-4:" == ".pdf" %}
+                                    <i class="bi bi-file-earmark-pdf-fill text-danger" style="font-size: 2rem;"></i>
+                                {% elif archivo.archivo.name|slice:"-4:" == ".doc" or archivo.archivo.name|slice:"-5:" == ".docx" %}
+                                    <i class="bi bi-file-earmark-word-fill text-primary" style="font-size: 2rem;"></i>
+                                {% elif archivo.archivo.name|slice:"-4:" == ".jpg" or archivo.archivo.name|slice:"-5:" == ".jpeg" or archivo.archivo.name|slice:"-4:" == ".png" or archivo.archivo.name|slice:"-4:" == ".gif" or archivo.archivo.name|slice:"-4:" == ".bmp" %}
+                                    <i class="bi bi-file-earmark-image-fill text-success" style="font-size: 2rem;"></i>
+                                {% else %}
+                                    <i class="bi bi-file-earmark-fill text-secondary" style="font-size: 2rem;"></i>
+                                {% endif %}
+                            </div>
+                            <div class="flex-grow-1">
+                                <h6 class="mb-0">{{ archivo.nombre_original }}</h6>
+                                <small class="text-muted">
+                                    {% if archivo.descripcion %}{{ archivo.descripcion }} - {% endif %}
+                                    {{ archivo.fecha_subida|date:"d/m/Y H:i" }} por {{ archivo.subido_por.nombre|default:archivo.subido_por.email }}
+                                    - {{ archivo.archivo.size|filesizeformat }}
+                                </small>
+                            </div>
+                            <div class="flex-shrink-0">
+                                <a href="{{ archivo.archivo.url }}" target="_blank" class="btn btn-primary btn-sm me-1">
+                                    <i class="bi bi-download"></i>
+                                </a>
+                                {% if user == archivo.subido_por or user.is_staff %}
+                                <a href="{% url 'incidencias:eliminar_archivo' archivo.pk %}" 
+                                   class="btn btn-danger btn-sm"
+                                   onclick="return confirm('¿Está seguro de eliminar este archivo?')">
+                                    <i class="bi bi-trash"></i>
+                                </a>
+                                {% endif %}
+                            </div>
+                        </div>
+                        
+                        <!-- Vista previa de imágenes adicionales -->
+                        {% if archivo.archivo.name|slice:"-4:" == ".jpg" or archivo.archivo.name|slice:"-5:" == ".jpeg" or archivo.archivo.name|slice:"-4:" == ".png" or archivo.archivo.name|slice:"-4:" == ".gif" or archivo.archivo.name|slice:"-4:" == ".bmp" %}
+                        <div class="mt-2">
+                            <img src="{{ archivo.archivo.url }}" alt="{{ archivo.nombre_original }}" class="img-fluid rounded" style="max-height: 300px; cursor: pointer;" onclick="window.open('{{ archivo.archivo.url }}', '_blank')">
+                        </div>
+                        {% endif %}
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <p class="text-muted text-center py-3">No hay archivos adjuntos. <a href="#formSubirArchivo" data-bs-toggle="collapse">Agregar archivo</a></p>
+                {% endif %}
+            </div>
+
+            <!-- Formulario de cambio de estado -->
+            {% if puede_cambiar_estado and observacion.estado.nombre != 'Cerrada' %}
+            <div class="mt-4">
+                <h5>Cambiar Estado</h5>
+                <form method="post" class="border rounded p-3">
+                    {% csrf_token %}
+                    <div class="row">
+                        <div class="col-md-6">
+                            <label for="{{ form.estado.id_for_label }}" class="form-label">{{ form.estado.label }}</label>
+                            {{ form.estado }}
+                        </div>
+                    </div>
+                    <div class="mt-3">
+                        <label for="{{ form.comentario.id_for_label }}" class="form-label">{{ form.comentario.label }}</label>
+                        {{ form.comentario }}
+                        <small class="form-text text-muted">{{ form.comentario.help_text }}</small>
+                    </div>
+                    <div class="mt-3">
+                        <button type="submit" name="cambiar_estado" class="btn btn-techo-primary">Cambiar Estado</button>
+                    </div>
+                </form>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="col-lg-4">
+        <div class="chart-container">
+            <h5>Información Adicional</h5>
+            <dl>
+                <dt>Estado Actual:</dt>
+                <dd>
+                    <span class="badge badge-{{ observacion.estado.nombre|lower }}">{{ observacion.estado.nombre }}</span>
+                </dd>
+
+                <dt>Fecha Creación:</dt>
+                <dd>{{ observacion.fecha_creacion|date:"d/m/Y H:i" }}</dd>
+
+                <dt>Creado por:</dt>
+                <dd>{{ observacion.creado_por.nombre|default:observacion.creado_por.email }}</dd>
+
+                {% if observacion.asignado_a %}
+                <dt>Asignado a:</dt>
+                <dd>{{ observacion.asignado_a.nombre|default:observacion.asignado_a.email }}</dd>
+                {% endif %}
+
+                {% if observacion.fecha_vencimiento %}
+                <dt>Fecha Vencimiento:</dt>
+                <dd>
+                    {{ observacion.fecha_vencimiento|date:"d/m/Y" }}
+                    {% if observacion.esta_vencida %}
+                    <span class="badge bg-danger ms-1">VENCIDA</span>
+                    {% endif %}
+                </dd>
+                {% endif %}
+
+                {% if observacion.fecha_cierre %}
+                <dt>Fecha Cierre:</dt>
+                <dd>{{ observacion.fecha_cierre|date:"d/m/Y H:i" }}</dd>
+                {% endif %}
+            </dl>
+
+            <!-- Acciones rápidas -->
+            <div class="mt-4">
+                <h6>Acciones Rápidas</h6>
+                <div class="d-grid gap-2">
+                    {% if observacion.estado.nombre == 'Abierta' %}
+                    <button class="btn btn-warning btn-sm" onclick="cambiarEstadoRapido({{ observacion.pk }}, 'En Proceso')">
+                        ▶️ Marcar En Proceso
+                    </button>
+                    <button class="btn btn-success btn-sm" onclick="cambiarEstadoRapido({{ observacion.pk }}, 'Cerrada')">
+                        ✅ Marcar Cerrada
+                    </button>
+                    {% elif observacion.estado.nombre == 'En Proceso' %}
+                    <button class="btn btn-success btn-sm" onclick="cambiarEstadoRapido({{ observacion.pk }}, 'Cerrada')">
+                        ✅ Marcar Cerrada
+                    </button>
+                    <button class="btn btn-outline-secondary btn-sm" onclick="cambiarEstadoRapido({{ observacion.pk }}, 'Abierta')">
+                        ↩️ Volver a Abierta
+                    </button>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        {% if seguimientos %}
+        <div class="chart-container mt-3">
+            <h5>Historial de Seguimiento</h5>
+            <div class="timeline">
+                {% for seguimiento in seguimientos %}
+                <div class="timeline-item border-start border-3 ps-3 pb-3">
+                    <div class="timeline-date small text-muted">{{ seguimiento.fecha|date:"d/m H:i" }}</div>
+                    <div class="timeline-content">
+                        <strong>{{ seguimiento.accion }}</strong><br>
+                        <small class="text-muted">por {{ seguimiento.usuario.nombre|default:seguimiento.usuario.email }}</small>
+                        {% if seguimiento.comentario %}
+                        <div class="mt-1 p-2 bg-light rounded small">{{ seguimiento.comentario }}</div>
+                        {% endif %}
+                        {% if seguimiento.estado_anterior and seguimiento.estado_nuevo %}
+                        <div class="mt-1">
+                            <span class="badge badge-{{ seguimiento.estado_anterior.nombre|lower }} small">{{ seguimiento.estado_anterior.nombre }}</span>
+                            →
+                            <span class="badge badge-{{ seguimiento.estado_nuevo.nombre|lower }} small">{{ seguimiento.estado_nuevo.nombre }}</span>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<div class="mt-4 text-center">
+    <a href="{% url 'incidencias:lista_observaciones' %}" class="btn btn-outline-secondary">« Volver a la Lista</a>
+    <a href="{% url 'incidencias:crear_observacion' %}" class="btn btn-techo-primary ms-2">Nueva Observación</a>
+</div>
+
+<script>
+function cambiarEstadoRapido(obsId, estadoNombre) {
+    // Obtener el ID del estado por nombre
+    const estados = {
+        'Abierta': 1,
+        'En Proceso': 2, 
+        'Cerrada': 3,
+        'Rechazada': 4
+    };
+
+    const estadoId = estados[estadoNombre];
+    const comentario = prompt(`¿Comentario para cambiar a "${estadoNombre}"?`);
+
+    if (comentario !== null) { // null si se cancela
+        fetch(`/incidencias/${obsId}/cambiar-estado/`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+                'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+            },
+            body: new URLSearchParams({
+                estado: estadoId,
+                comentario: comentario || `Cambio rápido a ${estadoNombre}`
+            })
+        })
+        .then(response => {
+            if (response.ok) {
+                location.reload(); // Recargar para mostrar cambios
+            } else {
+                alert('Error al cambiar estado');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Error al cambiar estado');
+        });
+    }
+}
+</script>
+
+{% endblock %}

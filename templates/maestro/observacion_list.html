@@ -1,0 +1,114 @@
+{% extends "base.html" %}
+
+{% block title %}{{ titulo }} - {{ block.super }}{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>{{ titulo }}</h2>
+        <a href="{% url 'incidencias:crear_observacion' %}" class="btn btn-primary">
+            <i class="bi bi-plus-circle"></i> Crear Observación
+        </a>
+    </div>
+
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        {% endfor %}
+    {% endif %}
+
+    <div class="card bg-dark text-white">
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-hover table-dark">
+                    <thead>
+                        <tr>
+                            <th>Proyecto</th>
+                            <th>Vivienda</th>
+                            <th>Elemento</th>
+                            <th>Tipo</th>
+                            <th>Estado</th>
+                            <th>Prioridad</th>
+                            <th>Fecha Creación</th>
+                            <th>Archivo</th>
+                            <th>Activo</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for observacion in observaciones %}
+                        <tr>
+                            <td>{{ observacion.proyecto.codigo }}</td>
+                            <td>{{ observacion.vivienda.codigo|default:"-" }}</td>
+                            <td>{{ observacion.elemento|default:"-" }}</td>
+                            <td>{{ observacion.tipo.nombre }}</td>
+                            <td>
+                                <span class="badge 
+                                    {% if observacion.estado.nombre == 'Pendiente' %}bg-warning
+                                    {% elif observacion.estado.nombre == 'En Proceso' %}bg-info
+                                    {% elif observacion.estado.nombre == 'Resuelta' %}bg-success
+                                    {% elif observacion.estado.nombre == 'Cerrada' %}bg-secondary
+                                    {% else %}bg-primary
+                                    {% endif %}">
+                                    {{ observacion.estado.nombre }}
+                                </span>
+                            </td>
+                            <td>
+                                <span class="badge {% if observacion.prioridad == 'urgente' or observacion.prioridad == 'alta' %}badge-urgente{% elif observacion.prioridad == 'media' %}bg-warning{% elif observacion.prioridad == 'baja' %}bg-success{% endif %}">
+                                    {{ observacion.get_prioridad_display }}
+                                </span>
+                            </td>
+                            <td>{{ observacion.fecha_creacion|date:"d/m/Y H:i" }}</td>
+                            <td>
+                                {% if observacion.archivo_adjunto %}
+                                    <a href="{{ observacion.archivo_adjunto.url }}" target="_blank" class="btn btn-sm btn-info" title="Ver archivo">
+                                        <i class="bi bi-file-earmark"></i>
+                                    </a>
+                                {% else %}
+                                    <span class="text-muted">-</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if observacion.activo %}
+                                    <span class="badge bg-success">Activo</span>
+                                {% else %}
+                                    <span class="badge bg-secondary">Inactivo</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <div class="acciones-botones">
+                                    <a href="{% url 'maestro_observacion_edit' observacion.pk %}" class="btn btn-sm btn-warning">
+                                        <i class="bi bi-pencil"></i> Editar
+                                    </a>
+                                    <form method="post" action="{% url 'maestro_observacion_delete' observacion.pk %}" style="display:inline;">
+                                        {% csrf_token %}
+                                        <button type="submit" class="btn btn-sm btn-danger" 
+                                                onclick="return confirm('¿Desactivar esta observación?')">
+                                            <i class="bi bi-trash"></i> Desactivar
+                                        </button>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="10" class="text-center">No hay observaciones registradas.</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div class="mt-3">
+        <a href="{% url 'maestro_index' %}" class="btn btn-secondary">Volver al Panel Maestro</a>
+        <a href="{% url 'incidencias:crear_observacion' %}" class="btn btn-primary">
+            <i class="bi bi-plus-circle"></i> Crear Nueva Observación
+        </a>
+    </div>
+</div>
+{% endblock %}

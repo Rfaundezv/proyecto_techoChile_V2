@@ -1,0 +1,132 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}Nuevo Proyecto - TECHO CHILE{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-8">
+        <div class="form-techo">
+            <h3 class="section-title mb-4">Crear Nuevo Proyecto</h3>
+
+            <form method="post" novalidate>
+                {% csrf_token %}
+
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label for="{{ form.codigo.id_for_label }}" class="form-label">Código del Proyecto</label>
+                            {{ form.codigo }}
+                            {% if form.codigo.errors %}
+                                <div class="text-danger small">{{ form.codigo.errors.0 }}</div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label for="{{ form.siglas.id_for_label }}" class="form-label">Siglas</label>
+                            {{ form.siglas }}
+                            {% if form.siglas.errors %}
+                                <div class="text-danger small">{{ form.siglas.errors.0 }}</div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mb-3">
+                    <label for="{{ form.nombre.id_for_label }}" class="form-label">Nombre del Proyecto</label>
+                    {{ form.nombre }}
+                    {% if form.nombre.errors %}
+                        <div class="text-danger small">{{ form.nombre.errors.0 }}</div>
+                    {% endif %}
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label for="{{ form.region.id_for_label }}" class="form-label">Región</label>
+                            {{ form.region }}
+                            {% if form.region.errors %}
+                                <div class="text-danger small">{{ form.region.errors.0 }}</div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label for="{{ form.comuna.id_for_label }}" class="form-label">Comuna</label>
+                            {{ form.comuna }}
+                            {% if form.comuna.errors %}
+                                <div class="text-danger small">{{ form.comuna.errors.0 }}</div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mb-3">
+                    <label for="{{ form.constructora.id_for_label }}" class="form-label">Constructora</label>
+                    {{ form.constructora }}
+                    {% if form.constructora.errors %}
+                        <div class="text-danger small">{{ form.constructora.errors.0 }}</div>
+                    {% endif %}
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label for="{{ form.fecha_entrega.id_for_label }}" class="form-label">Fecha de Entrega</label>
+                            {{ form.fecha_entrega }}
+                            {% if form.fecha_entrega.errors %}
+                                <div class="text-danger small">{{ form.fecha_entrega.errors.0 }}</div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label for="{{ form.fecha_termino_postventa.id_for_label }}" class="form-label">Término Postventa</label>
+                            {{ form.fecha_termino_postventa }}
+                            <small class="form-text text-muted">Se calculará automáticamente si se deja vacío (120 días)</small>
+                            {% if form.fecha_termino_postventa.errors %}
+                                <div class="text-danger small">{{ form.fecha_termino_postventa.errors.0 }}</div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label for="{{ form.coordenadas_s.id_for_label }}" class="form-label">Latitud</label>
+                            {{ form.coordenadas_s }}
+                            {% if form.coordenadas_s.errors %}
+                                <div class="text-danger small">{{ form.coordenadas_s.errors.0 }}</div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label for="{{ form.coordenadas_w.id_for_label }}" class="form-label">Longitud</label>
+                            {{ form.coordenadas_w }}
+                            {% if form.coordenadas_w.errors %}
+                                <div class="text-danger small">{{ form.coordenadas_w.errors.0 }}</div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mb-3">
+                    <div class="form-check">
+                        {{ form.activo }}
+                        <label class="form-check-label" for="{{ form.activo.id_for_label }}">
+                            Proyecto activo
+                        </label>
+                    </div>
+                </div>
+
+                <div class="d-flex gap-2">
+                    <button type="submit" class="btn btn-techo-primary">Crear Proyecto</button>
+                    <a href="{% url 'proyectos:lista' %}" class="btn btn-outline-secondary">Cancelar</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

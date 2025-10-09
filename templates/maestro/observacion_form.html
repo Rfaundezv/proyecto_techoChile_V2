@@ -1,0 +1,349 @@
+{% extends "base.html" %}
+
+{% block title %}{{ titulo }} - {{ block.super }}{% endblock %}
+
+{% block extra_css %}
+<style>
+    .form-control:focus, .form-select:focus {
+        border-color: #00a7e1;
+        box-shadow: 0 0 0 0.2rem rgba(0, 167, 225, 0.25);
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="card">
+        <div class="card-header bg-primary text-white">
+            <h4 class="mb-0">{{ titulo }}</h4>
+        </div>
+        <div class="card-body">
+            <form method="post" id="observacionForm" enctype="multipart/form-data">
+                {% csrf_token %}
+                
+                {% if form.errors %}
+                    <div class="alert alert-danger">
+                        <strong>Por favor corrija los siguientes errores:</strong>
+                        <ul class="mb-0">
+                            {% for field in form %}
+                                {% for error in field.errors %}
+                                    <li>{{ field.label }}: {{ error }}</li>
+                                {% endfor %}
+                            {% endfor %}
+                            {% for error in form.non_field_errors %}
+                                <li>{{ error }}</li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                {% endif %}
+
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label for="{{ form.proyecto.id_for_label }}" class="form-label">Proyecto *</label>
+                        {{ form.proyecto }}
+                        {% if form.proyecto.errors %}
+                            <div class="text-danger small">{{ form.proyecto.errors.0 }}</div>
+                        {% endif %}
+                    </div>
+
+                    <div class="col-md-6 mb-3">
+                        <label for="{{ form.vivienda.id_for_label }}" class="form-label">Vivienda</label>
+                        {{ form.vivienda }}
+                        {% if form.vivienda.errors %}
+                            <div class="text-danger small">{{ form.vivienda.errors.0 }}</div>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label for="{{ form.recinto.id_for_label }}" class="form-label">Recinto</label>
+                        {{ form.recinto }}
+                        {% if form.recinto.errors %}
+                            <div class="text-danger small">{{ form.recinto.errors.0 }}</div>
+                        {% endif %}
+                    </div>
+
+                    <div class="col-md-6 mb-3">
+                        <label for="{{ form.elemento.id_for_label }}" class="form-label">Elemento *</label>
+                        {{ form.elemento }}
+                        {% if form.elemento.errors %}
+                            <div class="text-danger small">{{ form.elemento.errors.0 }}</div>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <div class="mb-3">
+                    <label for="{{ form.tipo.id_for_label }}" class="form-label">Tipo *</label>
+                    {{ form.tipo }}
+                    {% if form.tipo.errors %}
+                        <div class="text-danger small">{{ form.tipo.errors.0 }}</div>
+                    {% endif %}
+                </div>
+
+                <div class="mb-3">
+                    <label for="{{ form.detalle.id_for_label }}" class="form-label">Descripción *</label>
+                    {{ form.detalle }}
+                    {% if form.detalle.errors %}
+                        <div class="text-danger small">{{ form.detalle.errors.0 }}</div>
+                    {% endif %}
+                </div>
+
+                <div class="row">
+                    <div class="col-md-4 mb-3">
+                        <label for="{{ form.estado.id_for_label }}" class="form-label">Estado *</label>
+                        {{ form.estado }}
+                        {% if form.estado.errors %}
+                            <div class="text-danger small">{{ form.estado.errors.0 }}</div>
+                        {% endif %}
+                    </div>
+
+                    <div class="col-md-4 mb-3">
+                        <label for="{{ form.prioridad.id_for_label }}" class="form-label">Prioridad *</label>
+                        {{ form.prioridad }}
+                        {% if form.prioridad.errors %}
+                            <div class="text-danger small">{{ form.prioridad.errors.0 }}</div>
+                        {% endif %}
+                    </div>
+
+                    <div class="col-md-4 mb-3">
+                        <label for="{{ form.fecha_vencimiento.id_for_label }}" class="form-label">Fecha Límite</label>
+                        {{ form.fecha_vencimiento }}
+                        {% if form.fecha_vencimiento.errors %}
+                            <div class="text-danger small">{{ form.fecha_vencimiento.errors.0 }}</div>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <div class="mb-3">
+                    <label for="{{ form.es_urgente.id_for_label }}" class="form-label">Urgente</label>
+                    <div class="form-check">
+                        {{ form.es_urgente }}
+                        <label class="form-check-label" for="{{ form.es_urgente.id_for_label }}">
+                            Marcar como urgente
+                        </label>
+                    </div>
+                    {% if form.es_urgente.errors %}
+                        <div class="text-danger small">{{ form.es_urgente.errors.0 }}</div>
+                    {% endif %}
+                </div>
+
+                <div class="mb-3">
+                    <label for="{{ form.observaciones_seguimiento.id_for_label }}" class="form-label">Notas de Seguimiento</label>
+                    {{ form.observaciones_seguimiento }}
+                    {% if form.observaciones_seguimiento.errors %}
+                        <div class="text-danger small">{{ form.observaciones_seguimiento.errors.0 }}</div>
+                    {% endif %}
+                </div>
+
+                <div class="mb-3">
+                    <label for="{{ form.archivo_adjunto.id_for_label }}" class="form-label">Archivo Principal (Opcional)</label>
+                    {{ form.archivo_adjunto }}
+                    {% if form.instance.archivo_adjunto %}
+                        <div class="mt-2">
+                            <small class="text-muted">
+                                Archivo actual: <a href="{{ form.instance.archivo_adjunto.url }}" target="_blank">{{ form.instance.archivo_adjunto.name }}</a>
+                            </small>
+                        </div>
+                    {% endif %}
+                    <small class="form-text text-muted">Formato: PDF, DOC, DOCX, JPG, PNG, GIF, BMP. Máx: 10MB</small>
+                    {% if form.archivo_adjunto.errors %}
+                        <div class="text-danger small">{{ form.archivo_adjunto.errors.0 }}</div>
+                    {% endif %}
+                </div>
+
+                {% if form.instance.pk %}
+                <div class="mb-3">
+                    <label for="archivos_adjuntos" class="form-label">Agregar Archivos Adicionales (Opcional)</label>
+                    <div class="input-group">
+                        <input type="file" class="form-control" id="archivos_adjuntos" multiple 
+                               accept=".pdf,.doc,.docx,.jpg,.jpeg,.png,.gif,.bmp">
+                        <button type="button" class="btn btn-outline-secondary" id="btn-agregar-archivos">
+                            <i class="bi bi-plus-circle"></i> Agregar
+                        </button>
+                    </div>
+                    <small class="form-text text-muted d-block mt-1">
+                        Formatos: PDF, DOC, DOCX, JPG, PNG, GIF, BMP. Máximo <strong>10MB en total</strong>
+                    </small>
+                    <div id="archivos-seleccionados" class="mt-2"></div>
+                </div>
+                {% endif %}
+
+                <div class="mb-3">
+                    <label for="{{ form.activo.id_for_label }}" class="form-label">Activo</label>
+                    <div class="form-check">
+                        {{ form.activo }}
+                        <label class="form-check-label" for="{{ form.activo.id_for_label }}">
+                            Marcar como activo
+                        </label>
+                    </div>
+                    {% if form.activo.errors %}
+                        <div class="text-danger small">{{ form.activo.errors.0 }}</div>
+                    {% endif %}
+                </div>
+
+                <div class="d-flex justify-content-between mt-4">
+                    <a href="{% url 'maestro_observacion_list' %}" class="btn btn-secondary">
+                        <i class="bi bi-arrow-left"></i> Cancelar
+                    </a>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="bi bi-save"></i> Guardar
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Sistema de archivos acumulativos
+    let archivosSeleccionados = [];
+    const MAX_SIZE_TOTAL = 10 * 1024 * 1024; // 10MB en bytes
+    
+    const archivosInput = document.getElementById('archivos_adjuntos');
+    const btnAgregarArchivos = document.getElementById('btn-agregar-archivos');
+    const archivosDiv = document.getElementById('archivos-seleccionados');
+    
+    if (archivosInput && btnAgregarArchivos) {
+        btnAgregarArchivos.addEventListener('click', function() {
+            const files = archivosInput.files;
+            
+            if (files.length === 0) {
+                alert('Por favor seleccione al menos un archivo');
+                return;
+            }
+            
+            // Agregar archivos a la lista
+            for (let i = 0; i < files.length; i++) {
+                archivosSeleccionados.push(files[i]);
+            }
+            
+            // Limpiar input
+            archivosInput.value = '';
+            
+            // Actualizar visualización
+            actualizarListaArchivos();
+        });
+        
+        // Permitir eliminar archivos de la lista
+        archivosDiv.addEventListener('click', function(e) {
+            if (e.target.classList.contains('btn-eliminar-archivo')) {
+                const index = parseInt(e.target.dataset.index);
+                archivosSeleccionados.splice(index, 1);
+                actualizarListaArchivos();
+            }
+        });
+    }
+    
+    function actualizarListaArchivos() {
+        if (archivosSeleccionados.length === 0) {
+            archivosDiv.innerHTML = '';
+            return;
+        }
+        
+        let sizeTotal = 0;
+        let html = '<div class="card"><div class="card-body">';
+        html += '<h6 class="card-title">Archivos seleccionados:</h6>';
+        html += '<div class="list-group list-group-flush">';
+        
+        archivosSeleccionados.forEach((file, index) => {
+            const size = (file.size / (1024 * 1024)).toFixed(2);
+            sizeTotal += file.size;
+            const icono = getFileIcon(file.name);
+            
+            html += `
+                <div class="list-group-item d-flex justify-content-between align-items-center">
+                    <div>
+                        <span>${icono}</span>
+                        <strong>${file.name}</strong>
+                        <small class="text-muted">(${size} MB)</small>
+                    </div>
+                    <button type="button" class="btn btn-sm btn-danger btn-eliminar-archivo" data-index="${index}">
+                        <i class="bi bi-trash"></i>
+                    </button>
+                </div>
+            `;
+        });
+        
+        html += '</div>';
+        
+        // Mostrar tamaño total
+        const sizeTotalMB = (sizeTotal / (1024 * 1024)).toFixed(2);
+        const porcentaje = ((sizeTotal / MAX_SIZE_TOTAL) * 100).toFixed(1);
+        
+        if (sizeTotal > MAX_SIZE_TOTAL) {
+            html += `
+                <div class="alert alert-danger mt-3 mb-0">
+                    <strong>⚠️ Tamaño total: ${sizeTotalMB} MB / 10 MB (${porcentaje}%)</strong><br>
+                    ¡El tamaño total excede el límite de 10MB! Por favor elimine algunos archivos.
+                </div>
+            `;
+        } else {
+            const alertClass = sizeTotal > MAX_SIZE_TOTAL * 0.8 ? 'alert-warning' : 'alert-info';
+            html += `
+                <div class="alert ${alertClass} mt-3 mb-0">
+                    Tamaño total: <strong>${sizeTotalMB} MB / 10 MB</strong> (${porcentaje}%)
+                </div>
+            `;
+        }
+        
+        html += '</div></div>';
+        archivosDiv.innerHTML = html;
+    }
+    
+    function getFileIcon(filename) {
+        const ext = filename.toLowerCase().split('.').pop();
+        const icons = {
+            'pdf': '📄',
+            'doc': '📝',
+            'docx': '📝',
+            'jpg': '🖼️',
+            'jpeg': '🖼️',
+            'png': '🖼️',
+            'gif': '🖼️',
+            'bmp': '🖼️'
+        };
+        return icons[ext] || '📁';
+    }
+    
+    // Transferir archivos al formulario antes de enviar
+    const form = document.getElementById('observacionForm');
+    if (form) {
+        form.addEventListener('submit', function(e) {
+            // Validar tamaño total
+            let sizeTotal = 0;
+            archivosSeleccionados.forEach(file => {
+                sizeTotal += file.size;
+            });
+            
+            if (sizeTotal > MAX_SIZE_TOTAL) {
+                e.preventDefault();
+                alert('El tamaño total de los archivos excede el límite de 10MB. Por favor elimine algunos archivos.');
+                return false;
+            }
+            
+            if (archivosSeleccionados.length > 0) {
+                // Crear un DataTransfer para transferir los archivos al input
+                const dataTransfer = new DataTransfer();
+                archivosSeleccionados.forEach(file => {
+                    dataTransfer.items.add(file);
+                });
+                
+                // Crear un input hidden con los archivos
+                const inputHidden = document.createElement('input');
+                inputHidden.type = 'file';
+                inputHidden.name = 'archivos_adjuntos';
+                inputHidden.multiple = true;
+                inputHidden.files = dataTransfer.files;
+                inputHidden.style.display = 'none';
+                
+                form.appendChild(inputHidden);
+            }
+        });
+    }
+});
+</script>
+{% endblock %}
+{% endblock %}
