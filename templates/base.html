@@ -118,7 +118,10 @@
                     
                     <li class="nav-item ms-lg-auto">
                             <span class="nav-link text-muted small">
-                                <i class="bi bi-person-badge"></i> {{ user.username }}
+                                <i class="bi bi-person-badge"></i> {{ user.nombre }}
+                                {% if user.rol %}
+                                    <span class="badge bg-primary ms-1">{{ user.rol.nombre }}</span>
+                                {% endif %}
                             </span>
                     </li>
                     

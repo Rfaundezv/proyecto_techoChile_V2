@@ -21,8 +21,8 @@ class Command(BaseCommand):
                 user.is_superuser = True
                 user.is_staff = True
                 user.save()
-                self.stdout.write(self.style.SUCCESS(f"Usuario '{user.username}' promovido a superusuario."))
+                self.stdout.write(self.style.SUCCESS(f"Usuario '{user.email}' promovido a superusuario."))
             else:
-                self.stdout.write(f"Usuario '{user.username}' ya es superusuario.")
+                self.stdout.write(f"Usuario '{user.email}' ya es superusuario.")
 
         self.stdout.write(self.style.SUCCESS('Promoción completada.'))

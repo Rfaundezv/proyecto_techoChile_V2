@@ -117,8 +117,23 @@ def lista_observaciones(request):
 @login_required
 @puede_crear_observacion
 def crear_observacion(request):
-    # **CASO ESPECIAL PARA FAMILIA**
-    if request.user.groups.filter(name='FAMILIA').exists():
+    # Los administradores y TECHO siempre pueden seleccionar proyecto y vivienda
+    es_admin_o_techo = (
+        request.user.is_superuser or 
+        request.user.groups.filter(name='ADMINISTRADOR').exists() or
+        (hasattr(request.user, 'rol') and request.user.rol and request.user.rol.nombre in ['ADMINISTRADOR', 'TECHO'])
+    )
+    
+    # Solo es familia si pertenece al grupo FAMILIA Y NO es admin/techo
+    es_familia = (
+        not es_admin_o_techo and 
+        (request.user.groups.filter(name='FAMILIA').exists() or (
+            hasattr(request.user, 'rol') and request.user.rol and request.user.rol.nombre == 'FAMILIA'
+        ))
+    )
+    
+    # Si es familia Y NO es admin/techo, usar lógica especial
+    if es_familia and not es_admin_o_techo:
         from django.db.models import Q
         
         # Buscar vivienda por RUT (más preciso) o por nombre (fallback)
@@ -261,7 +276,7 @@ def crear_observacion(request):
         }
         return render(request, 'incidencias/crear_observacion.html', context)
     
-    # **PARA OTROS ROLES (ADMIN, TECHO, CONSTRUCTORA)**
+    # **PARA ADMINISTRADORES, TECHO Y OTROS ROLES (pueden seleccionar proyecto y vivienda)**
     if request.method == 'POST':
         form = ObservacionForm(request.POST, request.FILES)
         
@@ -374,6 +389,120 @@ def crear_observacion(request):
         form.fields['recinto'].queryset = Recinto.objects.filter(activo=True)
     
     return render(request, 'incidencias/crear_observacion.html', {'form': form})
+    
+    # **PARA OTROS ROLES (ADMIN, TECHO, CONSTRUCTORA)**
+    if request.method == 'POST':
+        form = ObservacionForm(request.POST, request.FILES)
+        
+        # Permitir que el formulario valide con los datos del proyecto
+        if 'proyecto' in request.POST:
+            try:
+                proyecto_id = int(request.POST.get('proyecto'))
+                form.fields['vivienda'].queryset = Vivienda.objects.filter(proyecto_id=proyecto_id, activa=True)
+            except (ValueError, TypeError):
+                pass
+        
+        if form.is_valid():
+            observacion = form.save(commit=False)
+            observacion.creado_por = request.user
+            
+            # Asignar el proyecto desde el formulario
+            if 'proyecto' in form.cleaned_data:
+                observacion.proyecto = form.cleaned_data['proyecto']
+            
+            # Verificar permisos específicos para FAMILIA
+            if request.user.groups.filter(name='FAMILIA').exists():
+                vivienda = observacion.vivienda
+                if not puede_crear_obs_func(request.user, vivienda):
+                    messages.error(request, 'No tienes permisos para crear observaciones en esta vivienda.')
+                    return redirect('incidencias:lista_observaciones')
+            
+            # Sincronizar es_urgente con prioridad
+            if observacion.es_urgente:
+                observacion.prioridad = 'urgente'
+            elif observacion.prioridad == 'urgente':
+                observacion.es_urgente = True
+            
+            # Asignar estado inicial
+            try:
+                estado_abierta = EstadoObservacion.objects.get(codigo=1)
+            except EstadoObservacion.DoesNotExist:
+                try:
+                    estado_abierta = EstadoObservacion.objects.filter(activo=True).first()
+                except:
+                    estado_abierta = None
+            
+            if estado_abierta:
+                observacion.estado = estado_abierta
+            else:
+                messages.error(request, 'No se puede crear la observación: no hay estados configurados. Contacte al administrador.')
+                return redirect('incidencias:lista_observaciones')
+            
+            # Asignar fecha de vencimiento automática según configuración
+            from core.models import ConfiguracionObservacion
+            from datetime import timedelta, date
+            
+            config = ConfiguracionObservacion.get_configuracion()
+            if observacion.es_urgente:
+                # Urgente: sumar horas configuradas (por defecto 48 horas)
+                # Convertir horas a días (redondeando hacia arriba)
+                dias_urgente = (config.horas_vencimiento_urgente + 23) // 24  # 48h = 2 días
+                observacion.fecha_vencimiento = date.today() + timedelta(days=dias_urgente)
+            else:
+                # Normal: sumar días configurados (por defecto 120 días)
+                observacion.fecha_vencimiento = date.today() + timedelta(days=config.dias_vencimiento_normal)
+            
+            observacion.save()
+
+            # Procesar archivos adjuntos
+            archivos_adjuntos = request.FILES.getlist('archivos_adjuntos')
+            archivos_guardados = 0
+            size_total = sum(archivo.size for archivo in archivos_adjuntos)
+            
+            # Validar tamaño total (10MB)
+            if size_total > 10 * 1024 * 1024:
+                messages.error(request, f'El tamaño total de los archivos ({size_total / (1024*1024):.2f} MB) excede el límite de 10MB')
+            else:
+                for archivo in archivos_adjuntos:
+                    try:
+                        ArchivoAdjuntoObservacion.objects.create(
+                            observacion=observacion,
+                            archivo=archivo,
+                            nombre_original=archivo.name,
+                            subido_por=request.user
+                        )
+                        archivos_guardados += 1
+                    except Exception as e:
+                        messages.warning(request, f'No se pudo guardar el archivo {archivo.name}: {str(e)}')
+
+            # Crear seguimiento inicial (si existe el modelo)
+            comentario = 'Observación creada'
+            if archivos_guardados > 0:
+                comentario += f' con {archivos_guardados} archivo(s) adicional(es)'
+            
+            try:
+                SeguimientoObservacion.objects.create(
+                    observacion=observacion,
+                    usuario=request.user,
+                    accion='Creación',
+                    comentario=comentario
+                )
+            except:
+                pass  # Si no existe el modelo de seguimiento, continuar
+
+            mensaje = 'Observación creada exitosamente.'
+            if archivos_guardados > 0:
+                mensaje += f' Se adjuntaron {archivos_guardados} archivo(s) adicional(es).'
+            messages.success(request, mensaje)
+            return redirect('incidencias:detalle_observacion', pk=observacion.pk)
+    else:
+        form = ObservacionForm()
+        # Administradores y otros roles pueden seleccionar proyecto y vivienda
+        form.fields['proyecto'].queryset = Proyecto.objects.filter(activo=True)
+        form.fields['vivienda'].queryset = Vivienda.objects.none()  # Inicialmente vacío
+        form.fields['recinto'].queryset = Recinto.objects.filter(activo=True)
+    
+    return render(request, 'incidencias/crear_observacion.html', {'form': form, 'es_familia': es_familia})
 
 @login_required
 def detalle_observacion(request, pk):
