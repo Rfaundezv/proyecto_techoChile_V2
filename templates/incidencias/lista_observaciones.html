@@ -4,8 +4,8 @@
 {% block content %}
 <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
     <div>
-        <h2 class="section-title mb-1">{% if es_familia %}Mis Observaciones{% else %}Observaciones{% endif %}</h2>
-        <p class="section-subtitle d-none d-md-block">
+    <h2 class="section-title mb-1" style="color: #111 !important; background: none !important;">{% if es_familia %}Mis Observaciones{% else %}Observaciones{% endif %}</h2>
+    <p class="section-subtitle d-none d-md-block" style="color: #111 !important; background: none !important;">
             {% if es_familia %}
                 Seguimiento de las observaciones de tu vivienda
             {% else %}
@@ -14,18 +14,19 @@
         </p>
     </div>
     <div class="d-flex gap-2 flex-wrap">
-        {% if puede_crear %}
-        <a href="{% url 'incidencias:crear_observacion' %}" class="btn btn-techo-primary">
-            <i class="bi bi-plus-circle d-md-none"></i>
-            <span class="d-none d-md-inline">Nueva Observación</span>
-            <span class="d-md-none">Nueva</span>
-        </a>
-        {% endif %}
-        {% if not es_familia %}
-        <button class="btn btn-outline-primary d-none d-sm-inline">
-            Chequeo Móvil
-        </button>
-        {% endif %}
+            {% if puede_crear %}
+            <a href="{% url 'incidencias:crear_observacion' %}" class="btn btn-techo-primary" 
+               style="background: linear-gradient(45deg, #2563eb, #1e40af) !important; color: white !important; border: none !important; box-shadow: 0 2px 8px rgba(37, 99, 235, 0.3) !important; font-weight: 600 !important; text-decoration: none !important; display: inline-flex !important; align-items: center !important; justify-content: center !important; gap: 0.5rem !important; transition: all 0.3s ease !important;">
+                <i class="bi bi-plus-circle d-md-none"></i>
+                <span class="d-none d-md-inline">Nueva Observación</span>
+                <span class="d-md-none">Nueva</span>
+            </a>
+            {% endif %}
+            {% if not es_familia %}
+            <button class="btn btn-outline-primary d-none d-sm-inline">
+                Chequeo Móvil
+            </button>
+            {% endif %}
     </div>
     <!-- Métricas para familias -->
     {% if es_familia %}
@@ -161,12 +162,22 @@
                         {% with estado_class=obs.estado.nombre|slugify %}
                             {% if puede_cambiar_estado %}
                                 <span id="estado-badge-{{ obs.pk }}" class="badge badge-{{ estado_class }} estado-badge" 
-                                      data-obs-id="{{ obs.pk }}" style="cursor: pointer;{% if obs.estado.nombre == 'En Proceso' %} background: linear-gradient(45deg, #f97316, #ea580c) !important; color: #fff !important; border: 2px solid #ea580c !important; font-weight: 700 !important;{% endif %}" 
+                                      data-obs-id="{{ obs.pk }}" style="cursor: pointer;
+                                      {% if obs.estado.nombre == 'En Proceso' %}
+                                          background: linear-gradient(45deg, #f97316, #ea580c) !important; color: #fff !important; border: 2px solid #ea580c !important; font-weight: 700 !important;
+                                      {% elif obs.estado.nombre == 'Rechazada' %}
+                                          background: linear-gradient(45deg, #dc3545, #b91c1c) !important; color: #fff !important; border: 2px solid #b91c1c !important; font-weight: 700 !important;
+                                      {% endif %}"
                                       title="Click para cambiar estado">
                                     {{ obs.estado.nombre }}
                                 </span>
                             {% else %}
-                                <span class="badge badge-{{ estado_class }}" style="{% if obs.estado.nombre == 'En Proceso' %} background: linear-gradient(45deg, #f97316, #ea580c) !important; color: #fff !important; border: 2px solid #ea580c !important; font-weight: 700 !important;{% endif %}">
+                                <span class="badge badge-{{ estado_class }}" style="
+                                    {% if obs.estado.nombre == 'En Proceso' %}
+                                        background: linear-gradient(45deg, #f97316, #ea580c) !important; color: #fff !important; border: 2px solid #ea580c !important; font-weight: 700 !important;
+                                    {% elif obs.estado.nombre == 'Rechazada' %}
+                                        background: linear-gradient(45deg, #dc3545, #b91c1c) !important; color: #fff !important; border: 2px solid #b91c1c !important; font-weight: 700 !important;
+                                    {% endif %}">
                                     {{ obs.estado.nombre }}
                                 </span>
                             {% endif %}
@@ -265,7 +276,12 @@
                     <small class="text-muted d-block">{{ obs.proyecto.nombre|truncatechars:25 }}</small>
                 </div>
                 <span id="estado-badge-{{ obs.pk }}" class="badge badge-{{ obs.estado.nombre|lower }} estado-badge" 
-                      data-obs-id="{{ obs.pk }}" style="cursor: pointer;{% if obs.estado.nombre == 'En Proceso' %} background: linear-gradient(45deg, #f97316, #ea580c) !important; color: #fff !important; border: 2px solid #ea580c !important; font-weight: 700 !important;{% endif %}" 
+                      data-obs-id="{{ obs.pk }}" style="cursor: pointer;
+                      {% if obs.estado.nombre == 'En Proceso' %}
+                          background: linear-gradient(45deg, #f97316, #ea580c) !important; color: #fff !important; border: 2px solid #ea580c !important; font-weight: 700 !important;
+                      {% elif obs.estado.nombre == 'Rechazada' %}
+                          background: linear-gradient(45deg, #dc3545, #b91c1c) !important; color: #fff !important; border: 2px solid #b91c1c !important; font-weight: 700 !important;
+                      {% endif %}"
                       title="Click para cambiar estado">
                     {{ obs.estado.nombre }}
                 </span>
@@ -348,7 +364,8 @@
 
             <!-- Botones de acción -->
             <div class="d-flex gap-2 mt-3">
-                <a href="{% url 'incidencias:detalle_observacion' obs.pk %}" class="btn btn-sm btn-techo-primary flex-grow-1">
+                <a href="{% url 'incidencias:detalle_observacion' obs.pk %}" class="btn btn-sm btn-techo-primary flex-grow-1"
+                   style="background: linear-gradient(45deg, #2563eb, #1e40af) !important; color: white !important; border: none !important; box-shadow: 0 2px 8px rgba(37, 99, 235, 0.3) !important; font-weight: 600 !important; text-decoration: none !important; display: inline-flex !important; align-items: center !important; justify-content: center !important; gap: 0.5rem !important; transition: all 0.3s ease !important;">
                     Ver detalle
                 </a>
                 <button class="btn btn-sm btn-outline-warning cambiar-estado-btn" 
@@ -423,7 +440,8 @@
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                <button type="button" class="btn btn-techo-primary" id="confirmarCambioEstado">Cambiar Estado</button>
+                <button type="button" class="btn btn-techo-primary" id="confirmarCambioEstado"
+                        style="background: linear-gradient(45deg, #2563eb, #1e40af) !important; color: white !important; border: none !important; box-shadow: 0 2px 8px rgba(37, 99, 235, 0.3) !important; font-weight: 600 !important; text-decoration: none !important; display: inline-flex !important; align-items: center !important; justify-content: center !important; gap: 0.5rem !important; transition: all 0.3s ease !important;">Cambiar Estado</button>
             </div>
         </div>
     </div>

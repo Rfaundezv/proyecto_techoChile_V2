@@ -2,11 +2,21 @@
 {% block title %}Proyectos - TECHO CHILE{% endblock %}
 
 {% block content %}
-<div class="d-flex justify-content-between align-items-center mb-4">
-    <h2 class="section-title">Gestión de Proyectos</h2>
-    <a href="{% url 'proyectos:crear' %}" class="btn btn-techo-primary">
-        ➕ Nuevo Proyecto
-    </a>
+<div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
+    <div>
+    <h2 class="section-title mb-1" style="color: #111 !important; background: none !important;">Gestión de Proyectos</h2>
+    <p class="section-subtitle d-none d-md-block" style="color: #111 !important; background: none !important;">Administración de proyectos de vivienda</p>
+    </div>
+    <div class="d-flex gap-2 flex-wrap">
+        {% if not es_familia %}
+        <a href="{% url 'proyectos:crear' %}" class="btn btn-techo-primary"
+           style="background: linear-gradient(45deg, #2563eb, #1e40af) !important; color: white !important; border: none !important; box-shadow: 0 2px 8px rgba(37, 99, 235, 0.3) !important; font-weight: 600 !important; text-decoration: none !important; display: inline-flex !important; align-items: center !important; justify-content: center !important; gap: 0.5rem !important; transition: all 0.3s ease !important;">
+            <i class="bi bi-building-add d-md-none"></i>
+            <span class="d-none d-md-inline">Nuevo Proyecto</span>
+            <span class="d-md-none">Proyecto</span>
+        </a>
+        {% endif %}
+    </div>
 </div>
 
 <!-- Filtros -->
@@ -104,7 +114,8 @@
 
             <!-- Botones de acción -->
             <div class="d-flex gap-2">
-                <a href="{% url 'proyectos:detalle' proyecto.pk %}" class="btn btn-sm btn-techo-primary flex-grow-1">
+                <a href="{% url 'proyectos:detalle' proyecto.pk %}" class="btn btn-sm btn-techo-primary flex-grow-1"
+                   style="background: linear-gradient(45deg, #2563eb, #1e40af) !important; color: white !important; border: none !important; box-shadow: 0 2px 8px rgba(37, 99, 235, 0.3) !important; font-weight: 600 !important; text-decoration: none !important; display: inline-flex !important; align-items: center !important; justify-content: center !important; gap: 0.5rem !important; transition: all 0.3s ease !important;">
                     Ver detalle
                 </a>
                 <a href="{% url 'proyectos:editar' proyecto.pk %}" class="btn btn-sm btn-outline-warning">

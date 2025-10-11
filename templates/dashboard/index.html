@@ -68,11 +68,11 @@ a .metric-card:hover .metric-label {
 <!-- DASHBOARD ESPECIAL PARA FAMILIA -->
 <!-- ================================ -->
 <div class="section-header">
-    <h2 class="section-title">Mi Vivienda</h2>
+    <h2 class="section-title" style="color: #111 !important; background: none !important;">Mi Vivienda</h2>
     {% if mi_vivienda %}
-    <p class="section-subtitle">Información y seguimiento de tu vivienda - {{ mi_vivienda.proyecto.nombre }}</p>
+    <p class="section-subtitle" style="color: #111 !important; background: none !important;">Información y seguimiento de tu vivienda - {{ mi_vivienda.proyecto.nombre }}</p>
     {% else %}
-    <p class="section-subtitle text-warning">No se encontró una vivienda asignada a tu cuenta</p>
+    <p class="section-subtitle text-warning" style="color: #111 !important; background: none !important;">No se encontró una vivienda asignada a tu cuenta</p>
     {% endif %}
 </div>
 
@@ -233,9 +233,12 @@ a .metric-card:hover .metric-label {
 <!-- ====================================== -->
 <!-- DASHBOARD NORMAL PARA OTROS ROLES -->
 <!-- ====================================== -->
-<div class="section-header">
-    <h2 class="section-title">Resumen de mi gestión</h2>
-    <p class="section-subtitle">Panel de control con métricas clave de Techo Chile</p>
+<div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
+    <div>
+    <h2 class="section-title mb-1" style="color: #111 !important; background: none !important;">Resumen de Gestión</h2>
+    <p class="section-subtitle d-none d-md-block" style="color: #111 !important; background: none !important;">Panel de control con métricas clave de Techo Chile</p>
+    </div>
+ 
 </div>
 
 <div class="chart-container" style="border-radius: 0 0 12px 12px; margin-top: 0;">
@@ -357,7 +360,8 @@ a .metric-card:hover .metric-label {
                         <small class="text-muted">
                             <i class="bi bi-calendar3"></i> {{ obs.fecha_creacion|date:"d/m/Y" }}
                         </small>
-                        <a href="{% url 'incidencias:detalle_observacion' obs.pk %}" class="btn btn-sm btn-techo-primary">
+                        <a href="{% url 'incidencias:detalle_observacion' obs.pk %}" class="btn btn-sm btn-techo-primary"
+                           style="background: linear-gradient(45deg, #2563eb, #1e40af) !important; color: white !important; border: none !important; box-shadow: 0 2px 8px rgba(37, 99, 235, 0.3) !important; font-weight: 600 !important; text-decoration: none !important; display: inline-flex !important; align-items: center !important; justify-content: center !important; gap: 0.5rem !important; transition: all 0.3s ease !important;">
                             Ver detalle
                         </a>
                     </div>
@@ -368,7 +372,8 @@ a .metric-card:hover .metric-label {
             </div>
 
             <div class="text-center mt-3">
-                <a href="{% url 'incidencias:lista_observaciones' %}" class="btn btn-techo-primary">Ver todas las observaciones</a>
+                <a href="{% url 'incidencias:lista_observaciones' %}" class="btn btn-techo-primary"
+                   style="background: linear-gradient(45deg, #2563eb, #1e40af) !important; color: white !important; border: none !important; box-shadow: 0 2px 8px rgba(37, 99, 235, 0.3) !important; font-weight: 600 !important; text-decoration: none !important; display: inline-flex !important; align-items: center !important; justify-content: center !important; gap: 0.5rem !important; transition: all 0.3s ease !important;">Ver todas las observaciones</a>
             </div>
         </div>
     </div>
@@ -420,7 +425,8 @@ a .metric-card:hover .metric-label {
             <h4 class="mb-4">Acciones rápidas</h4>
             <div class="row g-3">
                 <div class="col-md-3">
-                    <a href="{% url 'proyectos:crear' %}" class="btn btn-techo-primary w-100">
+                    <a href="{% url 'proyectos:crear' %}" class="btn btn-techo-primary w-100"
+                       style="background: linear-gradient(45deg, #2563eb, #1e40af) !important; color: white !important; border: none !important; box-shadow: 0 2px 8px rgba(37, 99, 235, 0.3) !important; font-weight: 600 !important; text-decoration: none !important; display: inline-flex !important; align-items: center !important; justify-content: center !important; gap: 0.5rem !important; transition: all 0.3s ease !important;">
                     Nuevo Proyecto
                     </a>
                 </div>

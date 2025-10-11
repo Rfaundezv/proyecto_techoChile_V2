@@ -204,8 +204,15 @@ logger = logging.getLogger(__name__)
 @login_required
 @rol_requerido('ADMINISTRADOR', 'TECHO')
 def maestro(request):
+    # Determinar si el usuario es familia
+    es_familia = (
+        request.user.groups.filter(name='FAMILIA').exists() or 
+        (hasattr(request.user, 'rol') and request.user.rol and request.user.rol.nombre == 'FAMILIA')
+    )
+    
     context = {
-        'titulo': 'Panel Maestro'
+        'titulo': 'Panel Maestro',
+        'es_familia': es_familia,
     }
     return render(request, 'maestro/index.html', context)
 

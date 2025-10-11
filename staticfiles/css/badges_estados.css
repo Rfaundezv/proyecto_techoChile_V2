@@ -36,8 +36,12 @@
     color: white !important;
 }
 .badge-proceso, .badge-en-proceso { 
-    background: linear-gradient(45deg, #f97316, #ea580c) !important; 
-    color: white !important;
+    background: linear-gradient(45deg, #f97316, #ea580c) !important;
+    color: #fff !important;
+    border: 2px solid #ea580c !important;
+    box-shadow: 0 0 8px 2px rgba(249,115,22,0.15);
+    font-weight: 700;
+    text-shadow: 0 1px 2px rgba(0,0,0,0.15);
 }
 
 /* Alertas flotantes */

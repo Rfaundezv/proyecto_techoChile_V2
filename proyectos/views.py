@@ -34,9 +34,16 @@ def lista_proyectos(request):
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
 
+    # Determinar si el usuario es familia
+    es_familia = (
+        request.user.groups.filter(name='FAMILIA').exists() or 
+        (hasattr(request.user, 'rol') and request.user.rol and request.user.rol.nombre == 'FAMILIA')
+    )
+
     context = {
         'proyectos': page_obj,
         'search': search,
+        'es_familia': es_familia,
     }
     return render(request, 'proyectos/lista.html', context)
 

@@ -3,20 +3,49 @@
 {% block title %}{{ titulo }} - {{ block.super }}{% endblock %}
 
 {% block content %}
-<div class="container mt-4">
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <h2>{{ titulo }}</h2>
-        <form method="get" class="d-flex" style="gap: 1rem;">
-            <input type="text" name="rut" class="form-control" placeholder="RUT" value="{{ request.GET.rut|default:'' }}" style="max-width: 120px;">
-            <input type="text" name="correo" class="form-control" placeholder="Correo" value="{{ request.GET.correo|default:'' }}" style="max-width: 160px;">
-            <input type="text" name="rol" class="form-control" placeholder="Rol" value="{{ request.GET.rol|default:'' }}" style="max-width: 120px;">
-            <input type="text" name="empresa" class="form-control" placeholder="Empresa" value="{{ request.GET.empresa|default:'' }}" style="max-width: 120px;">
-            <button type="submit" class="btn btn-outline-primary">Buscar</button>
-        </form>
-        <a href="{% url 'maestro_usuario_create' %}" class="btn btn-primary">
-            <i class="bi bi-plus-circle"></i> Crear Usuario
+<div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
+    <div>
+        <h2 class="section-title mb-1">{{ titulo }}</h2>
+        <p class="section-subtitle d-none d-md-block">Gestión de usuarios desde el panel maestro</p>
+    </div>
+    <div class="d-flex gap-2 flex-wrap">
+        <a href="{% url 'incidencias:crear_observacion' %}" class="btn btn-techo-primary"
+           style="background: linear-gradient(45deg, #2563eb, #1e40af) !important; color: white !important; border: none !important; box-shadow: 0 2px 8px rgba(37, 99, 235, 0.3) !important; font-weight: 600 !important; text-decoration: none !important; display: inline-flex !important; align-items: center !important; justify-content: center !important; gap: 0.5rem !important; transition: all 0.3s ease !important;">
+            <i class="bi bi-plus-circle d-md-none"></i>
+            <span class="d-none d-md-inline">Nueva Observación</span>
+            <span class="d-md-none">Nueva Obs.</span>
+        </a>
+        <a href="{% url 'proyectos:crear' %}" class="btn btn-techo-primary"
+           style="background: linear-gradient(45deg, #2563eb, #1e40af) !important; color: white !important; border: none !important; box-shadow: 0 2px 8px rgba(37, 99, 235, 0.3) !important; font-weight: 600 !important; text-decoration: none !important; display: inline-flex !important; align-items: center !important; justify-content: center !important; gap: 0.5rem !important; transition: all 0.3s ease !important;">
+            <i class="bi bi-building-add d-md-none"></i>
+            <span class="d-none d-md-inline">Nuevo Proyecto</span>
+            <span class="d-md-none">Proyecto</span>
+        </a>
+        <a href="{% url 'maestro_index' %}" class="btn btn-outline-secondary">
+            <i class="bi bi-arrow-left"></i>
+            <span class="d-none d-md-inline">Volver al Panel Maestro</span>
+            <span class="d-md-none">Volver</span>
         </a>
     </div>
+</div>
+
+<!-- Filtros de búsqueda -->
+<div class="chart-container mb-4">
+    <h5 class="mb-3">Filtros de Búsqueda</h5>
+    <form method="get" class="d-flex flex-wrap gap-2">
+        <input type="text" name="rut" class="form-control" placeholder="RUT" value="{{ request.GET.rut|default:'' }}" style="max-width: 120px;">
+        <input type="text" name="correo" class="form-control" placeholder="Correo" value="{{ request.GET.correo|default:'' }}" style="max-width: 160px;">
+        <input type="text" name="rol" class="form-control" placeholder="Rol" value="{{ request.GET.rol|default:'' }}" style="max-width: 120px;">
+        <input type="text" name="empresa" class="form-control" placeholder="Empresa" value="{{ request.GET.empresa|default:'' }}" style="max-width: 120px;">
+        <button type="submit" class="btn btn-outline-primary">Buscar</button>
+        <a href="{% url 'maestro_usuario_create' %}" class="btn btn-techo-primary"
+           style="background: linear-gradient(45deg, #2563eb, #1e40af) !important; color: white !important; border: none !important; box-shadow: 0 2px 8px rgba(37, 99, 235, 0.3) !important; font-weight: 600 !important; text-decoration: none !important; display: inline-flex !important; align-items: center !important; justify-content: center !important; gap: 0.5rem !important; transition: all 0.3s ease !important;">
+            <i class="bi bi-plus-circle"></i> Crear Usuario
+        </a>
+    </form>
+</div>
+
+<div class="container mt-4">
 
     {% if messages %}
         {% for message in messages %}
