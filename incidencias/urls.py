@@ -1,3 +1,4 @@
+
 from django.urls import path
 from . import views
 
@@ -13,4 +14,5 @@ urlpatterns = [
     path('ajax/recintos/', views.ajax_recintos_por_proyecto, name='ajax_recintos'),
     path('ajax/recintos-vivienda/', views.ajax_recintos_por_vivienda, name='ajax_recintos_vivienda'),
     path('ajax/elementos/', views.ajax_elementos_por_recinto, name='ajax_elementos'),
+    path('archivos/<int:pk>/', views.ObservacionArchivosView.as_view(), name='incidencias_observacion_archivos'),
 ]

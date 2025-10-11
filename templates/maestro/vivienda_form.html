@@ -55,21 +55,36 @@
                     </div>
                 </div>
 
+                <!-- Búsqueda por RUT -->
                 <div class="row">
-                    <div class="col-md-6 mb-3">
-                        <label for="{{ form.familia_beneficiaria.id_for_label }}" class="form-label">Familia Beneficiaria *</label>
-                        {{ form.familia_beneficiaria }}
-                        {% if form.familia_beneficiaria.errors %}
-                            <div class="text-danger small">{{ form.familia_beneficiaria.errors.0 }}</div>
+                    <div class="col-md-12 mb-3">
+                        <label for="{{ form.rut_beneficiario.id_for_label }}" class="form-label">
+                            <strong>RUT del Beneficiario</strong>
+                        </label>
+                        <div class="input-group">
+                            {{ form.rut_beneficiario }}
+                            <button type="button" class="btn btn-outline-secondary" id="buscar-beneficiario">
+                                <i class="bi bi-search"></i> Buscar
+                            </button>
+                        </div>
+                        {% if form.rut_beneficiario.errors %}
+                            <div class="text-danger small mt-1">{{ form.rut_beneficiario.errors.0 }}</div>
                         {% endif %}
+                        <small class="form-text text-muted">{{ form.rut_beneficiario.help_text }}</small>
+                        <div id="resultado-busqueda" class="mt-2"></div>
                     </div>
+                </div>
 
-                    <div class="col-md-6 mb-3">
-                        <label for="{{ form.beneficiario.id_for_label }}" class="form-label">Beneficiario</label>
+                <div class="row">
+                    <div class="col-md-12 mb-3">
+                        <label for="{{ form.beneficiario.id_for_label }}" class="form-label">
+                            <strong>Beneficiario *</strong>
+                        </label>
                         {{ form.beneficiario }}
                         {% if form.beneficiario.errors %}
                             <div class="text-danger small">{{ form.beneficiario.errors.0 }}</div>
                         {% endif %}
+                        <small class="form-text text-muted">Se seleccionará automáticamente si se encuentra por RUT</small>
                     </div>
                 </div>
 
@@ -134,4 +149,89 @@
         </div>
     </div>
 </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const rutInput = document.getElementById('id_rut_beneficiario');
+    const buscarBtn = document.getElementById('buscar-beneficiario');
+    const resultadoDiv = document.getElementById('resultado-busqueda');
+    const beneficiarioSelect = document.getElementById('id_beneficiario');
+
+    function buscarBeneficiario() {
+        let rut = rutInput.value.trim();
+        
+        if (!rut) {
+            mostrarMensaje('Por favor ingrese un RUT', 'warning');
+            return;
+        }
+
+        // Limpiar RUT: remover puntos y espacios, mantener guión
+        rut = rut.replace(/\./g, '').replace(/\s/g, '');
+
+        // Mostrar loading
+        resultadoDiv.innerHTML = '<small class="text-info"><i class="bi bi-search"></i> Buscando...</small>';
+        buscarBtn.disabled = true;
+
+        fetch(`{% url 'maestro_buscar_beneficiario_rut' %}?rut=${encodeURIComponent(rut)}`, {
+            method: 'GET',
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest',
+                'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                // Seleccionar en el dropdown de beneficiario
+                for (let option of beneficiarioSelect.options) {
+                    if (option.value == data.beneficiario.id) {
+                        option.selected = true;
+                        break;
+                    }
+                }
+                
+                mostrarMensaje(`✅ Beneficiario encontrado: ${data.beneficiario.nombre_completo}`, 'success');
+            } else {
+                mostrarMensaje(`❌ ${data.error}`, 'danger');
+                // Limpiar campos si no se encuentra
+                beneficiarioSelect.value = '';
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            mostrarMensaje('❌ Error al buscar el beneficiario', 'danger');
+        })
+        .finally(() => {
+            buscarBtn.disabled = false;
+        });
+    }
+
+    function mostrarMensaje(mensaje, tipo) {
+        const claseColor = tipo === 'success' ? 'text-success' : tipo === 'danger' ? 'text-danger' : 'text-warning';
+        resultadoDiv.innerHTML = `<small class="${claseColor}">${mensaje}</small>`;
+    }
+
+    // Event listeners
+    if (buscarBtn) {
+        buscarBtn.addEventListener('click', buscarBeneficiario);
+    }
+    
+    if (rutInput) {
+        rutInput.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                buscarBeneficiario();
+            }
+        });
+
+        // Limpiar resultado cuando se cambia el RUT
+        rutInput.addEventListener('input', function() {
+            if (resultadoDiv && resultadoDiv.innerHTML) {
+                resultadoDiv.innerHTML = '';
+            }
+        });
+    }
+});
+</script>
+
 {% endblock %}

@@ -225,7 +225,7 @@
             
             <div class="form-techo">
                 <h3 class="section-title mb-4">
-                    {% if es_familia %}
+                    {% if es_familia|default:False %}
                         Nueva Observación de mi Vivienda
                     {% else %}
                         Crear Nueva Observación
@@ -235,7 +235,7 @@
             <form method="post" enctype="multipart/form-data" novalidate>
                 {% csrf_token %}
 
-                {% if not es_familia %}
+                {% if not es_familia|default:False %}
                 <!-- Campos de Proyecto y Vivienda solo para NO FAMILIA -->
                 <div class="row">
                     <div class="col-md-6">
@@ -639,6 +639,77 @@ document.addEventListener('DOMContentLoaded', function() {
         };
         return icons[ext] || '📁';
     }
+
+    // CARGA DINÁMICA DE VIVIENDAS PARA ADMINISTRADORES
+    {% if not es_familia|default:False %}
+    // Esperar a que todos los elementos estén disponibles
+    document.addEventListener('DOMContentLoaded', function() {
+        const proyectoSelect = document.getElementById('id_proyecto');
+        const viviendaSelect = document.getElementById('id_vivienda');
+        
+        console.log('Inicializando carga dinámica de viviendas...');
+        console.log('Proyecto select:', proyectoSelect);
+        console.log('Vivienda select:', viviendaSelect);
+        
+        if (proyectoSelect && viviendaSelect) {
+            proyectoSelect.addEventListener('change', function() {
+                const proyectoId = this.value;
+                console.log('Proyecto seleccionado:', proyectoId);
+                
+                // Limpiar viviendas
+                viviendaSelect.innerHTML = '<option value="">Cargando viviendas...</option>';
+                
+                if (proyectoId) {
+                    // Usar fetch para cargar viviendas
+                    console.log('Enviando petición AJAX...');
+                    fetch(`/incidencias/ajax/viviendas/?proyecto_id=${proyectoId}`, {
+                        method: 'GET',
+                        headers: {
+                            'X-Requested-With': 'XMLHttpRequest'
+                        }
+                    })
+                    .then(response => {
+                        console.log('Respuesta recibida:', response.status, response.statusText);
+                        if (!response.ok) {
+                            throw new Error(`HTTP error! status: ${response.status}`);
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                        console.log('Datos recibidos:', data);
+                        viviendaSelect.innerHTML = '<option value="">---------</option>';
+                        
+                        if (data.viviendas && data.viviendas.length > 0) {
+                            data.viviendas.forEach(function(vivienda) {
+                                const option = document.createElement('option');
+                                option.value = vivienda.id;
+                                option.textContent = vivienda.codigo;
+                                viviendaSelect.appendChild(option);
+                            });
+                            console.log(`Cargadas ${data.viviendas.length} viviendas exitosamente`);
+                        } else {
+                            viviendaSelect.innerHTML = '<option value="">No hay viviendas disponibles</option>';
+                            console.log('No se encontraron viviendas para este proyecto');
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error al cargar viviendas:', error);
+                        viviendaSelect.innerHTML = '<option value="">Error al cargar viviendas</option>';
+                    });
+                } else {
+                    viviendaSelect.innerHTML = '<option value="">---------</option>';
+                    console.log('Proyecto deseleccionado, limpiando viviendas');
+                }
+            });
+            console.log('Event listener agregado correctamente');
+        } else {
+            console.error('Elementos no encontrados:', {
+                proyectoSelect: proyectoSelect ? 'ENCONTRADO' : 'NO ENCONTRADO',
+                viviendaSelect: viviendaSelect ? 'ENCONTRADO' : 'NO ENCONTRADO'
+            });
+        }
+    });
+    {% endif %}
 });
 </script>
 {% endblock %}

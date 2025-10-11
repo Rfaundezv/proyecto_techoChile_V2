@@ -6,6 +6,13 @@
 <div class="container mt-4">
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h2>{{ titulo }}</h2>
+        <form method="get" class="d-flex" style="gap: 1rem;">
+            <input type="text" name="rut" class="form-control" placeholder="RUT" value="{{ request.GET.rut|default:'' }}" style="max-width: 120px;">
+            <input type="text" name="correo" class="form-control" placeholder="Correo" value="{{ request.GET.correo|default:'' }}" style="max-width: 160px;">
+            <input type="text" name="rol" class="form-control" placeholder="Rol" value="{{ request.GET.rol|default:'' }}" style="max-width: 120px;">
+            <input type="text" name="empresa" class="form-control" placeholder="Empresa" value="{{ request.GET.empresa|default:'' }}" style="max-width: 120px;">
+            <button type="submit" class="btn btn-outline-primary">Buscar</button>
+        </form>
         <a href="{% url 'maestro_usuario_create' %}" class="btn btn-primary">
             <i class="bi bi-plus-circle"></i> Crear Usuario
         </a>
@@ -27,8 +34,10 @@
                     <thead>
                         <tr>
                             <th>Nombre</th>
+                            <th>RUT</th>
                             <th>Email</th>
                             <th>Rol</th>
+                            <th>Comuna</th>
                             <th>Región</th>
                             <th>Empresa</th>
                             <th>Estado</th>
@@ -39,8 +48,10 @@
                         {% for usuario in usuarios %}
                         <tr>
                             <td>{{ usuario.nombre }}</td>
+                            <td>{{ usuario.rut|default:"-" }}</td>
                             <td>{{ usuario.email }}</td>
                             <td>{{ usuario.rol|default:"-" }}</td>
+                            <td>{{ usuario.comuna.nombre|default:"-" }}</td>
                             <td>{{ usuario.region.nombre|default:"-" }}</td>
                             <td>{{ usuario.empresa|default:"-" }}</td>
                             <td>

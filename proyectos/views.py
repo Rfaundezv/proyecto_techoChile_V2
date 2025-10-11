@@ -125,6 +125,7 @@ def crear_vivienda(request, proyecto_pk):
     return render(request, 'proyectos/crear_vivienda.html', context)
 
 @login_required
+@rol_requerido('ADMINISTRADOR', 'TECHO')
 def crear_beneficiario(request):
     if request.method == 'POST':
         form = BeneficiarioForm(request.POST)
@@ -140,3 +141,47 @@ def crear_beneficiario(request):
         'titulo': 'Crear Nuevo Beneficiario'
     }
     return render(request, 'proyectos/crear_beneficiario.html', context)
+
+@login_required
+def buscar_beneficiario_por_rut(request):
+    """Vista AJAX para buscar beneficiario por RUT"""
+    from django.http import JsonResponse
+    from .models import Beneficiario
+    
+    if request.method == 'GET' and request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+        rut_original = request.GET.get('rut', '').strip()
+        
+        if not rut_original:
+            return JsonResponse({'error': 'RUT no proporcionado'}, status=400)
+        
+        # Limpiar RUT para la búsqueda: remover puntos y espacios
+        rut_limpio = rut_original.replace('.', '').replace(' ', '')
+        
+        try:
+            # Buscar beneficiario por RUT (con o sin puntos)
+            beneficiario = Beneficiario.objects.filter(
+                Q(rut=rut_original) | Q(rut=rut_limpio),
+                activo=True
+            ).first()
+            
+            if beneficiario:
+                return JsonResponse({
+                    'success': True,
+                    'beneficiario': {
+                        'id': beneficiario.id,
+                        'nombre_completo': beneficiario.nombre_completo,
+                        'nombre': beneficiario.nombre,
+                        'apellido_paterno': beneficiario.apellido_paterno,
+                        'apellido_materno': beneficiario.apellido_materno,
+                        'email': beneficiario.email or ''
+                    }
+                })
+            else:
+                return JsonResponse({
+                    'success': False,
+                    'error': 'No se encontró un beneficiario con ese RUT'
+                })
+        except Exception as e:
+            return JsonResponse({'error': 'Error en la búsqueda'}, status=500)
+    
+    return JsonResponse({'error': 'Método no permitido'}, status=405)

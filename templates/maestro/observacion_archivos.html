@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+
+{% block title %}{{ titulo }} - {{ block.super }}{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2>{{ titulo }}</h2>
+    <div class="mb-3">
+        <a href="{% url 'maestro_observacion_list' %}" class="btn btn-secondary">Volver a Observaciones</a>
+    </div>
+    <div class="card">
+        <div class="card-body">
+            <h5>Archivos adjuntos para la observación #{{ observacion.pk }}</h5>
+            {% if archivos %}
+                <ul class="list-group">
+                    {% for archivo in archivos %}
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            <a href="{{ archivo.archivo.url }}" target="_blank">
+                                <i class="bi bi-paperclip"></i> {{ archivo.archivo.name }}
+                            </a>
+                            <span class="text-muted">{{ archivo.archivo.size|filesizeformat }}</span>
+                        </li>
+                    {% endfor %}
+                </ul>
+            {% else %}
+                <div class="alert alert-info mt-3">No hay archivos adjuntos para esta observación.</div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

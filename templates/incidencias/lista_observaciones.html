@@ -158,17 +158,19 @@
                         {% endif %}
                     </td>
                     <td>
-                        {% if puede_cambiar_estado %}
-                            <span id="estado-badge-{{ obs.pk }}" class="badge badge-{{ obs.estado.nombre|lower }} estado-badge" 
-                                  data-obs-id="{{ obs.pk }}" style="cursor: pointer;" 
-                                  title="Click para cambiar estado">
-                                {{ obs.estado.nombre }}
-                            </span>
-                        {% else %}
-                            <span class="badge badge-{{ obs.estado.nombre|lower }}">
-                                {{ obs.estado.nombre }}
-                            </span>
-                        {% endif %}
+                        {% with estado_class=obs.estado.nombre|slugify %}
+                            {% if puede_cambiar_estado %}
+                                <span id="estado-badge-{{ obs.pk }}" class="badge badge-{{ estado_class }} estado-badge" 
+                                      data-obs-id="{{ obs.pk }}" style="cursor: pointer;{% if obs.estado.nombre == 'En Proceso' %} background: linear-gradient(45deg, #f97316, #ea580c) !important; color: #fff !important; border: 2px solid #ea580c !important; font-weight: 700 !important;{% endif %}" 
+                                      title="Click para cambiar estado">
+                                    {{ obs.estado.nombre }}
+                                </span>
+                            {% else %}
+                                <span class="badge badge-{{ estado_class }}" style="{% if obs.estado.nombre == 'En Proceso' %} background: linear-gradient(45deg, #f97316, #ea580c) !important; color: #fff !important; border: 2px solid #ea580c !important; font-weight: 700 !important;{% endif %}">
+                                    {{ obs.estado.nombre }}
+                                </span>
+                            {% endif %}
+                        {% endwith %}
                         {% if obs.estado.nombre == 'Abierta' and obs.esta_vencida %}
                         <br><small class="text-danger">VENCIDA</small>
                         {% endif %}
@@ -207,7 +209,7 @@
                             {% with total=obs.total_archivos %}
                                 {% if obs.archivo_adjunto %}
                                     {% with total_final=total|add:1 %}
-                                        <a href="{% url 'incidencias:detalle_observacion' obs.pk %}" class="text-decoration-none" title="Tiene {{ total_final }} archivo(s) adjunto(s)">
+                                        <a href="{% url 'incidencias:incidencias_observacion_archivos' obs.pk %}" class="text-decoration-none" title="Tiene {{ total_final }} archivo(s) adjunto(s)">
                                             <i class="bi bi-paperclip fs-5" style="color: #00a7e1;"></i>
                                             {% if total_final > 1 %}
                                                 <span class="badge bg-info ms-1">{{ total_final }}</span>
@@ -215,7 +217,7 @@
                                         </a>
                                     {% endwith %}
                                 {% else %}
-                                    <a href="{% url 'incidencias:detalle_observacion' obs.pk %}" class="text-decoration-none" title="Tiene {{ total }} archivo(s) adjunto(s)">
+                                    <a href="{% url 'incidencias:incidencias_observacion_archivos' obs.pk %}" class="text-decoration-none" title="Tiene {{ total }} archivo(s) adjunto(s)">
                                         <i class="bi bi-paperclip fs-5" style="color: #00a7e1;"></i>
                                         {% if total > 1 %}
                                             <span class="badge bg-info ms-1">{{ total }}</span>
@@ -263,7 +265,7 @@
                     <small class="text-muted d-block">{{ obs.proyecto.nombre|truncatechars:25 }}</small>
                 </div>
                 <span id="estado-badge-{{ obs.pk }}" class="badge badge-{{ obs.estado.nombre|lower }} estado-badge" 
-                      data-obs-id="{{ obs.pk }}" style="cursor: pointer;" 
+                      data-obs-id="{{ obs.pk }}" style="cursor: pointer;{% if obs.estado.nombre == 'En Proceso' %} background: linear-gradient(45deg, #f97316, #ea580c) !important; color: #fff !important; border: 2px solid #ea580c !important; font-weight: 700 !important;{% endif %}" 
                       title="Click para cambiar estado">
                     {{ obs.estado.nombre }}
                 </span>
@@ -325,16 +327,20 @@
                     {% with total=obs.total_archivos %}
                         {% if obs.archivo_adjunto %}
                             {% with total_final=total|add:1 %}
-                                <i class="bi bi-paperclip" style="color: #00a7e1;"></i>
-                                {% if total_final > 1 %}
-                                    <span class="badge bg-info">{{ total_final }}</span>
-                                {% endif %}
+                                <a href="{% url 'incidencias:incidencias_observacion_archivos' obs.pk %}" class="text-decoration-none" title="Tiene {{ total_final }} archivo(s) adjunto(s)">
+                                    <i class="bi bi-paperclip" style="color: #00a7e1;"></i>
+                                    {% if total_final > 1 %}
+                                        <span class="badge bg-info">{{ total_final }}</span>
+                                    {% endif %}
+                                </a>
                             {% endwith %}
                         {% else %}
-                            <i class="bi bi-paperclip" style="color: #00a7e1;"></i>
-                            {% if total > 1 %}
-                                <span class="badge bg-info">{{ total }}</span>
-                            {% endif %}
+                            <a href="{% url 'incidencias:incidencias_observacion_archivos' obs.pk %}" class="text-decoration-none" title="Tiene {{ total }} archivo(s) adjunto(s)">
+                                <i class="bi bi-paperclip" style="color: #00a7e1;"></i>
+                                {% if total > 1 %}
+                                    <span class="badge bg-info">{{ total }}</span>
+                                {% endif %}
+                            </a>
                         {% endif %}
                     {% endwith %}
                 {% endif %}
@@ -401,6 +407,11 @@
                             <option value="{{ estado.id }}">{{ estado.nombre }}</option>
                             {% endfor %}
                         </select>
+                        {% comment %}
+                        Debug estados disponibles:
+                        Total: {{ estados|length }}
+                        {% for estado in estados %}{{ estado.nombre }} (ID: {{ estado.id }}), {% endfor %}
+                        {% endcomment %}
                     </div>
                     <div class="mb-3">
                         <label for="comentario" class="form-label">Comentario:</label>

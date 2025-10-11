@@ -33,6 +33,7 @@ INSTALLED_APPS = [
     'core',
     'proyectos',
     'incidencias',
+    "django_extensions",
 ]
 
 MIDDLEWARE = [

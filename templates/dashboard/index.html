@@ -323,7 +323,7 @@ a .metric-card:hover .metric-label {
                             <td><strong>{{ obs.proyecto.codigo }}</strong></td>
                             <td>{{ obs.vivienda.codigo }}</td>
                             <td>{{ obs.elemento|truncatechars:30 }}</td>
-                            <td><span class="badge badge-{{ obs.estado.nombre|lower }}">{{ obs.estado.nombre }}</span></td>
+                            <td><span class="badge badge-{{ obs.estado.nombre|lower }}" style="{% if obs.estado.nombre == 'En Proceso' %}background: linear-gradient(45deg, #f97316, #ea580c) !important; color: #fff !important; border: 2px solid #ea580c !important; font-weight: 700 !important;{% endif %}">{{ obs.estado.nombre }}</span></td>
                             <td>{{ obs.fecha_creacion|date:"d/m/Y" }}</td>
                             <td>
                                 <a href="{% url 'incidencias:detalle_observacion' obs.pk %}" class="btn btn-sm btn-outline-info">Ver</a>
@@ -347,7 +347,7 @@ a .metric-card:hover .metric-label {
                             <strong class="text-primary">{{ obs.proyecto.codigo }}</strong>
                             <span class="text-muted ms-2">Viv. {{ obs.vivienda.codigo }}</span>
                         </div>
-                        <span class="badge badge-{{ obs.estado.nombre|lower }}">{{ obs.estado.nombre }}</span>
+                        <span class="badge badge-{{ obs.estado.nombre|lower }}" style="{% if obs.estado.nombre == 'En Proceso' %}background: linear-gradient(45deg, #f97316, #ea580c) !important; color: #fff !important; border: 2px solid #ea580c !important; font-weight: 700 !important;{% endif %}">{{ obs.estado.nombre }}</span>
                     </div>
                     <div class="mb-2">
                         <i class="bi bi-tools text-muted"></i>

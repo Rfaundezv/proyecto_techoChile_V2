@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+
+{% block title %}{{ titulo }} - {{ block.super }}{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2>{{ titulo }}</h2>
+    <div class="mb-3">
+        <a href="{% url 'incidencias:lista_observaciones' %}" class="btn btn-secondary">Volver a Observaciones</a>
+    </div>
+    <div class="card">
+        <div class="card-body">
+            <h5>Archivos adjuntos para la observación #{{ observacion.pk }}</h5>
+            <ul class="list-group">
+                {% if archivo_principal %}
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        <a href="{{ archivo_principal.url }}" target="_blank">
+                            <i class="bi bi-paperclip"></i> Archivo principal
+                        </a>
+                        <span class="text-muted">{{ archivo_principal.size|filesizeformat }}</span>
+                    </li>
+                {% endif %}
+                {% for archivo in archivos %}
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        <a href="{{ archivo.archivo.url }}" target="_blank">
+                            <i class="bi bi-paperclip"></i> {{ archivo.archivo.name }}
+                        </a>
+                        <span class="text-muted">{{ archivo.archivo.size|filesizeformat }}</span>
+                    </li>
+                {% empty %}
+                    {% if not archivo_principal %}
+                        <li class="list-group-item text-center text-muted">No hay archivos adjuntos para esta observación.</li>
+                    {% endif %}
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+</div>
+{% endblock %}

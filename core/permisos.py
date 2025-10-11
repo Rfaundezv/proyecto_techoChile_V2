@@ -50,7 +50,7 @@ def puede_ver_proyecto(usuario, proyecto):
     # CONSTRUCTORA solo ve sus proyectos
     if rol == 'CONSTRUCTORA':
         if usuario.empresa:
-            return proyecto.constructora.nombre.lower() == usuario.empresa.lower()
+            return proyecto.constructora.lower() == usuario.empresa.lower()
         return False
     
     # FAMILIA solo ve proyectos donde tiene vivienda
@@ -96,18 +96,16 @@ def puede_ver_observacion(usuario, observacion):
     if usuario.is_superuser:
         return True
     # ADMINISTRADOR, TECHO y SERVIU pueden ver todas
-    if usuario.groups.filter(name__in=['ADMINISTRADOR', 'TECHO', 'SERVIU']).exists():
+    if usuario.rol and usuario.rol.nombre in ['ADMINISTRADOR', 'TECHO', 'SERVIU']:
         return True
     # CONSTRUCTORA solo ve observaciones de sus proyectos
-    if usuario.groups.filter(name='CONSTRUCTORA').exists():
+    if usuario.rol and usuario.rol.nombre == 'CONSTRUCTORA':
         if usuario.empresa:
             proj_const = observacion.vivienda.proyecto.constructora.lower()
             return proj_const == usuario.empresa.lower()
         return False
-    # FAMILIA solo ve sus propias observaciones (grupo o rol antiguo)
-    is_familia = usuario.groups.filter(name='FAMILIA').exists() or (
-        hasattr(usuario, 'rol') and usuario.rol and usuario.rol.nombre == 'FAMILIA'
-    )
+    # FAMILIA solo ve sus propias observaciones
+    is_familia = usuario.rol and usuario.rol.nombre == 'FAMILIA'
     if is_familia:
         benef = getattr(observacion.vivienda, 'beneficiario', None)
         if benef:
@@ -150,7 +148,7 @@ def puede_editar_observacion(usuario, observacion):
     # CONSTRUCTORA puede agregar soluciones y cerrar (verificar en vista)
     if rol == 'CONSTRUCTORA':
         if usuario.empresa:
-            return observacion.vivienda.proyecto.constructora.nombre.lower() == usuario.empresa.lower()
+            return observacion.vivienda.proyecto.constructora.lower() == usuario.empresa.lower()
         return False
     
     # FAMILIA puede editar sus propias observaciones si están abiertas
@@ -280,10 +278,10 @@ def puede_ver_reporte(usuario, tipo_reporte, proyecto=None, vivienda=None):
     if rol == 'CONSTRUCTORA':
         if tipo_reporte == 'postventa' and vivienda:
             if usuario.empresa:
-                return vivienda.proyecto.constructora.nombre.lower() == usuario.empresa.lower()
+                return vivienda.proyecto.constructora.lower() == usuario.empresa.lower()
         elif proyecto:
             if usuario.empresa:
-                return proyecto.constructora.nombre.lower() == usuario.empresa.lower()
+                return proyecto.constructora.lower() == usuario.empresa.lower()
         return False
     
     # FAMILIA solo ve ficha de postventa de su vivienda
@@ -358,13 +356,14 @@ def filtrar_observaciones_por_rol(usuario, queryset):
     if not usuario.is_authenticated:
         return queryset.none()
     # Superusuario y roles ADMINISTRADOR, TECHO, SERVIU ven todo
-    if usuario.is_superuser or usuario.groups.filter(name__in=['ADMINISTRADOR', 'TECHO', 'SERVIU']).exists():
+    if usuario.is_superuser or (usuario.rol and usuario.rol.nombre in ['ADMINISTRADOR', 'TECHO', 'SERVIU']):
         return queryset
     # CONSTRUCTORA solo observa sus proyectos
-    if usuario.groups.filter(name='CONSTRUCTORA').exists() and getattr(usuario, 'empresa', None):
-        return queryset.filter(vivienda__proyecto__constructora__iexact=usuario.empresa)
-    # FAMILIA solo ve sus propias observaciones (por grupo o rol antiguo)
-    is_familia = usuario.groups.filter(name='FAMILIA').exists() or (hasattr(usuario, 'rol') and usuario.rol and usuario.rol.nombre == 'FAMILIA')
+    if usuario.rol and usuario.rol.nombre == 'CONSTRUCTORA' and getattr(usuario, 'empresa', None):
+        empresa_usuario = usuario.empresa.strip().lower()
+        return queryset.filter(vivienda__proyecto__constructora__icontains=empresa_usuario)
+    # FAMILIA solo ve sus propias observaciones
+    is_familia = usuario.rol and usuario.rol.nombre == 'FAMILIA'
     if is_familia:
         from django.db.models import Q
         # Combinar filtros por RUT y nombre/familia_beneficiaria

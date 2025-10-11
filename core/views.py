@@ -1,9 +1,26 @@
+from incidencias.models import ArchivoAdjuntoObservacion
+# Vista para mostrar archivos adjuntos de una observación en el panel maestro
+from django.views.generic import View
+from django.utils.decorators import method_decorator
+from django.contrib.auth.decorators import login_required
+class ObservacionArchivosView(View):
+    @method_decorator(login_required)
+    def get(self, request, pk):
+        observacion = get_object_or_404(Observacion, pk=pk)
+        archivos = ArchivoAdjuntoObservacion.objects.filter(observacion=observacion)
+        return render(request, 'maestro/observacion_archivos.html', {
+            'observacion': observacion,
+            'archivos': archivos,
+            'titulo': f"Archivos de Observación #{observacion.pk}"
+        })
 from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http import JsonResponse
 from django.db.models import Count, Q
 from django.contrib import messages
 from .models import Comuna, Region
+from .decorators import rol_requerido, RolRequiredMixin
 from proyectos.models import Proyecto, Vivienda
 from incidencias.models import ArchivoAdjuntoObservacion, Observacion
 from datetime import datetime, timedelta
@@ -17,7 +34,7 @@ def dashboard(request):
 
     # Determinar si el usuario es familia beneficiaria mediante grupo "FAMILIA"
     # Beneficiarios pueden detectarse por grupo o por rol asignado en modelo
-    es_familia = user.groups.filter(name='FAMILIA').exists() or (hasattr(user, 'rol') and user.rol and user.rol.nombre == 'FAMILIA')
+    es_familia = user.rol and user.rol.nombre == 'FAMILIA'
     mi_vivienda = None
     sin_vivienda = False
     if es_familia:
@@ -80,6 +97,10 @@ def dashboard(request):
         # Obtener proyectos relacionados al usuario
         if user.is_superuser or (user.rol and user.rol.nombre == 'ADMINISTRADOR'):
             proyectos_user = Proyecto.objects.all()
+        elif user.rol and user.rol.nombre == 'CONSTRUCTORA' and getattr(user, 'empresa', None):
+            # CONSTRUCTORA solo ve sus proyectos
+            empresa_usuario = user.empresa.strip().lower()
+            proyectos_user = Proyecto.objects.filter(constructora__icontains=empresa_usuario)
         else:
             proyectos_user = Proyecto.objects.filter(
                 Q(creado_por=user) | 
@@ -97,17 +118,17 @@ def dashboard(request):
         ).count()
 
         # Observaciones para dashboard
-        obs_total = Observacion.objects.filter(proyecto__in=proyectos_user).count()
+        obs_total = Observacion.objects.filter(vivienda__proyecto__in=proyectos_user).count()
         obs_abiertas = Observacion.objects.filter(
-            proyecto__in=proyectos_user,
+            vivienda__proyecto__in=proyectos_user,
             estado__nombre='Abierta'
         ).count()
         obs_cerradas = Observacion.objects.filter(
-            proyecto__in=proyectos_user,
+            vivienda__proyecto__in=proyectos_user,
             estado__nombre='Cerrada'
         ).count()
         obs_urgentes = Observacion.objects.filter(
-            proyecto__in=proyectos_user,
+            vivienda__proyecto__in=proyectos_user,
             prioridad='urgente',
             estado__nombre='Abierta'
         ).count()
@@ -124,9 +145,9 @@ def dashboard(request):
 
         # Obtener las últimas 5 observaciones
         ultimas_observaciones = Observacion.objects.filter(
-            proyecto__in=proyectos_user
+            vivienda__proyecto__in=proyectos_user
         ).select_related(
-            'proyecto', 'vivienda', 'estado'
+            'vivienda__proyecto', 'vivienda', 'estado'
         ).order_by('-fecha_creacion')[:5]
 
         context = {
@@ -144,7 +165,7 @@ def dashboard(request):
             'ultimas_observaciones': ultimas_observaciones,
             # Variables para vista de familia y admin
             'es_familia': es_familia,
-            'is_admin': user.groups.filter(name='ADMINISTRADOR').exists(),
+            'is_admin': user.rol and user.rol.nombre == 'ADMINISTRADOR',
             'mi_vivienda': mi_vivienda,
             'sin_vivienda': sin_vivienda,
             'timestamp': int(datetime.now().timestamp()),
@@ -181,6 +202,7 @@ logger = logging.getLogger(__name__)
 # ...existing code...
 
 @login_required
+@rol_requerido('ADMINISTRADOR', 'TECHO')
 def maestro(request):
     context = {
         'titulo': 'Panel Maestro'
@@ -197,7 +219,8 @@ class SoftDeleteMixin:
         return redirect(self.list_url_name)
 
 # CRUD para Region
-class RegionList(SoftDeleteMixin, View):
+class RegionList(LoginRequiredMixin, RolRequiredMixin, SoftDeleteMixin, View):
+    roles_permitidos = ['ADMINISTRADOR', 'TECHO']
     model = Region
     list_url_name = 'maestro_region_list'
 
@@ -205,7 +228,8 @@ class RegionList(SoftDeleteMixin, View):
         regions = Region.objects.filter(activo=True)
         return render(request, 'maestro/region_list.html', {'regions': regions, 'titulo': 'Regiones'})
 
-class RegionCreate(View):
+class RegionCreate(LoginRequiredMixin, RolRequiredMixin, View):
+    roles_permitidos = ['ADMINISTRADOR', 'TECHO']
     def get(self, request):
         from .forms import RegionForm
         return render(request, 'maestro/region_form.html', {'form': RegionForm(), 'titulo': 'Crear Región'})
@@ -219,7 +243,8 @@ class RegionCreate(View):
             return redirect('maestro_region_list')
         return render(request, 'maestro/region_form.html', {'form': form, 'titulo': 'Crear Región'})
 
-class RegionUpdate(View):
+class RegionUpdate(LoginRequiredMixin, RolRequiredMixin, View):
+    roles_permitidos = ['ADMINISTRADOR', 'TECHO']
     def get(self, request, pk):
         from .forms import RegionForm
         region = get_object_or_404(Region, pk=pk)
@@ -235,7 +260,8 @@ class RegionUpdate(View):
             return redirect('maestro_region_list')
         return render(request, 'maestro/region_form.html', {'form': form, 'titulo': 'Editar Región'})
 
-class RegionDelete(SoftDeleteMixin, View):
+class RegionDelete(LoginRequiredMixin, RolRequiredMixin, SoftDeleteMixin, View):
+    roles_permitidos = ['ADMINISTRADOR', 'TECHO']
     model = Region
     list_url_name = 'maestro_region_list'
 
@@ -243,7 +269,8 @@ class RegionDelete(SoftDeleteMixin, View):
         return self.soft_delete(request, pk)
 
 # CRUD para Comuna
-class ComunaList(SoftDeleteMixin, View):
+class ComunaList(LoginRequiredMixin, RolRequiredMixin, SoftDeleteMixin, View):
+    roles_permitidos = ['ADMINISTRADOR', 'TECHO']
     model = Comuna
     list_url_name = 'maestro_comuna_list'
 
@@ -251,7 +278,8 @@ class ComunaList(SoftDeleteMixin, View):
         comunas = Comuna.objects.filter(activo=True).select_related('region')
         return render(request, 'maestro/comuna_list.html', {'comunas': comunas, 'titulo': 'Comunas'})
 
-class ComunaCreate(View):
+class ComunaCreate(LoginRequiredMixin, RolRequiredMixin, View):
+    roles_permitidos = ['ADMINISTRADOR', 'TECHO']
     def get(self, request):
         from .forms import ComunaForm
         return render(request, 'maestro/comuna_form.html', {'form': ComunaForm(), 'titulo': 'Crear Comuna'})
@@ -265,7 +293,8 @@ class ComunaCreate(View):
             return redirect('maestro_comuna_list')
         return render(request, 'maestro/comuna_form.html', {'form': form, 'titulo': 'Crear Comuna'})
 
-class ComunaUpdate(View):
+class ComunaUpdate(LoginRequiredMixin, RolRequiredMixin, View):
+    roles_permitidos = ['ADMINISTRADOR', 'TECHO']
     def get(self, request, pk):
         from .forms import ComunaForm
         comuna = get_object_or_404(Comuna, pk=pk)
@@ -281,7 +310,8 @@ class ComunaUpdate(View):
             return redirect('maestro_comuna_list')
         return render(request, 'maestro/comuna_form.html', {'form': form, 'titulo': 'Editar Comuna'})
 
-class ComunaDelete(SoftDeleteMixin, View):
+class ComunaDelete(LoginRequiredMixin, RolRequiredMixin, SoftDeleteMixin, View):
+    roles_permitidos = ['ADMINISTRADOR', 'TECHO']
     model = Comuna
     list_url_name = 'maestro_comuna_list'
 
@@ -289,7 +319,8 @@ class ComunaDelete(SoftDeleteMixin, View):
         return self.soft_delete(request, pk)
 
 # CRUD para Rol
-class RolList(SoftDeleteMixin, View):
+class RolList(LoginRequiredMixin, RolRequiredMixin, SoftDeleteMixin, View):
+    roles_permitidos = ['ADMINISTRADOR', 'TECHO']
     model = Rol
     list_url_name = 'maestro_rol_list'
 
@@ -298,7 +329,8 @@ class RolList(SoftDeleteMixin, View):
         roles = Rol.objects.all()
         return render(request, 'maestro/rol_list.html', {'roles': roles, 'titulo': 'Roles'})
 
-class RolCreate(View):
+class RolCreate(LoginRequiredMixin, RolRequiredMixin, View):
+    roles_permitidos = ['ADMINISTRADOR', 'TECHO']
     def get(self, request):
         from .forms import RolForm
         return render(request, 'maestro/rol_form.html', {'form': RolForm(), 'titulo': 'Crear Rol'})
@@ -312,7 +344,8 @@ class RolCreate(View):
             return redirect('maestro_rol_list')
         return render(request, 'maestro/rol_form.html', {'form': form, 'titulo': 'Crear Rol'})
 
-class RolUpdate(View):
+class RolUpdate(LoginRequiredMixin, RolRequiredMixin, View):
+    roles_permitidos = ['ADMINISTRADOR', 'TECHO']
     def get(self, request, pk):
         from .forms import RolForm
         rol = get_object_or_404(Rol, pk=pk)
@@ -328,14 +361,16 @@ class RolUpdate(View):
             return redirect('maestro_rol_list')
         return render(request, 'maestro/rol_form.html', {'form': form, 'titulo': 'Editar Rol'})
 
-class RolDelete(SoftDeleteMixin, View):
+class RolDelete(LoginRequiredMixin, RolRequiredMixin, SoftDeleteMixin, View):
+    roles_permitidos = ['ADMINISTRADOR', 'TECHO']
     model = Rol
     list_url_name = 'maestro_rol_list'
 
     def post(self, request, pk):
         return self.soft_delete(request, pk)
         
-class RolActivate(View):
+class RolActivate(LoginRequiredMixin, RolRequiredMixin, View):
+    roles_permitidos = ['ADMINISTRADOR', 'TECHO']
     """Reactivar un rol previamente desactivado"""
     def post(self, request, pk):
         # Buscar el rol y marcarlo como activo
@@ -346,15 +381,24 @@ class RolActivate(View):
         return redirect('maestro_rol_list')
 
 # CRUD para Constructora
-class ConstructoraList(SoftDeleteMixin, View):
+class ConstructoraList(LoginRequiredMixin, RolRequiredMixin, SoftDeleteMixin, View):
+    roles_permitidos = ['ADMINISTRADOR', 'TECHO']
     model = Constructora
     list_url_name = 'maestro_constructora_list'
 
     def get(self, request):
+        rut = request.GET.get('rut', '').strip()
         constructoras = Constructora.objects.filter(activo=True).select_related('region', 'comuna')
-        return render(request, 'maestro/constructora_list.html', {'constructoras': constructoras, 'titulo': 'Constructoras'})
+        if rut:
+            constructoras = constructoras.filter(rut__icontains=rut)
+        return render(request, 'maestro/constructora_list.html', {
+            'constructoras': constructoras,
+            'titulo': 'Constructoras',
+            'request': request
+        })
 
-class ConstructoraCreate(View):
+class ConstructoraCreate(LoginRequiredMixin, RolRequiredMixin, View):
+    roles_permitidos = ['ADMINISTRADOR', 'TECHO']
     def get(self, request):
         from .forms import ConstructoraForm
         return render(request, 'maestro/constructora_form.html', {'form': ConstructoraForm(), 'titulo': 'Crear Constructora'})
@@ -368,7 +412,8 @@ class ConstructoraCreate(View):
             return redirect('maestro_constructora_list')
         return render(request, 'maestro/constructora_form.html', {'form': form, 'titulo': 'Crear Constructora'})
 
-class ConstructoraUpdate(View):
+class ConstructoraUpdate(LoginRequiredMixin, RolRequiredMixin, View):
+    roles_permitidos = ['ADMINISTRADOR', 'TECHO']
     def get(self, request, pk):
         from .forms import ConstructoraForm
         constructora = get_object_or_404(Constructora, pk=pk)
@@ -384,7 +429,8 @@ class ConstructoraUpdate(View):
             return redirect('maestro_constructora_list')
         return render(request, 'maestro/constructora_form.html', {'form': form, 'titulo': 'Editar Constructora'})
 
-class ConstructoraDelete(SoftDeleteMixin, View):
+class ConstructoraDelete(LoginRequiredMixin, RolRequiredMixin, SoftDeleteMixin, View):
+    roles_permitidos = ['ADMINISTRADOR', 'TECHO']
     model = Constructora
     list_url_name = 'maestro_constructora_list'
 
@@ -392,15 +438,24 @@ class ConstructoraDelete(SoftDeleteMixin, View):
         return self.soft_delete(request, pk)
 
 # CRUD para Beneficiario
-class BeneficiarioList(SoftDeleteMixin, View):
+class BeneficiarioList(LoginRequiredMixin, RolRequiredMixin, SoftDeleteMixin, View):
+    roles_permitidos = ['ADMINISTRADOR', 'TECHO']
     model = Beneficiario
     list_url_name = 'maestro_beneficiario_list'
 
     def get(self, request):
+        rut = request.GET.get('rut', '').strip()
         beneficiarios = Beneficiario.objects.filter(activo=True)
-        return render(request, 'maestro/beneficiario_list.html', {'beneficiarios': beneficiarios, 'titulo': 'Beneficiarios'})
+        if rut:
+            beneficiarios = beneficiarios.filter(rut__icontains=rut)
+        return render(request, 'maestro/beneficiario_list.html', {
+            'beneficiarios': beneficiarios,
+            'titulo': 'Beneficiarios',
+            'request': request
+        })
 
-class BeneficiarioCreate(View):
+class BeneficiarioCreate(LoginRequiredMixin, RolRequiredMixin, View):
+    roles_permitidos = ['ADMINISTRADOR', 'TECHO']
     def get(self, request):
         from proyectos.forms import BeneficiarioForm
         return render(request, 'maestro/beneficiario_form.html', {'form': BeneficiarioForm(), 'titulo': 'Crear Beneficiario'})
@@ -414,7 +469,8 @@ class BeneficiarioCreate(View):
             return redirect('maestro_beneficiario_list')
         return render(request, 'maestro/beneficiario_form.html', {'form': form, 'titulo': 'Crear Beneficiario'})
 
-class BeneficiarioUpdate(View):
+class BeneficiarioUpdate(LoginRequiredMixin, RolRequiredMixin, View):
+    roles_permitidos = ['ADMINISTRADOR', 'TECHO']
     def get(self, request, pk):
         from proyectos.forms import BeneficiarioForm
         beneficiario = get_object_or_404(Beneficiario, pk=pk)
@@ -430,7 +486,8 @@ class BeneficiarioUpdate(View):
             return redirect('maestro_beneficiario_list')
         return render(request, 'maestro/beneficiario_form.html', {'form': form, 'titulo': 'Editar Beneficiario'})
 
-class BeneficiarioDelete(SoftDeleteMixin, View):
+class BeneficiarioDelete(LoginRequiredMixin, RolRequiredMixin, SoftDeleteMixin, View):
+    roles_permitidos = ['ADMINISTRADOR', 'TECHO']
     model = Beneficiario
     list_url_name = 'maestro_beneficiario_list'
 
@@ -438,12 +495,30 @@ class BeneficiarioDelete(SoftDeleteMixin, View):
         return self.soft_delete(request, pk)
 
 # CRUD para Usuario
-class UsuarioList(View):
+class UsuarioList(LoginRequiredMixin, RolRequiredMixin, View):
+    roles_permitidos = ['ADMINISTRADOR', 'TECHO']
     def get(self, request):
+        rut = request.GET.get('rut', '').strip()
+        correo = request.GET.get('correo', '').strip()
+        rol = request.GET.get('rol', '').strip()
+        empresa = request.GET.get('empresa', '').strip()
         usuarios = Usuario.objects.filter(is_active=True)
-        return render(request, 'maestro/usuario_list.html', {'usuarios': usuarios, 'titulo': 'Usuarios'})
+        if rut:
+            usuarios = usuarios.filter(rut__icontains=rut)
+        if correo:
+            usuarios = usuarios.filter(email__icontains=correo)
+        if rol:
+            usuarios = usuarios.filter(rol__icontains=rol)
+        if empresa:
+            usuarios = usuarios.filter(empresa__icontains=empresa)
+        return render(request, 'maestro/usuario_list.html', {
+            'usuarios': usuarios,
+            'titulo': 'Usuarios',
+            'request': request
+        })
 
-class UsuarioCreate(View):
+class UsuarioCreate(LoginRequiredMixin, RolRequiredMixin, View):
+    roles_permitidos = ['ADMINISTRADOR', 'TECHO']
     def get(self, request):
         from .forms import UsuarioForm
         return render(request, 'maestro/usuario_form.html', {'form': UsuarioForm(), 'titulo': 'Crear Usuario'})
@@ -457,7 +532,8 @@ class UsuarioCreate(View):
             return redirect('maestro_usuario_list')
         return render(request, 'maestro/usuario_form.html', {'form': form, 'titulo': 'Crear Usuario'})
 
-class UsuarioUpdate(View):
+class UsuarioUpdate(LoginRequiredMixin, RolRequiredMixin, View):
+    roles_permitidos = ['ADMINISTRADOR', 'TECHO']
     def get(self, request, pk):
         from .forms import UsuarioForm
         usuario = get_object_or_404(Usuario, pk=pk)
@@ -473,7 +549,8 @@ class UsuarioUpdate(View):
             return redirect('maestro_usuario_list')
         return render(request, 'maestro/usuario_form.html', {'form': form, 'titulo': 'Editar Usuario'})
 
-class UsuarioDelete(View):
+class UsuarioDelete(LoginRequiredMixin, RolRequiredMixin, View):
+    roles_permitidos = ['ADMINISTRADOR', 'TECHO']
     def post(self, request, pk):
         usuario = get_object_or_404(Usuario, pk=pk)
         usuario.is_active = False
@@ -482,7 +559,8 @@ class UsuarioDelete(View):
         return redirect('maestro_usuario_list')
 
 # CRUD para Proyecto
-class ProyectoList(SoftDeleteMixin, View):
+class ProyectoList(LoginRequiredMixin, RolRequiredMixin, SoftDeleteMixin, View):
+    roles_permitidos = ['ADMINISTRADOR', 'TECHO']
     model = Proyecto
     list_url_name = 'maestro_proyecto_list'
 
@@ -490,7 +568,8 @@ class ProyectoList(SoftDeleteMixin, View):
         proyectos = Proyecto.objects.filter(activo=True).select_related('region', 'comuna', 'creado_por')
         return render(request, 'maestro/proyecto_list.html', {'proyectos': proyectos, 'titulo': 'Proyectos'})
 
-class ProyectoCreate(View):
+class ProyectoCreate(LoginRequiredMixin, RolRequiredMixin, View):
+    roles_permitidos = ['ADMINISTRADOR', 'TECHO']
     def get(self, request):
         from proyectos.forms import ProyectoForm
         return render(request, 'maestro/proyecto_form.html', {'form': ProyectoForm(), 'titulo': 'Crear Proyecto'})
@@ -508,7 +587,8 @@ class ProyectoCreate(View):
             return redirect('maestro_proyecto_list')
         return render(request, 'maestro/proyecto_form.html', {'form': form, 'titulo': 'Crear Proyecto'})
 
-class ProyectoUpdate(View):
+class ProyectoUpdate(LoginRequiredMixin, RolRequiredMixin, View):
+    roles_permitidos = ['ADMINISTRADOR', 'TECHO']
     def get(self, request, pk):
         from proyectos.forms import ProyectoForm
         proyecto = get_object_or_404(Proyecto, pk=pk)
@@ -524,7 +604,8 @@ class ProyectoUpdate(View):
             return redirect('maestro_proyecto_list')
         return render(request, 'maestro/proyecto_form.html', {'form': form, 'titulo': 'Editar Proyecto'})
 
-class ProyectoDelete(SoftDeleteMixin, View):
+class ProyectoDelete(LoginRequiredMixin, RolRequiredMixin, SoftDeleteMixin, View):
+    roles_permitidos = ['ADMINISTRADOR', 'TECHO']
     model = Proyecto
     list_url_name = 'maestro_proyecto_list'
 
@@ -532,7 +613,8 @@ class ProyectoDelete(SoftDeleteMixin, View):
         return self.soft_delete(request, pk)
 
 # CRUD para Vivienda
-class ViviendaList(SoftDeleteMixin, View):
+class ViviendaList(LoginRequiredMixin, RolRequiredMixin, SoftDeleteMixin, View):
+    roles_permitidos = ['ADMINISTRADOR', 'TECHO']
     model = Vivienda
     list_url_name = 'maestro_vivienda_list'
 
@@ -540,7 +622,8 @@ class ViviendaList(SoftDeleteMixin, View):
         viviendas = Vivienda.objects.filter(activa=True).select_related('proyecto', 'tipologia', 'beneficiario')
         return render(request, 'maestro/vivienda_list.html', {'viviendas': viviendas, 'titulo': 'Viviendas'})
 
-class ViviendaCreate(View):
+class ViviendaCreate(LoginRequiredMixin, RolRequiredMixin, View):
+    roles_permitidos = ['ADMINISTRADOR', 'TECHO']
     def get(self, request):
         from .forms import ViviendaForm
         return render(request, 'maestro/vivienda_form.html', {'form': ViviendaForm(), 'titulo': 'Crear Vivienda'})
@@ -554,7 +637,8 @@ class ViviendaCreate(View):
             return redirect('maestro_vivienda_list')
         return render(request, 'maestro/vivienda_form.html', {'form': form, 'titulo': 'Crear Vivienda'})
 
-class ViviendaUpdate(View):
+class ViviendaUpdate(LoginRequiredMixin, RolRequiredMixin, View):
+    roles_permitidos = ['ADMINISTRADOR', 'TECHO']
     def get(self, request, pk):
         from .forms import ViviendaForm
         vivienda = get_object_or_404(Vivienda, pk=pk)
@@ -570,7 +654,8 @@ class ViviendaUpdate(View):
             return redirect('maestro_vivienda_list')
         return render(request, 'maestro/vivienda_form.html', {'form': form, 'titulo': 'Editar Vivienda'})
 
-class ViviendaDelete(View):
+class ViviendaDelete(LoginRequiredMixin, RolRequiredMixin, View):
+    roles_permitidos = ['ADMINISTRADOR', 'TECHO']
     def post(self, request, pk):
         vivienda = get_object_or_404(Vivienda, pk=pk)
         vivienda.activa = False
@@ -579,15 +664,89 @@ class ViviendaDelete(View):
         return redirect('maestro_vivienda_list')
 
 # CRUD para Observacion
-class ObservacionList(SoftDeleteMixin, View):
+class ObservacionList(LoginRequiredMixin, RolRequiredMixin, SoftDeleteMixin, View):
+    roles_permitidos = ['ADMINISTRADOR', 'TECHO']
     model = Observacion
     list_url_name = 'maestro_observacion_list'
 
     def get(self, request):
-        observaciones = Observacion.objects.filter(activo=True).select_related('proyecto', 'vivienda', 'tipo', 'estado', 'creado_por')
-        return render(request, 'maestro/observacion_list.html', {'observaciones': observaciones, 'titulo': 'Observaciones'})
+        from django.core.paginator import Paginator
+        from django.db.models import Q, Count
+        from incidencias.models import EstadoObservacion
+        
+        # Obtener parámetros de búsqueda
+        buscar_rut = request.GET.get('rut', '').strip()
+        buscar_vivienda = request.GET.get('vivienda', '').strip()
+        filtro_estado = request.GET.get('estado', '')
+        filtro_prioridad = request.GET.get('prioridad', '')
+        buscar_texto = request.GET.get('buscar', '').strip()
+        
+        # Query base con relaciones necesarias
+        observaciones_list = Observacion.objects.filter(activo=True).select_related(
+            'proyecto', 'vivienda', 'vivienda__beneficiario', 'tipo', 'estado', 'creado_por'
+        ).prefetch_related('archivos_adjuntos').annotate(
+            total_archivos=Count('archivos_adjuntos')
+        )
+        
+        # Aplicar filtros
+        if buscar_rut:
+            observaciones_list = observaciones_list.filter(
+                vivienda__beneficiario__rut__icontains=buscar_rut
+            )
+        
+        if buscar_vivienda:
+            observaciones_list = observaciones_list.filter(
+                Q(vivienda__codigo__icontains=buscar_vivienda) |
+                Q(proyecto__codigo__icontains=buscar_vivienda) |
+                Q(proyecto__nombre__icontains=buscar_vivienda)
+            )
+        
+        if filtro_estado:
+            observaciones_list = observaciones_list.filter(estado_id=filtro_estado)
+        
+        if filtro_prioridad:
+            observaciones_list = observaciones_list.filter(prioridad=filtro_prioridad)
+        
+        if buscar_texto:
+            observaciones_list = observaciones_list.filter(
+                Q(elemento__icontains=buscar_texto) |
+                Q(detalle__icontains=buscar_texto) |
+                Q(creado_por__email__icontains=buscar_texto)
+            )
+        
+        observaciones_list = observaciones_list.order_by('-fecha_creacion')
+        
+        # Paginación - 15 observaciones por página
+        paginator = Paginator(observaciones_list, 15)
+        page_number = request.GET.get('page')
+        observaciones = paginator.get_page(page_number)
+        
+        # Datos para los filtros
+        estados = EstadoObservacion.objects.filter(activo=True)
+        prioridades = [
+            ('baja', 'Baja'),
+            ('normal', 'Normal'),
+            ('alta', 'Alta'),
+            ('urgente', 'Urgente'),
+        ]
+        
+        context = {
+            'observaciones': observaciones,
+            'titulo': 'Observaciones',
+            'estados': estados,
+            'prioridades': prioridades,
+            'filtros': {
+                'rut': buscar_rut,
+                'vivienda': buscar_vivienda,
+                'estado': filtro_estado,
+                'prioridad': filtro_prioridad,
+                'buscar': buscar_texto,
+            }
+        }
+        return render(request, 'maestro/observacion_list.html', context)
 
-class ObservacionUpdate(View):
+class ObservacionUpdate(LoginRequiredMixin, RolRequiredMixin, View):
+    roles_permitidos = ['ADMINISTRADOR', 'TECHO']
     def get(self, request, pk):
         from .forms import ObservacionForm
         observacion = get_object_or_404(Observacion, pk=pk)
@@ -636,7 +795,8 @@ class ObservacionUpdate(View):
             return redirect('maestro_observacion_list')
         return render(request, 'maestro/observacion_form.html', {'form': form, 'titulo': 'Editar Observación'})
 
-class ObservacionDelete(SoftDeleteMixin, View):
+class ObservacionDelete(LoginRequiredMixin, RolRequiredMixin, SoftDeleteMixin, View):
+    roles_permitidos = ['ADMINISTRADOR', 'TECHO']
     model = Observacion
     list_url_name = 'maestro_observacion_list'
 
@@ -645,7 +805,8 @@ class ObservacionDelete(SoftDeleteMixin, View):
 
 
 # CRUD para Configuración de Observaciones
-class ConfiguracionObservacionView(View):
+class ConfiguracionObservacionView(LoginRequiredMixin, RolRequiredMixin, View):
+    roles_permitidos = ['ADMINISTRADOR', 'TECHO']
     """Vista para ver y editar la configuración de observaciones"""
     
     def get(self, request):
@@ -682,3 +843,60 @@ class ConfiguracionObservacionView(View):
             'titulo': 'Configuración de Observaciones'
         }
         return render(request, 'maestro/configuracion_observacion.html', context)
+
+@login_required
+def buscar_beneficiario_por_rut(request):
+    """Vista AJAX para buscar un beneficiario por RUT"""
+    from proyectos.models import Beneficiario
+    from django.db.models import Q
+    
+    if request.method == 'GET' and request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+        rut_original = request.GET.get('rut', '').strip()
+        
+        if not rut_original:
+            return JsonResponse({
+                'success': False,
+                'error': 'RUT requerido'
+            })
+        
+        # Limpiar RUT para la búsqueda: remover puntos, espacios y guiones
+        def normalizar_rut(rut):
+            return rut.replace('.', '').replace(' ', '').replace('-', '').lower()
+
+        rut_normalizado = normalizar_rut(rut_original)
+
+        try:
+            # Buscar todos los beneficiarios activos
+            beneficiarios = Beneficiario.objects.filter(activo=True)
+            beneficiario = None
+            for b in beneficiarios:
+                if b.rut:
+                    if normalizar_rut(b.rut) == rut_normalizado:
+                        beneficiario = b
+                        break
+
+            if beneficiario:
+                return JsonResponse({
+                    'success': True,
+                    'beneficiario': {
+                        'id': beneficiario.id,
+                        'nombre_completo': beneficiario.nombre_completo,
+                        'rut': beneficiario.rut,
+                    }
+                })
+            else:
+                return JsonResponse({
+                    'success': False,
+                    'error': f'No se encontró un beneficiario activo con RUT {rut_original}'
+                })
+
+        except Exception as e:
+            return JsonResponse({
+                'success': False,
+                'error': f'Error al buscar beneficiario: {str(e)}'
+            })
+    
+    return JsonResponse({
+        'success': False,
+        'error': 'Solicitud inválida'
+    })

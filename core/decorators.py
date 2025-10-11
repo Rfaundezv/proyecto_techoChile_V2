@@ -5,6 +5,7 @@ from functools import wraps
 from django.shortcuts import redirect
 from django.contrib import messages
 from django.http import HttpResponseForbidden
+from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 
 def rol_requerido(*roles_permitidos):
     """
@@ -22,8 +23,8 @@ def rol_requerido(*roles_permitidos):
                 messages.error(request, 'Debes iniciar sesión para acceder a esta página.')
                 return redirect('login')
             
-            # Superusuarios o miembros del grupo ADMINISTRADOR tienen acceso completo
-            if request.user.is_superuser or request.user.groups.filter(name='ADMINISTRADOR').exists():
+            # Superusuarios o usuarios con rol ADMINISTRADOR tienen acceso completo
+            if request.user.is_superuser or (request.user.rol and request.user.rol.nombre == 'ADMINISTRADOR'):
                 return view_func(request, *args, **kwargs)
             
             # Verificar si tiene rol asignado
@@ -54,7 +55,7 @@ def puede_ver_proyecto(view_func):
         if not request.user.is_authenticated:
             return redirect('login')
         
-        if request.user.is_superuser or request.user.groups.filter(name='ADMINISTRADOR').exists():
+        if request.user.is_superuser or (request.user.rol and request.user.rol.nombre == 'ADMINISTRADOR'):
             return view_func(request, *args, **kwargs)
         
         if not request.user.rol:
@@ -89,7 +90,7 @@ def puede_editar_proyecto(view_func):
         if not request.user.is_authenticated:
             return redirect('login')
         
-        if request.user.is_superuser or request.user.groups.filter(name='ADMINISTRADOR').exists():
+        if request.user.is_superuser or (request.user.rol and request.user.rol.nombre == 'ADMINISTRADOR'):
             return view_func(request, *args, **kwargs)
         
         if not request.user.rol:
@@ -119,7 +120,7 @@ def puede_crear_observacion(view_func):
         if not request.user.is_authenticated:
             return redirect('login')
         
-        if request.user.is_superuser or request.user.groups.filter(name='ADMINISTRADOR').exists():
+        if request.user.is_superuser or (request.user.rol and request.user.rol.nombre == 'ADMINISTRADOR'):
             return view_func(request, *args, **kwargs)
         
         if not request.user.rol:
@@ -176,11 +177,29 @@ def puede_ver_reportes(view_func):
         
         # Solo ADMINISTRADOR, TECHO y SERVIU permiten ver reportes
         if request.user.is_superuser or \
-           request.user.groups.filter(name='ADMINISTRADOR').exists() or \
-           request.user.groups.filter(name='TECHO').exists() or \
-           request.user.groups.filter(name='SERVIU').exists():
+           (request.user.rol and request.user.rol.nombre in ['ADMINISTRADOR', 'TECHO', 'SERVIU']):
             return view_func(request, *args, **kwargs)
         messages.error(request, 'No tienes permisos para ver reportes.')
         return redirect('dashboard')
     
     return wrapper
+
+
+class RolRequiredMixin(UserPassesTestMixin):
+    """
+    Mixin para vistas basadas en clases que requieren roles específicos.
+    
+    Uso:
+        class MiVista(RolRequiredMixin, View):
+            roles_permitidos = ['ADMINISTRADOR', 'TECHO']
+    """
+    roles_permitidos = []
+    
+    def test_func(self):
+        if not self.request.user.is_authenticated:
+            return False
+        if self.request.user.is_superuser:
+            return True
+        if not self.request.user.rol:
+            return False
+        return self.request.user.rol.nombre in self.roles_permitidos

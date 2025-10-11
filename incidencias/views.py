@@ -1,3 +1,23 @@
+from django.views.generic import View
+from django.shortcuts import get_object_or_404, render
+from .models import Observacion, ArchivoAdjuntoObservacion
+from django.contrib.auth.decorators import login_required
+from django.utils.decorators import method_decorator
+# Vista para mostrar archivos adjuntos de una observación en incidencias
+class ObservacionArchivosView(View):
+    @method_decorator(login_required)
+    def get(self, request, pk):
+        observacion = get_object_or_404(Observacion, pk=pk)
+        archivos = list(ArchivoAdjuntoObservacion.objects.filter(observacion=observacion))
+        archivo_principal = None
+        if observacion.archivo_adjunto:
+            archivo_principal = observacion.archivo_adjunto
+        return render(request, 'incidencias/observacion_archivos.html', {
+            'observacion': observacion,
+            'archivos': archivos,
+            'archivo_principal': archivo_principal,
+            'titulo': f"Archivos de Observación #{observacion.pk}"
+        })
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
@@ -19,10 +39,15 @@ from core.permisos import (
 
 @login_required
 def lista_observaciones(request):
-    form = FiltroObservacionForm(request.GET)
+    form = FiltroObservacionForm(request.GET, user=request.user)
     observaciones = Observacion.objects.select_related(
         'vivienda__proyecto', 'recinto', 'creado_por'
     ).prefetch_related('archivos_adjuntos').order_by('-fecha_creacion')
+
+    # Agregar atributo total_archivos a cada observación
+    for obs in observaciones:
+        total_adjuntos = obs.archivos_adjuntos.count()
+        obs.total_archivos = total_adjuntos + (1 if obs.archivo_adjunto else 0)
     
     # Filtrar observaciones según el rol del usuario (incluye rol antiguo)
     observaciones = filtrar_observaciones_por_rol(request.user, observaciones)
@@ -94,7 +119,14 @@ def lista_observaciones(request):
         from datetime import date
         obs_vencidas = observaciones.filter(fecha_vencimiento__lt=date.today(), estado__nombre='Abierta').count()
     else:
-        obs_total = obs_abiertas = obs_cerradas = obs_urgentes = obs_vencidas = None
+        obs_total = observaciones.count()
+        obs_abiertas = obs_cerradas = obs_urgentes = obs_vencidas = None
+
+    # Estados permitidos para el cambio (solo si puede cambiar estado)
+    if puede_cambiar:
+        estados = EstadoObservacion.objects.filter(activo=True).order_by('nombre')
+    else:
+        estados = []
 
     context = {
         'form': form,
@@ -111,6 +143,7 @@ def lista_observaciones(request):
         'obs_cerradas': obs_cerradas,
         'obs_urgentes': obs_urgentes,
         'obs_vencidas': obs_vencidas,
+        'estados': estados,
     }
     return render(request, 'incidencias/lista_observaciones.html', context)
 
@@ -278,7 +311,7 @@ def crear_observacion(request):
     
     # **PARA ADMINISTRADORES, TECHO Y OTROS ROLES (pueden seleccionar proyecto y vivienda)**
     if request.method == 'POST':
-        form = ObservacionForm(request.POST, request.FILES)
+        form = ObservacionForm(request.POST, request.FILES, user=request.user)
         
         # Permitir que el formulario valide con los datos del proyecto
         if 'proyecto' in request.POST:
@@ -382,17 +415,25 @@ def crear_observacion(request):
             messages.success(request, mensaje)
             return redirect('incidencias:detalle_observacion', pk=observacion.pk)
     else:
-        form = ObservacionForm()
+        form = ObservacionForm(user=request.user)
         # Administradores y otros roles pueden seleccionar proyecto y vivienda
-        form.fields['proyecto'].queryset = Proyecto.objects.filter(activo=True)
-        form.fields['vivienda'].queryset = Vivienda.objects.none()  # Inicialmente vacío
-        form.fields['recinto'].queryset = Recinto.objects.filter(activo=True)
+        if 'proyecto' in form.fields:
+            form.fields['proyecto'].queryset = Proyecto.objects.filter(activo=True)
+        if 'vivienda' in form.fields:
+            form.fields['vivienda'].queryset = Vivienda.objects.none()  # Inicialmente vacío
+        if 'recinto' in form.fields:
+            form.fields['recinto'].queryset = Recinto.objects.filter(activo=True)
     
-    return render(request, 'incidencias/crear_observacion.html', {'form': form})
+    # Pasar el contexto es_familia para que el template sepa qué mostrar
+    context = {
+        'form': form,
+        'es_familia': es_familia
+    }
+    return render(request, 'incidencias/crear_observacion.html', context)
     
     # **PARA OTROS ROLES (ADMIN, TECHO, CONSTRUCTORA)**
     if request.method == 'POST':
-        form = ObservacionForm(request.POST, request.FILES)
+        form = ObservacionForm(request.POST, request.FILES, user=request.user)
         
         # Permitir que el formulario valide con los datos del proyecto
         if 'proyecto' in request.POST:
@@ -496,9 +537,9 @@ def crear_observacion(request):
             messages.success(request, mensaje)
             return redirect('incidencias:detalle_observacion', pk=observacion.pk)
     else:
-        form = ObservacionForm()
+        form = ObservacionForm(user=request.user)
         # Administradores y otros roles pueden seleccionar proyecto y vivienda
-        form.fields['proyecto'].queryset = Proyecto.objects.filter(activo=True)
+        # El queryset de proyecto ya está filtrado por el __init__ del formulario según el rol
         form.fields['vivienda'].queryset = Vivienda.objects.none()  # Inicialmente vacío
         form.fields['recinto'].queryset = Recinto.objects.filter(activo=True)
     
@@ -520,7 +561,7 @@ def detalle_observacion(request, pk):
     puede_cambiar_estado = False
     puede_subir_archivos = False
     puede_agregar_solucion = False
-    
+
     if request.user.rol:
         rol = request.user.rol.nombre
         if rol in ['ADMINISTRADOR', 'TECHO']:
@@ -528,13 +569,12 @@ def detalle_observacion(request, pk):
             puede_subir_archivos = True
             puede_agregar_solucion = True
         elif rol == 'CONSTRUCTORA':
-            # Constructora puede agregar solución y cerrar
             puede_agregar_solucion = True
-            puede_cambiar_estado = observacion.estado == 'ABIERTA'  # Solo puede cerrar si está abierta
+            # Permitir cambiar estado si está Abierta, En Proceso o Rechazada
+            puede_cambiar_estado = observacion.estado.nombre in ['Abierta', 'En Proceso', 'Rechazada']
             puede_subir_archivos = True
         elif rol == 'FAMILIA':
-            # Familia solo puede ver y agregar comentarios si es su observación
-            puede_subir_archivos = True if observacion.estado == 'ABIERTA' else False
+            puede_subir_archivos = True if observacion.estado.nombre == 'Abierta' else False
     
     archivos = observacion.archivos_adjuntos.all().order_by('-fecha_subida')
 
@@ -547,7 +587,7 @@ def detalle_observacion(request, pk):
         
         # Verificar si es cambio de estado o subida de archivo
         if 'cambiar_estado' in request.POST and puede_cambiar_estado:
-            form = CambioEstadoForm(request.POST)
+            form = CambioEstadoForm(request.POST, estado_actual=observacion.estado)
             archivo_form = ArchivoAdjuntoForm()
             
             if form.is_valid():
@@ -597,8 +637,12 @@ def detalle_observacion(request, pk):
                 messages.success(request, 'Archivo adjuntado exitosamente.')
                 return redirect('incidencias:detalle_observacion', pk=pk)
     else:
-        form = CambioEstadoForm() if puede_cambiar_estado else None
-        archivo_form = ArchivoAdjuntoForm() if puede_subir_archivos else None
+        form = None
+        archivo_form = None
+        if puede_cambiar_estado:
+            form = CambioEstadoForm(estado_actual=observacion.estado)
+        if puede_subir_archivos:
+            archivo_form = ArchivoAdjuntoForm()
 
     context = {
         'observacion': observacion,
@@ -630,7 +674,7 @@ def cambiar_estado_observacion(request, pk):
                 observacion.fecha_cierre = timezone.now()
             observacion.save()
 
-            # Crear seguimiento
+            # Crear seguimiento con comentario
             SeguimientoObservacion.objects.create(
                 observacion=observacion,
                 usuario=request.user,
@@ -657,7 +701,7 @@ def cambiar_estado_observacion(request, pk):
                 return JsonResponse({'success': False, 'message': 'Estado no válido'})
             messages.error(request, 'Estado no válido')
 
-    return redirect('incidencias:lista_observaciones')
+    return redirect('incidencias:detalle_observacion', pk=pk)
 
 def get_badge_class(estado_nombre):
     """Devuelve la clase CSS para el badge según el estado"""
@@ -673,11 +717,21 @@ def get_badge_class(estado_nombre):
 def ajax_viviendas_por_proyecto(request):
     proyecto_id = request.GET.get('proyecto_id')
     viviendas = []
+    
     if proyecto_id:
         try:
-            viviendas = list(Vivienda.objects.filter(proyecto_id=proyecto_id).values('id', 'codigo'))
+            # Filtrar solo viviendas activas
+            viviendas_queryset = Vivienda.objects.filter(
+                proyecto_id=proyecto_id, 
+                activa=True
+            ).order_by('codigo')
+            
+            viviendas = list(viviendas_queryset.values('id', 'codigo'))
+            print(f"Viviendas encontradas para proyecto {proyecto_id}: {len(viviendas)}")
+            
         except Exception as e:
-            pass
+            print(f"Error al obtener viviendas: {e}")
+    
     return JsonResponse({'viviendas': viviendas})
 
 @login_required

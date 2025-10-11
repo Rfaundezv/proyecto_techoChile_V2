@@ -100,13 +100,38 @@ class UsuarioForm(forms.ModelForm):
         return usuario
 
 class ViviendaForm(forms.ModelForm):
+    def clean_beneficiario(self):
+        beneficiario = self.cleaned_data.get('beneficiario')
+        if beneficiario:
+            from proyectos.models import Vivienda
+            existe = Vivienda.objects.filter(beneficiario=beneficiario).exclude(pk=self.instance.pk).exists()
+            if existe:
+                raise forms.ValidationError('Este beneficiario ya tiene una vivienda asignada.')
+        return beneficiario
+    def save(self, commit=True):
+        vivienda = super().save(commit=False)
+        # Si familia_beneficiaria está vacío y hay beneficiario, lo llenamos
+        if not vivienda.familia_beneficiaria and vivienda.beneficiario:
+            vivienda.familia_beneficiaria = vivienda.beneficiario.nombre_completo
+        if commit:
+            vivienda.save()
+        return vivienda
+    rut_beneficiario = forms.CharField(
+        max_length=12,
+        required=False,
+        widget=forms.TextInput(attrs={
+            'class': 'form-control',
+            'placeholder': 'Ej: 12.345.678-9 o 123456789'
+        }),
+        help_text='Ingrese el RUT con o sin puntos para buscar automáticamente el beneficiario'
+    )
+
     class Meta:
         model = Vivienda
-        fields = ['proyecto', 'codigo', 'familia_beneficiaria', 'beneficiario', 'tipologia', 'estado', 'fecha_entrega', 'observaciones_generales', 'activa']
+        fields = ['proyecto', 'codigo', 'beneficiario', 'tipologia', 'estado', 'fecha_entrega', 'observaciones_generales', 'activa']
         widgets = {
             'proyecto': forms.Select(attrs={'class': 'form-select'}),
             'codigo': forms.TextInput(attrs={'class': 'form-control'}),
-            'familia_beneficiaria': forms.TextInput(attrs={'class': 'form-control'}),
             'beneficiario': forms.Select(attrs={'class': 'form-select'}),
             'tipologia': forms.Select(attrs={'class': 'form-select'}),
             'estado': forms.Select(attrs={'class': 'form-select'}),

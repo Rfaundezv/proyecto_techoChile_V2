@@ -13,16 +13,11 @@ class ProyectoForm(forms.ModelForm):
         required=True,
         widget=forms.Select(attrs={'class': 'form-select'})
     )
-    constructora = forms.ModelChoiceField(
-        queryset=Constructora.objects.filter(activo=True),
-        required=False,
-        widget=forms.Select(attrs={'class': 'form-select'}),
-        empty_label="Seleccionar constructora"
-    )
-    constructora_rut = forms.CharField(
-        required=False,
+    constructora = forms.CharField(
+        max_length=100,
+        required=True,
         widget=forms.TextInput(attrs={'class': 'form-control'}),
-        help_text='RUT de la constructora (opcional). Si se provee, se guardará en la constructora seleccionada.'
+        help_text='Nombre de la constructora'
     )
 
     class Meta:
@@ -34,6 +29,7 @@ class ProyectoForm(forms.ModelForm):
             'codigo': forms.TextInput(attrs={'class': 'form-control'}),
             'siglas': forms.TextInput(attrs={'class': 'form-control'}),
             'nombre': forms.TextInput(attrs={'class': 'form-control'}),
+            'constructora': forms.TextInput(attrs={'class': 'form-control'}),
             'fecha_entrega': forms.DateInput(attrs={'class': 'form-control', 'type': 'date'}),
             'fecha_termino_postventa': forms.DateInput(attrs={'class': 'form-control', 'type': 'date'}),
             'coordenadas_s': forms.NumberInput(attrs={'class': 'form-control', 'step': '0.00000001'}),
@@ -52,24 +48,25 @@ class ProyectoForm(forms.ModelForm):
                 pass
         elif self.instance.pk and self.instance.region:
             self.fields['comuna'].queryset = self.instance.region.comunas.order_by('nombre')
-        # Inicializar constructora_rut con el rut actual si existe
-        if self.instance.pk and self.instance.constructora:
-            self.fields['constructora_rut'].initial = getattr(self.instance.constructora, 'rut', '')
+
 
     def save(self, commit=True):
         proyecto = super().save(commit=False)
-        rut = self.cleaned_data.get('constructora_rut')
-        constructora = self.cleaned_data.get('constructora')
-        if constructora and rut:
-            # Actualizar la constructora seleccionada con el rut proporcionado
-            constructora.rut = rut
-            constructora.save()
         if commit:
             proyecto.save()
             self.save_m2m()
         return proyecto
 
 class ViviendaForm(forms.ModelForm):
+    rut_beneficiario = forms.CharField(
+        required=False,
+        widget=forms.TextInput(attrs={
+            'class': 'form-control',
+            'placeholder': 'Ej: 12.345.678-9 o 123456789',
+            'id': 'id_rut_beneficiario'
+        }),
+        help_text='Ingrese el RUT con o sin puntos para buscar automáticamente el beneficiario'
+    )
     beneficiario = forms.ModelChoiceField(
         queryset=Beneficiario.objects.all(),
         required=False,
@@ -78,7 +75,7 @@ class ViviendaForm(forms.ModelForm):
     )
     class Meta:
         model = Vivienda
-        fields = ['codigo', 'familia_beneficiaria', 'beneficiario', 'tipologia', 'estado', 
+        fields = ['codigo', 'rut_beneficiario', 'familia_beneficiaria', 'beneficiario', 'tipologia', 'estado', 
                   'fecha_entrega', 'observaciones_generales']
         widgets = {
             'codigo': forms.TextInput(attrs={'class': 'form-control'}),

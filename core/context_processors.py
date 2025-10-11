@@ -45,6 +45,42 @@ def global_stats_context(request):
                 'obs_total': 0,
             }
         
+        # **CASO ESPECIAL PARA CONSTRUCTORA**
+        if user.rol and user.rol.nombre == 'CONSTRUCTORA' and getattr(user, 'empresa', None):
+            # Solo mostrar estadísticas de SU constructora
+            try:
+                empresa_usuario = user.empresa.strip().lower()
+                
+                # Proyectos de la constructora
+                proyectos_constructora = Proyecto.objects.filter(
+                    constructora__icontains=empresa_usuario
+                )
+                
+                # Viviendas de esos proyectos
+                viviendas_constructora = Vivienda.objects.filter(
+                    proyecto__in=proyectos_constructora
+                )
+                
+                # Observaciones de esas viviendas
+                observaciones_constructora = Observacion.objects.filter(
+                    vivienda__proyecto__constructora__icontains=empresa_usuario
+                )
+                
+                return {
+                    'total_proyectos': proyectos_constructora.count(),
+                    'viviendas_total': viviendas_constructora.count(),
+                    'obs_total': observaciones_constructora.count(),
+                }
+            except:
+                pass
+            
+            # Si hay error, mostrar 0
+            return {
+                'total_proyectos': 0,
+                'viviendas_total': 0,
+                'obs_total': 0,
+            }
+        
         # **PARA OTROS ROLES**: Estadísticas globales
         total_proyectos = Proyecto.objects.count()
         viviendas_total = Vivienda.objects.count()
@@ -81,5 +117,6 @@ def permisos_usuario(request):
         'es_familia': tiene_rol(request.user, 'FAMILIA'),
         'puede_panel_maestro': puede_acceder_panel_maestro(request.user),
         'rol_usuario': request.user.rol.nombre if request.user.rol else None,
+        'nombre_constructora': request.user.empresa if getattr(request.user, 'empresa', None) else None,
     }
 

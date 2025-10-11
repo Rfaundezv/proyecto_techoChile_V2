@@ -112,8 +112,12 @@ class Beneficiario(models.Model):
     email = models.EmailField(max_length=254, blank=True, null=True)
     activo = models.BooleanField(default=True)
 
-    def __str__(self):
+    @property
+    def nombre_completo(self):
         return f"{self.nombre} {self.apellido_paterno} {self.apellido_materno or ''}".strip()
+
+    def __str__(self):
+        return self.nombre_completo
 
     class Meta:
         verbose_name = "Beneficiario"
@@ -145,8 +149,8 @@ class Vivienda(models.Model):
     tipologia = models.ForeignKey(TipologiaVivienda, on_delete=models.PROTECT)
 
     codigo = models.CharField(max_length=10, help_text="Código único de la vivienda dentro del proyecto")
-    familia_beneficiaria = models.CharField(max_length=200, help_text="Nombre de la familia")
-    beneficiario = models.ForeignKey(Beneficiario, null=True, blank=True, on_delete=models.SET_NULL, related_name='viviendas')
+    familia_beneficiaria = models.CharField(max_length=200, help_text="Nombre de la familia", blank=True, null=True)
+    beneficiario = models.OneToOneField(Beneficiario, null=True, blank=True, on_delete=models.SET_NULL, related_name='vivienda')
     estado = models.CharField(max_length=20, choices=ESTADOS_CHOICES, default='construccion')
 
     fecha_entrega = models.DateField(blank=True, null=True)

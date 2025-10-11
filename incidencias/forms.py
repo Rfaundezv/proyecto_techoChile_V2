@@ -10,6 +10,18 @@ class FiltroObservacionForm(forms.Form):
         empty_label="Todos los proyectos",
         widget=forms.Select(attrs={'class': 'form-select'})
     )
+    
+    def __init__(self, *args, **kwargs):
+        user = kwargs.pop('user', None)
+        super().__init__(*args, **kwargs)
+        
+        if user and user.rol and user.rol.nombre == 'CONSTRUCTORA' and getattr(user, 'empresa', None):
+            # Filtrar proyectos solo de la constructora del usuario
+            empresa_usuario = user.empresa.strip().lower()
+            self.fields['proyecto'].queryset = Proyecto.objects.filter(
+                activo=True,
+                constructora__icontains=empresa_usuario
+            )
     numero_vivienda = forms.CharField(
         max_length=10,
         required=False,
@@ -48,6 +60,46 @@ class ObservacionForm(forms.ModelForm):
         queryset=Vivienda.objects.none(),
         widget=forms.Select(attrs={'class': 'form-select'})
     )
+    
+    def __init__(self, *args, **kwargs):
+        # Extraer parámetros personalizados antes de llamar a super()
+        user = kwargs.pop('user', None)
+        exclude_fields = kwargs.pop('exclude_fields', [])
+        # Limpiar cualquier otro parámetro no esperado
+        kwargs.pop('usuario', None)  # En caso de que se pase por error
+        
+        super().__init__(*args, **kwargs)
+        
+        # Excluir campos si se especifica (para familias)
+        for field in exclude_fields:
+            if field in self.fields:
+                del self.fields[field]
+        
+        # Filtrar proyectos para usuarios de constructora
+        if user and hasattr(user, 'rol') and user.rol and user.rol.nombre == 'CONSTRUCTORA' and getattr(user, 'empresa', None):
+            empresa_usuario = user.empresa.strip().lower()
+            if 'proyecto' in self.fields:
+                self.fields['proyecto'].queryset = Proyecto.objects.filter(
+                    activo=True,
+                    constructora__icontains=empresa_usuario
+                )
+        
+        # Si hay datos de proyecto, cargar viviendas y recintos
+        if 'proyecto' in self.data and 'vivienda' in self.fields:
+            try:
+                proyecto_id = int(self.data.get('proyecto'))
+                self.fields['vivienda'].queryset = Vivienda.objects.filter(
+                    proyecto_id=proyecto_id, 
+                    activa=True
+                ).order_by('codigo')
+                
+                # Obtener tipologías de viviendas del proyecto para recintos
+                if 'recinto' in self.fields:
+                    tipologias = Vivienda.objects.filter(proyecto_id=proyecto_id).values_list('tipologia', flat=True).distinct()
+                    self.fields['recinto'].queryset = Recinto.objects.filter(tipologia__in=tipologias)
+            except (ValueError, TypeError):
+                pass
+                
     recinto = forms.ModelChoiceField(
         queryset=Recinto.objects.none(),
         required=False,
@@ -86,37 +138,34 @@ class ObservacionForm(forms.ModelForm):
             'es_urgente': 'Las observaciones urgentes tienen un plazo de 48 horas. Las normales 120 días.',
         }
 
-    def __init__(self, *args, **kwargs):
-        exclude_fields = kwargs.pop('exclude_fields', [])
-        super().__init__(*args, **kwargs)
-
-        # Excluir campos si se especifica
-        for field in exclude_fields:
-            if field in self.fields:
-                del self.fields[field]
-
-        if 'proyecto' in self.data:
-            try:
-                proyecto_id = int(self.data.get('proyecto'))
-                self.fields['vivienda'].queryset = Vivienda.objects.filter(proyecto_id=proyecto_id)
-                # Obtener tipologías de viviendas del proyecto para recintos
-                tipologias = Vivienda.objects.filter(proyecto_id=proyecto_id).values_list('tipologia', flat=True).distinct()
-                self.fields['recinto'].queryset = Recinto.objects.filter(tipologia__in=tipologias)
-            except (ValueError, TypeError):
-                pass
-
 class CambioEstadoForm(forms.Form):
     estado = forms.ModelChoiceField(
-        queryset=EstadoObservacion.objects.all(),
+        queryset=EstadoObservacion.objects.filter(activo=True),
         widget=forms.Select(attrs={'class': 'form-select'}),
-        label="Nuevo Estado"
+        label="Nuevo Estado",
+        empty_label="Seleccionar estado"
     )
     comentario = forms.CharField(
-        widget=forms.Textarea(attrs={'class': 'form-control', 'rows': 3}),
+        widget=forms.Textarea(attrs={
+            'class': 'form-control', 
+            'rows': 3,
+            'placeholder': 'Agregar comentario sobre el cambio...'
+        }),
         required=False,
-        label="Comentario (opcional)",
-        help_text="Agrega un comentario sobre el cambio de estado"
+        label="Comentario",
+        help_text="Opcional pero recomendado para seguimiento"
     )
+    
+    def __init__(self, *args, **kwargs):
+        estado_actual = kwargs.pop('estado_actual', None)
+        super().__init__(*args, **kwargs)
+        
+        # Filtrar estados según el estado actual
+        if estado_actual:
+            queryset = EstadoObservacion.objects.filter(activo=True)
+            # Excluir el estado actual de las opciones
+            queryset = queryset.exclude(pk=estado_actual.pk)
+            self.fields['estado'].queryset = queryset
 
 class ArchivoAdjuntoForm(forms.ModelForm):
     class Meta:
