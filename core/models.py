@@ -86,12 +86,15 @@ class Usuario(AbstractBaseUser, PermissionsMixin):
         validators=[validar_rut],
         db_index=True
     )
-    nombre = models.CharField(max_length=150, verbose_name="Nombre completo")
+    nombre = models.CharField(max_length=100, verbose_name="Nombre")
+    apellido_paterno = models.CharField(max_length=100, verbose_name="Apellido paterno", blank=True, null=True)
+    apellido_materno = models.CharField(max_length=100, verbose_name="Apellido materno", blank=True, null=True)
     telefono = models.CharField(max_length=15, blank=True, verbose_name="Teléfono")
     rol = models.ForeignKey(Rol, on_delete=models.PROTECT, null=True, blank=True)
     region = models.ForeignKey(Region, on_delete=models.SET_NULL, null=True, blank=True)
     comuna = models.ForeignKey(Comuna, on_delete=models.SET_NULL, null=True, blank=True)
-    empresa = models.CharField(max_length=200, blank=True, help_text="Para usuarios de constructoras")
+    constructora = models.ForeignKey('Constructora', on_delete=models.SET_NULL, null=True, blank=True, help_text="Constructora asociada (solo para usuarios con rol Constructora)")
+    empresa = models.CharField(max_length=200, blank=True, help_text="Para usuarios de constructoras (campo legacy, usar constructora)")  # Mantener por compatibilidad
 
     is_active = models.BooleanField(default=True, verbose_name="Activo")
     is_staff = models.BooleanField(default=False, verbose_name="Es staff")

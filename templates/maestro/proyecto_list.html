@@ -3,12 +3,16 @@
 {% block title %}{{ titulo }} - {{ block.super }}{% endblock %}
 
 {% block content %}
-<div class="container mt-4">
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <h2>{{ titulo }}</h2>
-        <a href="{% url 'maestro_proyecto_create' %}" class="btn btn-primary">
-            <i class="bi bi-plus-circle"></i> Crear Proyecto
-        </a>
+<div class="container-fluid mt-4">
+    <div class="row mb-4">
+        <div class="col-12 col-md-6 mb-2 mb-md-0">
+            <h2 class="h4 mb-0">{{ titulo }}</h2>
+        </div>
+        <div class="col-12 col-md-6 text-md-end">
+            <a href="{% url 'maestro_proyecto_create' %}" class="btn btn-primary btn-sm">
+                <i class="bi bi-plus-circle"></i> <span class="d-none d-sm-inline">Crear Proyecto</span>
+            </a>
+        </div>
     </div>
 
     {% if messages %}
@@ -21,31 +25,43 @@
     {% endif %}
 
     <div class="card">
-        <div class="card-body">
+    <div class="card-body p-0 p-md-3">
             <div class="table-responsive">
                 <table class="table table-hover">
                     <thead>
                         <tr>
-                            <th>Código</th>
-                            <th>Nombre</th>
-                            <th>Constructora</th>
-                            <th>Región</th>
-                            <th>Comuna</th>
-                            <th>Fecha Entrega</th>
-                            <th>Estado</th>
+                            <th>Proyecto</th>
+                            <th class="d-none d-md-table-cell">Constructora</th>
+                            <th class="d-none d-lg-table-cell">Región</th>
+                            <th class="d-none d-lg-table-cell">Comuna</th>
+                            <th class="d-none d-sm-table-cell">F. Entrega</th>
+                            <th class="d-none d-sm-table-cell">Estado</th>
                             <th>Acciones</th>
                         </tr>
                     </thead>
                     <tbody>
                         {% for proyecto in proyectos %}
                         <tr>
-                            <td>{{ proyecto.codigo }}</td>
-                            <td>{{ proyecto.nombre }}</td>
-                            <td>{{ proyecto.constructora|default:"-" }}</td>
-                            <td>{{ proyecto.region.nombre }}</td>
-                            <td>{{ proyecto.comuna.nombre }}</td>
-                            <td>{{ proyecto.fecha_entrega|date:"d/m/Y" }}</td>
                             <td>
+                                <div class="d-flex flex-column">
+                                    <span class="fw-bold">{{ proyecto.codigo }}</span>
+                                    <span class="text-break">{{ proyecto.nombre }}</span>
+                                    <small class="text-muted d-md-none">{{ proyecto.constructora|default:"Sin constructora" }}</small>
+                                    <small class="text-muted d-sm-none">
+                                        {{ proyecto.fecha_entrega|date:"d/m/Y" }}
+                                        {% if proyecto.activo %}
+                                            <i class="bi bi-check-circle text-success ms-1"></i>
+                                        {% else %}
+                                            <i class="bi bi-x-circle text-secondary ms-1"></i>
+                                        {% endif %}
+                                    </small>
+                                </div>
+                            </td>
+                            <td class="d-none d-md-table-cell">{{ proyecto.constructora|default:"-" }}</td>
+                            <td class="d-none d-lg-table-cell">{{ proyecto.region.nombre }}</td>
+                            <td class="d-none d-lg-table-cell">{{ proyecto.comuna.nombre }}</td>
+                            <td class="d-none d-sm-table-cell">{{ proyecto.fecha_entrega|date:"d/m/Y" }}</td>
+                            <td class="d-none d-sm-table-cell">
                                 {% if proyecto.activo %}
                                     <span class="badge bg-success">Activo</span>
                                 {% else %}
@@ -53,19 +69,21 @@
                                 {% endif %}
                             </td>
                             <td>
-                                <a href="{% url 'proyectos:detalle' proyecto.pk %}" class="btn btn-sm btn-info">
-                                    <i class="bi bi-eye"></i> Ver
-                                </a>
-                                <a href="{% url 'maestro_proyecto_edit' proyecto.pk %}" class="btn btn-sm btn-warning">
-                                    <i class="bi bi-pencil"></i> Editar
-                                </a>
-                                <form method="post" action="{% url 'maestro_proyecto_delete' proyecto.pk %}" style="display:inline;">
-                                    {% csrf_token %}
-                                    <button type="submit" class="btn btn-sm btn-danger" 
-                                            onclick="return confirm('¿Desactivar este proyecto?')">
-                                        <i class="bi bi-trash"></i> Desactivar
-                                    </button>
-                                </form>
+                                <div class="d-flex gap-1 flex-wrap">
+                                    <a href="{% url 'proyectos:detalle' proyecto.pk %}" class="btn btn-sm btn-info">
+                                        <i class="bi bi-eye"></i> <span class="d-none d-lg-inline">Ver</span>
+                                    </a>
+                                    <a href="{% url 'maestro_proyecto_edit' proyecto.pk %}" class="btn btn-sm btn-warning">
+                                        <i class="bi bi-pencil"></i> <span class="d-none d-lg-inline">Editar</span>
+                                    </a>
+                                    <form method="post" action="{% url 'maestro_proyecto_delete' proyecto.pk %}" style="display:inline;">
+                                        {% csrf_token %}
+                                        <button type="submit" class="btn btn-sm btn-danger" 
+                                                onclick="return confirm('¿Desactivar este proyecto?')">
+                                            <i class="bi bi-trash"></i> <span class="d-none d-lg-inline">Desactivar</span>
+                                        </button>
+                                    </form>
+                                </div>
                             </td>
                         </tr>
                         {% empty %}

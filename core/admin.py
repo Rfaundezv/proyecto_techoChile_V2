@@ -5,25 +5,29 @@ from .models import Usuario, Rol, Region, Comuna, Constructora, ConfiguracionObs
 
 @admin.register(Usuario)
 class UsuarioAdmin(BaseUserAdmin):
-    list_display = ('email', 'nombre', 'rol', 'region', 'is_active', 'is_staff')
-    list_filter = ('is_active', 'is_staff', 'rol', 'region')
+    list_display = ('email', 'nombre', 'rol', 'constructora', 'region', 'is_active', 'is_staff')
+    list_filter = ('is_active', 'is_staff', 'rol', 'region', 'constructora')
     search_fields = ('email', 'nombre')
     ordering = ('email',)
 
     fieldsets = (
         (None, {'fields': ('email', 'password')}),
-        ('Información personal', {'fields': ('nombre', 'telefono', 'empresa')}),
+        ('Información personal', {'fields': ('nombre', 'telefono')}),
+        ('Rol y Empresa', {'fields': ('rol', 'constructora', 'empresa')}),
         ('Ubicación', {'fields': ('region', 'comuna')}),
-        ('Permisos', {'fields': ('rol', 'is_active', 'is_staff', 'is_superuser', 'groups', 'user_permissions')}),
+        ('Permisos', {'fields': ('is_active', 'is_staff', 'is_superuser', 'groups', 'user_permissions')}),
         ('Fechas importantes', {'fields': ('last_login', 'date_joined')}),
     )
 
     add_fieldsets = (
         (None, {
             'classes': ('wide',),
-            'fields': ('email', 'nombre', 'password1', 'password2', 'rol', 'region'),
+            'fields': ('email', 'nombre', 'password1', 'password2', 'rol', 'constructora', 'region'),
         }),
     )
+
+    class Media:
+        js = ('admin/js/usuario_admin.js',)
 
 @admin.register(Rol)
 class RolAdmin(admin.ModelAdmin):

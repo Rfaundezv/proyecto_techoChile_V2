@@ -52,6 +52,11 @@ class ConstructoraForm(forms.ModelForm):
         }
 
 class UsuarioForm(forms.ModelForm):
+    confirm_email = forms.EmailField(
+        required=True,
+        widget=forms.EmailInput(attrs={'class': 'form-control'}),
+        label='Confirmar email'
+    )
     password = forms.CharField(
         required=False,
         widget=forms.PasswordInput(attrs={'class': 'form-control'}),
@@ -65,26 +70,51 @@ class UsuarioForm(forms.ModelForm):
     
     class Meta:
         model = Usuario
-        fields = ['email', 'nombre', 'telefono', 'rol', 'region', 'comuna', 'empresa', 'is_active']
+        fields = ['email', 'rut', 'nombre', 'apellido_paterno', 'apellido_materno', 'telefono', 'rol', 'region', 'comuna', 'constructora', 'empresa', 'is_active']
         widgets = {
             'email': forms.EmailInput(attrs={'class': 'form-control'}),
+            'rut': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Ej: 12345678-9'}),
             'nombre': forms.TextInput(attrs={'class': 'form-control'}),
+            'apellido_paterno': forms.TextInput(attrs={'class': 'form-control'}),
+            'apellido_materno': forms.TextInput(attrs={'class': 'form-control'}),
             'telefono': forms.TextInput(attrs={'class': 'form-control'}),
             'rol': forms.Select(attrs={'class': 'form-select'}),
             'region': forms.Select(attrs={'class': 'form-select'}),
             'comuna': forms.Select(attrs={'class': 'form-select'}),
+            'constructora': forms.Select(attrs={'class': 'form-select'}),
             'empresa': forms.TextInput(attrs={'class': 'form-control'}),
             'is_active': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
         }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # Mostrar solo constructoras activas, igual que región y comuna
+        self.fields['constructora'].queryset = Constructora.objects.filter(activo=True).order_by('nombre')
+        self.fields['region'].queryset = Region.objects.filter(activo=True).order_by('nombre')
+        self.fields['comuna'].queryset = Comuna.objects.filter(activo=True).order_by('nombre')
+        # Contraseña obligatoria solo en creación
+        if not self.instance.pk:
+            self.fields['password'].required = True
+        else:
+            self.fields['password'].required = False
 
     def clean(self):
         cleaned_data = super().clean()
         password = cleaned_data.get('password')
         confirm_password = cleaned_data.get('confirm_password')
-        
+        email = cleaned_data.get('email')
+        confirm_email = cleaned_data.get('confirm_email')
+        rol = cleaned_data.get('rol')
+        constructora = cleaned_data.get('constructora')
+        # Validar contraseña
         if password and password != confirm_password:
             raise forms.ValidationError('Las contraseñas no coinciden')
-        
+        # Validar email
+        if email and confirm_email and email != confirm_email:
+            self.add_error('confirm_email', 'Los correos electrónicos no coinciden')
+        # Validar constructora si el rol es CONSTRUCTORA
+        if rol and hasattr(rol, 'nombre') and rol.nombre == 'CONSTRUCTORA' and not constructora:
+            self.add_error('constructora', 'Debes seleccionar una empresa constructora para este usuario.')
         return cleaned_data
 
     def save(self, commit=True):

@@ -3,16 +3,20 @@
 {% block title %}{{ titulo }} - {{ block.super }}{% endblock %}
 
 {% block content %}
-<div class="container mt-4">
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <h2>{{ titulo }}</h2>
-        <form method="get" class="d-flex" style="gap: 1rem;">
-            <input type="text" name="rut" class="form-control" placeholder="Buscar por RUT" value="{{ request.GET.rut|default:'' }}" style="max-width: 200px;">
-            <button type="submit" class="btn btn-outline-primary">Buscar</button>
-        </form>
-        <a href="{% url 'maestro_constructora_create' %}" class="btn btn-primary">
-            <i class="bi bi-plus-circle"></i> Crear Constructora
-        </a>
+<div class="container-fluid mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
+        <h2 class="mb-0">{{ titulo }}</h2>
+        <div class="d-flex flex-wrap gap-2">
+            <form method="get" class="d-flex gap-2">
+                <input type="text" name="rut" class="form-control form-control-sm" placeholder="Buscar por RUT" value="{{ request.GET.rut|default:'' }}" style="min-width: 150px;">
+                <button type="submit" class="btn btn-outline-primary btn-sm">
+                    <i class="bi bi-search"></i>
+                </button>
+            </form>
+            <a href="{% url 'maestro_constructora_create' %}" class="btn btn-primary btn-sm">
+                <i class="bi bi-plus-circle"></i> <span class="d-none d-sm-inline">Crear Constructora</span>
+            </a>
+        </div>
     </div>
 
     {% if messages %}
@@ -24,17 +28,17 @@
         {% endfor %}
     {% endif %}
 
-    <div class="card">
-        <div class="card-body">
+    <div class="card shadow-sm">
+        <div class="card-body p-0">
             <div class="table-responsive">
-                <table class="table table-hover">
+                <table class="table table-hover mb-0">
                     <thead>
                         <tr>
                             <th>Nombre</th>
-                            <th>RUT</th>
-                            <th>Región</th>
-                            <th>Comuna</th>
-                            <th>Teléfono</th>
+                            <th class="d-none d-md-table-cell">RUT</th>
+                            <th class="d-none d-lg-table-cell">Región</th>
+                            <th class="d-none d-lg-table-cell">Comuna</th>
+                            <th class="d-none d-sm-table-cell">Teléfono</th>
                             <th>Estado</th>
                             <th>Acciones</th>
                         </tr>
@@ -43,10 +47,10 @@
                         {% for constructora in constructoras %}
                         <tr>
                             <td>{{ constructora.nombre }}</td>
-                            <td>{{ constructora.rut|default:"-" }}</td>
-                            <td>{{ constructora.region.nombre|default:"-" }}</td>
-                            <td>{{ constructora.comuna.nombre|default:"-" }}</td>
-                            <td>{{ constructora.telefono|default:"-" }}</td>
+                            <td class="d-none d-md-table-cell">{{ constructora.rut|default:"-" }}</td>
+                            <td class="d-none d-lg-table-cell">{{ constructora.region.nombre|default:"-" }}</td>
+                            <td class="d-none d-lg-table-cell">{{ constructora.comuna.nombre|default:"-" }}</td>
+                            <td class="d-none d-sm-table-cell">{{ constructora.telefono|default:"-" }}</td>
                             <td>
                                 {% if constructora.activo %}
                                     <span class="badge bg-success">Activo</span>
@@ -55,15 +59,15 @@
                                 {% endif %}
                             </td>
                             <td>
-                                <div class="acciones-botones">
+                                <div class="d-flex gap-1 flex-wrap">
                                     <a href="{% url 'maestro_constructora_edit' constructora.pk %}" class="btn btn-sm btn-warning">
-                                        <i class="bi bi-pencil"></i> Editar
+                                        <i class="bi bi-pencil"></i> <span class="d-none d-md-inline">Editar</span>
                                     </a>
                                     <form method="post" action="{% url 'maestro_constructora_delete' constructora.pk %}" style="display:inline;">
                                         {% csrf_token %}
                                         <button type="submit" class="btn btn-sm btn-danger" 
                                                 onclick="return confirm('¿Desactivar esta constructora?')">
-                                            <i class="bi bi-trash"></i> Desactivar
+                                            <i class="bi bi-trash"></i> <span class="d-none d-md-inline">Desactivar</span>
                                         </button>
                                     </form>
                                 </div>

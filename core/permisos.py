@@ -49,8 +49,12 @@ def puede_ver_proyecto(usuario, proyecto):
     
     # CONSTRUCTORA solo ve sus proyectos
     if rol == 'CONSTRUCTORA':
-        if usuario.empresa:
-            return proyecto.constructora.lower() == usuario.empresa.lower()
+        # Usar el nuevo campo constructora (ForeignKey)
+        if getattr(usuario, 'constructora', None):
+            return proyecto.constructora == usuario.constructora
+        # Fallback al campo empresa legacy
+        elif getattr(usuario, 'empresa', None):
+            return proyecto.constructora.nombre.lower() == usuario.empresa.lower()
         return False
     
     # FAMILIA solo ve proyectos donde tiene vivienda
@@ -100,8 +104,12 @@ def puede_ver_observacion(usuario, observacion):
         return True
     # CONSTRUCTORA solo ve observaciones de sus proyectos
     if usuario.rol and usuario.rol.nombre == 'CONSTRUCTORA':
-        if usuario.empresa:
-            proj_const = observacion.vivienda.proyecto.constructora.lower()
+        # Usar el nuevo campo constructora (ForeignKey)
+        if getattr(usuario, 'constructora', None):
+            return observacion.vivienda.proyecto.constructora == usuario.constructora
+        # Fallback al campo empresa legacy
+        elif getattr(usuario, 'empresa', None):
+            proj_const = observacion.vivienda.proyecto.constructora.nombre.lower()
             return proj_const == usuario.empresa.lower()
         return False
     # FAMILIA solo ve sus propias observaciones
@@ -147,8 +155,12 @@ def puede_editar_observacion(usuario, observacion):
     
     # CONSTRUCTORA puede agregar soluciones y cerrar (verificar en vista)
     if rol == 'CONSTRUCTORA':
-        if usuario.empresa:
-            return observacion.vivienda.proyecto.constructora.lower() == usuario.empresa.lower()
+        # Usar el nuevo campo constructora (ForeignKey)
+        if getattr(usuario, 'constructora', None):
+            return observacion.vivienda.proyecto.constructora == usuario.constructora
+        # Fallback al campo empresa legacy
+        elif getattr(usuario, 'empresa', None):
+            return observacion.vivienda.proyecto.constructora.nombre.lower() == usuario.empresa.lower()
         return False
     
     # FAMILIA puede editar sus propias observaciones si están abiertas
@@ -321,8 +333,13 @@ def filtrar_proyectos_por_rol(usuario, queryset):
         return queryset
     
     # CONSTRUCTORA solo sus proyectos
-    if rol == 'CONSTRUCTORA' and usuario.empresa:
-        return queryset.filter(constructora__iexact=usuario.empresa)
+    if rol == 'CONSTRUCTORA':
+        # Usar la nueva relación ForeignKey si existe
+        if hasattr(usuario, 'constructora') and usuario.constructora:
+            return queryset.filter(constructora=usuario.constructora)
+        # Fallback al campo empresa legacy
+        elif usuario.empresa:
+            return queryset.filter(constructora__nombre__iexact=usuario.empresa)
     
     # FAMILIA solo proyectos donde tiene vivienda - buscar por RUT (más preciso)
     if rol == 'FAMILIA':
@@ -359,9 +376,16 @@ def filtrar_observaciones_por_rol(usuario, queryset):
     if usuario.is_superuser or (usuario.rol and usuario.rol.nombre in ['ADMINISTRADOR', 'TECHO', 'SERVIU']):
         return queryset
     # CONSTRUCTORA solo observa sus proyectos
-    if usuario.rol and usuario.rol.nombre == 'CONSTRUCTORA' and getattr(usuario, 'empresa', None):
-        empresa_usuario = usuario.empresa.strip().lower()
-        return queryset.filter(vivienda__proyecto__constructora__icontains=empresa_usuario)
+    if usuario.rol and usuario.rol.nombre == 'CONSTRUCTORA':
+        # Usar el nuevo campo constructora (ForeignKey)
+        if getattr(usuario, 'constructora', None):
+            return queryset.filter(vivienda__proyecto__constructora=usuario.constructora)
+        # Fallback al campo empresa legacy
+        elif getattr(usuario, 'empresa', None):
+            empresa_usuario = usuario.empresa.strip().lower()
+            return queryset.filter(vivienda__proyecto__constructora__nombre__icontains=empresa_usuario)
+        else:
+            return queryset.none()
     # FAMILIA solo ve sus propias observaciones
     is_familia = usuario.rol and usuario.rol.nombre == 'FAMILIA'
     if is_familia:

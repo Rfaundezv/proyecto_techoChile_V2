@@ -1,0 +1,195 @@
+%% ERD (compat) - without FK/UNIQUE markers to avoid parser issues
+erDiagram
+  %% --- CORE ---
+  Region ||--o{ Comuna : tiene
+  Rol ||--o{ Usuario : asigna
+  Region ||--o{ Usuario : "vive en"
+  Comuna ||--o{ Usuario : "vive en"
+  Comuna ||--o{ Constructora : "domicilio"
+  Region ||--o{ Constructora : "domicilio"
+
+  Region {
+    int id
+    string nombre
+    string codigo
+    bool activo
+  }
+  Comuna {
+    int id
+    string nombre
+    string codigo
+    bool activo
+    int region_id
+  }
+  Rol {
+    int id
+    string nombre
+    text descripcion
+    bool activo
+  }
+  Usuario {
+    int id
+    string email
+    string nombre
+    string telefono
+    string empresa
+    string rut
+    bool is_active
+    bool is_staff
+    bool is_superuser
+    datetime date_joined
+    int comuna_id
+    int region_id
+    int rol_id
+  }
+  Constructora {
+    bigint id
+    string nombre
+    string direccion
+    string contacto
+    string telefono
+    string email
+    string rut
+    bool activo
+    int comuna_id
+    int region_id
+  }
+
+  %% --- PROYECTOS ---
+  Proyecto ||--o{ Vivienda : tiene
+  TipologiaVivienda ||--o{ Recinto : define
+  TipologiaVivienda ||--o{ Vivienda : clasifica
+  Beneficiario ||--o{ Telefono : tiene
+  Beneficiario ||--|| Vivienda : "1 a 1 (opcional)"
+
+  Proyecto {
+    int id
+    string codigo
+    string siglas
+    string nombre
+    string constructora
+    date fecha_entrega
+    date fecha_termino_postventa
+    decimal coordenadas_s
+    decimal coordenadas_w
+    bool activo
+    datetime fecha_creacion
+    datetime fecha_actualizacion
+    int comuna_id
+    int region_id
+    int creado_por_id
+  }
+  TipologiaVivienda {
+    int id
+    int codigo
+    string nombre
+    text descripcion
+    bool activa
+  }
+  Recinto {
+    int id
+    string codigo
+    string nombre
+    text descripcion
+    string elementos_disponibles
+    bool activo
+    int tipologia_id
+  }
+  Vivienda {
+    int id
+    string codigo
+    string familia_beneficiaria
+    string estado
+    date fecha_entrega
+    date fecha_inicio_postventa
+    date fecha_termino_postventa
+    text observaciones_generales
+    bool activa
+    datetime fecha_creacion
+    datetime fecha_actualizacion
+    int proyecto_id
+    int tipologia_id
+    int beneficiario_id
+  }
+  Beneficiario {
+    bigint id
+    string nombre
+    string apellido_paterno
+    string apellido_materno
+    string rut
+    string email
+    bool activo
+  }
+  Telefono {
+    bigint id
+    string numero
+    bool activo
+    int beneficiario_id
+  }
+
+  %% --- INCIDENCIAS ---
+  Observacion ||--o{ ArchivoAdjuntoObservacion : tiene
+  Observacion ||--o{ SeguimientoObservacion : tiene
+  Proyecto ||--o{ Observacion : "reporta en"
+  Vivienda ||--o{ Observacion : "reporta en"
+  Recinto ||--o{ Observacion : "ubica en"
+  TipoObservacion ||--o{ Observacion : "tipifica"
+  EstadoObservacion ||--o{ Observacion : "estado actual"
+  Usuario ||--o{ Observacion : "crea"
+  Usuario ||--o{ Observacion : "asigna"
+
+  EstadoObservacion {
+    bigint id
+    int codigo
+    string nombre
+    text descripcion
+    bool activo
+  }
+  TipoObservacion {
+    bigint id
+    string nombre
+    text descripcion
+    bool activo
+  }
+  Observacion {
+    bigint id
+    string elemento
+    text detalle
+    string prioridad
+    bool es_urgente
+    datetime fecha_creacion
+    date fecha_vencimiento
+    datetime fecha_cierre
+    text observaciones_seguimiento
+    datetime fecha_ultima_actualizacion
+    string id_externo
+    bool activo
+    string archivo_adjunto
+    int asignado_a_id
+    int creado_por_id
+    int estado_id
+    int proyecto_id
+    int recinto_id
+    int tipo_id
+    int vivienda_id
+  }
+  ArchivoAdjuntoObservacion {
+    bigint id
+    string archivo
+    string nombre_original
+    string descripcion
+    datetime fecha_subida
+    int observacion_id
+    int subido_por_id
+  }
+  SeguimientoObservacion {
+    bigint id
+    datetime fecha
+    string accion
+    text comentario
+    bool activo
+    int estado_anterior_id
+    int estado_nuevo_id
+    int observacion_id
+    int usuario_id
+  }

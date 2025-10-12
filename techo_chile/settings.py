@@ -15,7 +15,7 @@ DEBUG = os.getenv('DEBUG', 'True').lower() == 'true'
 ALLOWED_HOSTS = [
     "127.0.0.1",
     "localhost",
-    "geek-html-her-went.trycloudflare.com"
+    "marco-suspended-markers-owen.trycloudflare.com"
 ]
 
 CSRF_TRUSTED_ORIGINS = [

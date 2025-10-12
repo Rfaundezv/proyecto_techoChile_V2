@@ -27,7 +27,7 @@ def lista_proyectos(request):
         proyectos = proyectos.filter(
             Q(codigo__icontains=search) | 
             Q(nombre__icontains=search) |
-            Q(constructora__icontains=search)
+            Q(constructora__nombre__icontains=search)
         )
 
     paginator = Paginator(proyectos, 10)

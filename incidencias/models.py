@@ -31,7 +31,7 @@ class TipoObservacion(models.Model):
 
 class EstadoObservacion(models.Model):
     codigo = models.IntegerField(unique=True)
-    nombre = models.CharField(max_length=50)
+    nombre = models.CharField(max_length=50, unique=True)  # También único por nombre
     descripcion = models.TextField(blank=True)
     activo = models.BooleanField(default=True)
 
@@ -41,14 +41,24 @@ class EstadoObservacion(models.Model):
     class Meta:
         verbose_name = "Estado de Observación"
         verbose_name_plural = "Estados de Observación"
+        constraints = [
+            models.UniqueConstraint(
+                fields=["codigo", "nombre"], 
+                name="uniq_estado_codigo_nombre"
+            )
+        ]
+        indexes = [
+            models.Index(fields=["activo"]),
+            models.Index(fields=["codigo", "activo"]),
+        ]
 
 class Observacion(models.Model):
-    PRIORIDADES = [
-        ('baja', 'Baja'),
-        ('media', 'Media'),
-        ('alta', 'Alta'),
-        ('urgente', 'Urgente'),
-    ]
+    # Usar TextChoices para mejor validación
+    class Prioridad(models.TextChoices):
+        BAJA = "BAJA", "Baja"
+        MEDIA = "MEDIA", "Media"
+        ALTA = "ALTA", "Alta"
+        URGENTE = "URGENTE", "Urgente"
 
     proyecto = models.ForeignKey(Proyecto, on_delete=models.CASCADE, related_name='observaciones')
     vivienda = models.ForeignKey(Vivienda, on_delete=models.CASCADE, related_name='observaciones')
@@ -59,15 +69,18 @@ class Observacion(models.Model):
     tipo = models.ForeignKey(TipoObservacion, on_delete=models.PROTECT)
     estado = models.ForeignKey(EstadoObservacion, on_delete=models.PROTECT)
 
-    prioridad = models.CharField(max_length=20, choices=PRIORIDADES, default='media')
+    prioridad = models.CharField(max_length=10, choices=Prioridad.choices, default=Prioridad.MEDIA)
     es_urgente = models.BooleanField(default=False)
 
     fecha_creacion = models.DateTimeField(auto_now_add=True)
     fecha_vencimiento = models.DateField(blank=True, null=True)
     fecha_cierre = models.DateTimeField(blank=True, null=True)
 
-    creado_por = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.PROTECT, related_name='observaciones_creadas')
-    asignado_a = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, blank=True, related_name='observaciones_asignadas')
+    # Proteger usuarios importantes, permitir SET_NULL para flexibilidad
+    creado_por = models.ForeignKey(settings.AUTH_USER_MODEL, null=True, on_delete=models.SET_NULL, 
+                                   related_name='observaciones_creadas')
+    asignado_a = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, 
+                                   null=True, blank=True, related_name='observaciones_asignadas')
 
     # Seguimiento
     observaciones_seguimiento = models.TextField(blank=True, help_text="Notas de seguimiento")
@@ -111,8 +124,29 @@ class Observacion(models.Model):
         verbose_name = "Observación"
         verbose_name_plural = "Observaciones"
         ordering = ['-fecha_creacion']
+        # Índices optimizados para consultas frecuentes
         indexes = [
             models.Index(fields=['id_externo']),
+            models.Index(fields=["estado", "fecha_vencimiento"]),  # Consultas de vencimiento
+            models.Index(fields=["proyecto", "vivienda"]),         # Filtros por proyecto/vivienda
+            models.Index(fields=["asignado_a", "estado"]),         # Consultas por asignado
+            models.Index(fields=["fecha_ultima_actualizacion"]),   # Ordenamiento temporal
+            models.Index(fields=["prioridad", "es_urgente"]),      # Filtros de prioridad
+            models.Index(fields=["creado_por", "fecha_creacion"]), # Historiales por usuario
+        ]
+        # Validaciones de integridad
+        constraints = [
+            # Validar fechas lógicas
+            models.CheckConstraint(
+                check=models.Q(fecha_cierre__isnull=True) | 
+                      models.Q(fecha_cierre__gte=models.F('fecha_creacion')),
+                name="chk_fecha_cierre_despues_creacion"
+            ),
+            models.CheckConstraint(
+                check=models.Q(fecha_vencimiento__isnull=True) |
+                      models.Q(fecha_vencimiento__gte=models.F('fecha_creacion__date')),
+                name="chk_fecha_vencimiento_despues_creacion"
+            ),
         ]
 
 class ArchivoAdjuntoObservacion(models.Model):
@@ -143,11 +177,13 @@ class ArchivoAdjuntoObservacion(models.Model):
 class SeguimientoObservacion(models.Model):
     observacion = models.ForeignKey(Observacion, on_delete=models.CASCADE, related_name='seguimientos')
     fecha = models.DateTimeField(auto_now_add=True)
-    usuario = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.PROTECT)
+    usuario = models.ForeignKey(settings.AUTH_USER_MODEL, null=True, on_delete=models.SET_NULL)
     accion = models.CharField(max_length=100)
     comentario = models.TextField(blank=True)
-    estado_anterior = models.ForeignKey(EstadoObservacion, on_delete=models.PROTECT, related_name='seguimientos_desde', null=True, blank=True)
-    estado_nuevo = models.ForeignKey(EstadoObservacion, on_delete=models.PROTECT, related_name='seguimientos_hacia', null=True, blank=True)
+    estado_anterior = models.ForeignKey(EstadoObservacion, on_delete=models.PROTECT, 
+                                       related_name='seguimientos_desde', null=True, blank=True)
+    estado_nuevo = models.ForeignKey(EstadoObservacion, on_delete=models.PROTECT, 
+                                    related_name='seguimientos_hacia', null=True, blank=True)
     activo = models.BooleanField(default=True)
 
     def __str__(self):
@@ -157,3 +193,9 @@ class SeguimientoObservacion(models.Model):
         verbose_name = "Seguimiento de Observación"
         verbose_name_plural = "Seguimientos de Observaciones"
         ordering = ['-fecha']
+        # Índices para optimizar consultas frecuentes
+        indexes = [
+            models.Index(fields=["observacion", "fecha"]),
+            models.Index(fields=["usuario", "fecha"]),
+        ]
+        # Sin restricciones de estado por ahora para permitir flexibilidad

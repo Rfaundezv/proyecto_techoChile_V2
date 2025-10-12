@@ -3,12 +3,16 @@
 {% block title %}{{ titulo }} - {{ block.super }}{% endblock %}
 
 {% block content %}
-<div class="container mt-4">
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <h2>{{ titulo }}</h2>
-        <a href="{% url 'maestro_vivienda_create' %}" class="btn btn-primary">
-            <i class="bi bi-plus-circle"></i> Crear Vivienda
-        </a>
+<div class="container-fluid mt-4">
+    <div class="row mb-4">
+        <div class="col-12 col-md-6 mb-2 mb-md-0">
+            <h2 class="h4 mb-0">{{ titulo }}</h2>
+        </div>
+        <div class="col-12 col-md-6 text-md-end">
+            <a href="{% url 'maestro_vivienda_create' %}" class="btn btn-primary btn-sm">
+                <i class="bi bi-plus-circle"></i> <span class="d-none d-sm-inline">Crear Vivienda</span>
+            </a>
+        </div>
     </div>
 
     {% if messages %}
@@ -21,29 +25,58 @@
     {% endif %}
 
     <div class="card">
-        <div class="card-body">
+    <div class="card-body p-0 p-md-3">
             <div class="table-responsive">
                 <table class="table table-hover">
                     <thead>
                         <tr>
-                            <th>Proyecto</th>
-                            <th>Código</th>
-                            <th>Beneficiario</th>
-                            <th>Tipología</th>
-                            <th>Estado</th>
-                            <th>Fecha Entrega</th>
-                            <th>Activo</th>
+                            <th>Vivienda</th>
+                            <th class="d-none d-md-table-cell">Beneficiario</th>
+                            <th class="d-none d-lg-table-cell">Tipología</th>
+                            <th class="d-none d-sm-table-cell">Estado</th>
+                            <th class="d-none d-lg-table-cell">F. Entrega</th>
+                            <th class="d-none d-sm-table-cell">Activo</th>
                             <th>Acciones</th>
                         </tr>
                     </thead>
                     <tbody>
                         {% for vivienda in viviendas %}
                         <tr>
-                            <td>{{ vivienda.proyecto.codigo }}</td>
-                            <td>{{ vivienda.codigo }}</td>
-                            <td>{{ vivienda.beneficiario|default:"-" }}</td>
-                            <td>{{ vivienda.tipologia.nombre }}</td>
                             <td>
+                                <div class="d-flex flex-column">
+                                    <span class="fw-bold">{{ vivienda.proyecto.codigo }}</span>
+                                    <span class="text-muted">{{ vivienda.codigo }}</span>
+                                    <small class="text-muted d-md-none">{{ vivienda.beneficiario|default:"Sin beneficiario" }}</small>
+                                    <small class="text-muted d-lg-none">{{ vivienda.tipologia.nombre }}</small>
+                                    <div class="d-sm-none mt-1">
+                                        <span class="badge
+                                            {% if vivienda.prioridad == 'alta' %}badge-urgente
+                                            {% elif vivienda.prioridad == 'media' %}bg-warning
+                                            {% elif vivienda.prioridad == 'baja' %}bg-success
+                                            {% else %}
+                                                {% if vivienda.estado == 'construccion' %}bg-warning
+                                                {% elif vivienda.estado == 'entregada' %}bg-info
+                                                {% elif vivienda.estado == 'postventa' %}bg-primary
+                                                {% elif vivienda.estado == 'terminada' %}bg-success
+                                                {% endif %}
+                                            {% endif %}">
+                                            {% if vivienda.prioridad %}
+                                                {{ vivienda.get_prioridad_display }}
+                                            {% else %}
+                                                {{ vivienda.get_estado_display }}
+                                            {% endif %}
+                                        </span>
+                                        {% if vivienda.activa %}
+                                            <i class="bi bi-check-circle text-success ms-1"></i>
+                                        {% else %}
+                                            <i class="bi bi-x-circle text-secondary ms-1"></i>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </td>
+                            <td class="d-none d-md-table-cell">{{ vivienda.beneficiario|default:"-" }}</td>
+                            <td class="d-none d-lg-table-cell">{{ vivienda.tipologia.nombre }}</td>
+                            <td class="d-none d-sm-table-cell">
                                 <span class="badge
                                     {% if vivienda.prioridad == 'alta' %}badge-urgente
                                     {% elif vivienda.prioridad == 'media' %}bg-warning
@@ -62,8 +95,8 @@
                                     {% endif %}
                                 </span>
                             </td>
-                            <td>{{ vivienda.fecha_entrega|date:"d/m/Y"|default:"-" }}</td>
-                            <td>
+                            <td class="d-none d-lg-table-cell">{{ vivienda.fecha_entrega|date:"d/m/Y"|default:"-" }}</td>
+                            <td class="d-none d-sm-table-cell">
                                 {% if vivienda.activa %}
                                     <span class="badge bg-success">Activo</span>
                                 {% else %}
@@ -71,15 +104,15 @@
                                 {% endif %}
                             </td>
                             <td>
-                                <div class="acciones-botones">
+                                <div class="d-flex gap-1 flex-wrap">
                                     <a href="{% url 'maestro_vivienda_edit' vivienda.pk %}" class="btn btn-sm btn-warning">
-                                        <i class="bi bi-pencil"></i> Editar
+                                        <i class="bi bi-pencil"></i> <span class="d-none d-md-inline">Editar</span>
                                     </a>
                                     <form method="post" action="{% url 'maestro_vivienda_delete' vivienda.pk %}" style="display:inline;">
                                         {% csrf_token %}
                                         <button type="submit" class="btn btn-sm btn-danger" 
                                                 onclick="return confirm('¿Desactivar esta vivienda?')">
-                                            <i class="bi bi-trash"></i> Desactivar
+                                            <i class="bi bi-trash"></i> <span class="d-none d-md-inline">Desactivar</span>
                                         </button>
                                     </form>
                                 </div>
@@ -87,7 +120,7 @@
                         </tr>
                         {% empty %}
                         <tr>
-                            <td colspan="9" class="text-center">No hay viviendas registradas.</td>
+                            <td colspan="7" class="text-center">No hay viviendas registradas.</td>
                         </tr>
                         {% endfor %}
                     </tbody>

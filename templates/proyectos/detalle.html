@@ -1,10 +1,15 @@
 {% extends 'base.html' %}
+{% load static %}
 {% block title %}{{ proyecto.codigo }} - TECHO CHILE{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/dynamic_titles.css' %}">
+{% endblock %}
 
 {% block content %}
 <div class="d-flex justify-content-between align-items-start mb-4">
     <div>
-    <h2 class="section-title" style="color: #111 !important; background: none !important;">{{ proyecto.codigo }} - {{ proyecto.nombre }}</h2>
+    <h2 class="section-title dynamic-title dynamic-h2">{{ proyecto.codigo }} - {{ proyecto.nombre }}</h2>
         <p class="text-muted">{{ proyecto.constructora }} | {{ proyecto.comuna.nombre }}, {{ proyecto.region.nombre }}</p>
     </div>
     <div class="d-flex gap-2">
@@ -17,7 +22,7 @@
 <div class="row g-4">
     <div class="col-md-4">
         <div class="chart-container">
-            <h5>Información del Proyecto</h5>
+            <h5 class="dynamic-title dynamic-h5">Información del Proyecto</h5>
             <dl class="row">
                 <dt class="col-sm-6">Código:</dt>
                 <dd class="col-sm-6">{{ proyecto.codigo }}</dd>
@@ -36,7 +41,7 @@
     </div>
     <div class="col-md-8">
         <div class="chart-container">
-            <h5>Viviendas del Proyecto</h5>
+            <h5 class="dynamic-title dynamic-h5">Viviendas del Proyecto</h5>
             {% if viviendas %}
             <div class="table-responsive">
                 <table class="table table-sm">

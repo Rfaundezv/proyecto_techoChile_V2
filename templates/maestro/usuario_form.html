@@ -8,26 +8,60 @@
         <div class="col-md-10">
             <div class="card">
                 <div class="card-header">
-                    <h3>{{ titulo }}</h3>
+                    <div class="usuario-form-titulos">
+                        <h3>{{ titulo }}</h3>
+                        {% if subtitulo %}
+                            <div class="usuario-form-subtitulo">{{ subtitulo }}</div>
+                        {% endif %}
+                    </div>
                 </div>
                 <div class="card-body">
                     <form method="post">
                         {% csrf_token %}
                         
+
                         <div class="row">
-                            <div class="col-md-6 mb-3">
-                                <label for="{{ form.nombre.id_for_label }}" class="form-label">Nombre completo *</label>
+                            <div class="col-md-3 mb-3">
+                                <label for="{{ form.rut.id_for_label }}" class="form-label">RUT</label>
+                                {{ form.rut }}
+                                {% if form.rut.errors %}
+                                    <div class="text-danger">{{ form.rut.errors }}</div>
+                                {% endif %}
+                            </div>
+                            <div class="col-md-3 mb-3">
+                                <label for="{{ form.nombre.id_for_label }}" class="form-label">Nombre *</label>
                                 {{ form.nombre }}
                                 {% if form.nombre.errors %}
                                     <div class="text-danger">{{ form.nombre.errors }}</div>
                                 {% endif %}
                             </div>
-
+                            <div class="col-md-3 mb-3">
+                                <label for="{{ form.apellido_paterno.id_for_label }}" class="form-label">Apellido paterno *</label>
+                                {{ form.apellido_paterno }}
+                                {% if form.apellido_paterno.errors %}
+                                    <div class="text-danger">{{ form.apellido_paterno.errors }}</div>
+                                {% endif %}
+                            </div>
+                            <div class="col-md-3 mb-3">
+                                <label for="{{ form.apellido_materno.id_for_label }}" class="form-label">Apellido materno *</label>
+                                {{ form.apellido_materno }}
+                                {% if form.apellido_materno.errors %}
+                                    <div class="text-danger">{{ form.apellido_materno.errors }}</div>
+                                {% endif %}
+                            </div>
+                            
                             <div class="col-md-6 mb-3">
                                 <label for="{{ form.email.id_for_label }}" class="form-label">Email *</label>
                                 {{ form.email }}
                                 {% if form.email.errors %}
                                     <div class="text-danger">{{ form.email.errors }}</div>
+                                {% endif %}
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="{{ form.confirm_email.id_for_label }}" class="form-label">Confirmar email *</label>
+                                {{ form.confirm_email }}
+                                {% if form.confirm_email.errors %}
+                                    <div class="text-danger">{{ form.confirm_email.errors }}</div>
                                 {% endif %}
                             </div>
                         </div>
@@ -87,12 +121,16 @@
                             </div>
                         </div>
 
-                        <div class="mb-3">
-                            <label for="{{ form.empresa.id_for_label }}" class="form-label">Empresa (para constructoras)</label>
-                            {{ form.empresa }}
-                            {% if form.empresa.errors %}
-                                <div class="text-danger">{{ form.empresa.errors }}</div>
-                            {% endif %}
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="{{ form.constructora.id_for_label }}" class="form-label">Constructora</label>
+                                {{ form.constructora }}
+                                {% if form.constructora.errors %}
+                                    <div class="text-danger">{{ form.constructora.errors }}</div>
+                                {% endif %}
+                            </div>
+                           
                         </div>
 
                         <div class="mb-3 form-check">
@@ -118,4 +156,8 @@
         </div>
     </div>
 </div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="/static/js/usuario_form.js"></script>
 {% endblock %}

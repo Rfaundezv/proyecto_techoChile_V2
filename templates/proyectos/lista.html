@@ -1,11 +1,16 @@
 {% extends 'base.html' %}
+{% load static %}
 {% block title %}Proyectos - TECHO CHILE{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/dynamic_titles.css' %}">
+{% endblock %}
 
 {% block content %}
 <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
     <div>
-    <h2 class="section-title mb-1" style="color: #111 !important; background: none !important;">Gestión de Proyectos</h2>
-    <p class="section-subtitle d-none d-md-block" style="color: #111 !important; background: none !important;">Administración de proyectos de vivienda</p>
+    <h2 class="section-title mb-1 dynamic-title dynamic-h2">Gestión de Proyectos</h2>
+    <p class="section-subtitle d-none d-md-block dynamic-title dynamic-h5">Administración de proyectos de vivienda</p>
     </div>
     <div class="d-flex gap-2 flex-wrap">
         {% if not es_familia %}

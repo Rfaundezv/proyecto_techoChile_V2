@@ -15,13 +15,22 @@ class FiltroObservacionForm(forms.Form):
         user = kwargs.pop('user', None)
         super().__init__(*args, **kwargs)
         
-        if user and user.rol and user.rol.nombre == 'CONSTRUCTORA' and getattr(user, 'empresa', None):
+        if user and user.rol and user.rol.nombre == 'CONSTRUCTORA':
             # Filtrar proyectos solo de la constructora del usuario
-            empresa_usuario = user.empresa.strip().lower()
-            self.fields['proyecto'].queryset = Proyecto.objects.filter(
-                activo=True,
-                constructora__icontains=empresa_usuario
-            )
+            if getattr(user, 'constructora', None):
+                self.fields['proyecto'].queryset = Proyecto.objects.filter(
+                    activo=True,
+                    constructora=user.constructora
+                )
+            elif getattr(user, 'empresa', None):
+                # Fallback al campo legacy
+                empresa_usuario = user.empresa.strip().lower()
+                self.fields['proyecto'].queryset = Proyecto.objects.filter(
+                    activo=True,
+                    constructora__nombre__icontains=empresa_usuario
+                )
+            else:
+                self.fields['proyecto'].queryset = Proyecto.objects.none()
     numero_vivienda = forms.CharField(
         max_length=10,
         required=False,
@@ -76,13 +85,22 @@ class ObservacionForm(forms.ModelForm):
                 del self.fields[field]
         
         # Filtrar proyectos para usuarios de constructora
-        if user and hasattr(user, 'rol') and user.rol and user.rol.nombre == 'CONSTRUCTORA' and getattr(user, 'empresa', None):
-            empresa_usuario = user.empresa.strip().lower()
+        if user and hasattr(user, 'rol') and user.rol and user.rol.nombre == 'CONSTRUCTORA':
             if 'proyecto' in self.fields:
-                self.fields['proyecto'].queryset = Proyecto.objects.filter(
-                    activo=True,
-                    constructora__icontains=empresa_usuario
-                )
+                if getattr(user, 'constructora', None):
+                    self.fields['proyecto'].queryset = Proyecto.objects.filter(
+                        activo=True,
+                        constructora=user.constructora
+                    )
+                elif getattr(user, 'empresa', None):
+                    # Fallback al campo legacy
+                    empresa_usuario = user.empresa.strip().lower()
+                    self.fields['proyecto'].queryset = Proyecto.objects.filter(
+                        activo=True,
+                        constructora__nombre__icontains=empresa_usuario
+                    )
+                else:
+                    self.fields['proyecto'].queryset = Proyecto.objects.none()
         
         # Si hay datos de proyecto, cargar viviendas y recintos
         if 'proyecto' in self.data and 'vivienda' in self.fields:

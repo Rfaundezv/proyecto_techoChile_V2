@@ -1,0 +1,56 @@
+/* Estilos específicos para las métricas del dashboard */
+.metric-number {
+    font-size: 2rem !important;
+    font-weight: bold !important;
+    margin: 0 !important;
+    line-height: 1 !important;
+}
+
+.metric-card:hover {
+    transform: translateY(-5px) !important;
+    box-shadow: 0 8px 25px rgba(0,0,0,0.1) !important;
+}
+
+/* Efectos hover específicos por color */
+.metric-card.success:hover { 
+    background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%) !important;
+    color: white !important;
+}
+.metric-card.warning:hover { 
+    background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%) !important;
+    color: white !important;
+}
+.metric-card.danger:hover { 
+    background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%) !important;
+    color: white !important;
+}
+.metric-card:hover { 
+    background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%) !important;
+    color: white !important;
+}
+
+/* Hover para tarjetas enlazadas */
+a .metric-card.success:hover { 
+    background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%) !important;
+    color: white !important;
+}
+a .metric-card.warning:hover { 
+    background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%) !important;
+    color: white !important;
+}
+a .metric-card.danger:hover { 
+    background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%) !important;
+    color: white !important;
+}
+a .metric-card:hover { 
+    background: linear-gradient(135deg, #2563eb 0, #1d4ed8 100%) !important;
+    color: white !important;
+}
+
+/* Texto en hover */
+.metric-card:hover .metric-number,
+.metric-card:hover .metric-label,
+a .metric-card:hover .metric-number,
+a .metric-card:hover .metric-label {
+    color: white !important;
+}

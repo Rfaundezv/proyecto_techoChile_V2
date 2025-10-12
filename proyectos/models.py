@@ -28,7 +28,8 @@ class Proyecto(models.Model):
     siglas = models.CharField(max_length=10, help_text="Siglas del proyecto")
     nombre = models.CharField(max_length=200, verbose_name="Nombre del proyecto")
 
-    constructora = models.CharField(max_length=100)
+    constructora = models.ForeignKey('core.Constructora', on_delete=models.PROTECT, verbose_name="Constructora")
+    constructora_legacy = models.CharField(max_length=100, blank=True, help_text="Campo legacy para compatibilidad")
     comuna = models.ForeignKey(Comuna, on_delete=models.PROTECT)
     region = models.ForeignKey(Region, on_delete=models.PROTECT)
 
@@ -100,7 +101,16 @@ class Recinto(models.Model):
     class Meta:
         verbose_name = "Recinto"
         verbose_name_plural = "Recintos"
-        unique_together = ('tipologia', 'codigo')
+        # Restricción de unicidad mejorada
+        constraints = [
+            models.UniqueConstraint(
+                fields=["tipologia", "codigo"], 
+                name="uniq_recinto_tipologia_codigo"
+            )
+        ]
+        indexes = [
+            models.Index(fields=["tipologia", "activo"]),
+        ]
         ordering = ['tipologia__codigo', 'codigo']
 
 
@@ -122,12 +132,29 @@ class Beneficiario(models.Model):
     class Meta:
         verbose_name = "Beneficiario"
         verbose_name_plural = "Beneficiarios"
+        indexes = [
+            models.Index(fields=["rut"]),  # RUT ya es único, pero optimizamos búsquedas
+            models.Index(fields=["email"]),
+            models.Index(fields=["apellido_paterno", "apellido_materno", "nombre"]),
+        ]
         ordering = ['apellido_paterno', 'apellido_materno', 'nombre']
 
 class Telefono(models.Model):
     beneficiario = models.ForeignKey(Beneficiario, on_delete=models.CASCADE, related_name='telefonos')
-    numero = models.CharField(max_length=20, verbose_name="Teléfono")
+    numero = models.CharField(max_length=20, verbose_name="Teléfono", 
+                             help_text="Formato recomendado: +56 9 1234 5678")
     activo = models.BooleanField(default=True)
+
+    def clean(self):
+        """Normalizar número de teléfono (básico)"""
+        if self.numero:
+            # Remover espacios y caracteres especiales comunes
+            import re
+            self.numero = re.sub(r'[^\d+]', '', self.numero)
+
+    def save(self, *args, **kwargs):
+        self.clean()
+        super().save(*args, **kwargs)
 
     def __str__(self):
         return self.numero
@@ -135,6 +162,9 @@ class Telefono(models.Model):
     class Meta:
         verbose_name = "Teléfono"
         verbose_name_plural = "Teléfonos"
+        indexes = [
+            models.Index(fields=["numero"]),
+        ]
 
 class Vivienda(models.Model):
     ESTADOS_CHOICES = [
@@ -169,7 +199,31 @@ class Vivienda(models.Model):
     class Meta:
         verbose_name = "Vivienda"
         verbose_name_plural = "Viviendas"
-        unique_together = ('proyecto', 'codigo')
+        # Índices y restricciones mejorados
+        constraints = [
+            models.UniqueConstraint(
+                fields=["proyecto", "codigo"], 
+                name="uniq_vivienda_proyecto_codigo"
+            ),
+            # Validación de fechas lógicas
+            models.CheckConstraint(
+                check=models.Q(fecha_entrega__isnull=True) | 
+                      models.Q(fecha_inicio_postventa__isnull=True) |
+                      models.Q(fecha_inicio_postventa__gte=models.F('fecha_entrega')),
+                name="chk_fecha_postventa_despues_entrega"
+            ),
+            models.CheckConstraint(
+                check=models.Q(fecha_termino_postventa__isnull=True) | 
+                      models.Q(fecha_inicio_postventa__isnull=True) |
+                      models.Q(fecha_termino_postventa__gte=models.F('fecha_inicio_postventa')),
+                name="chk_fecha_termino_despues_inicio"
+            )
+        ]
+        indexes = [
+            models.Index(fields=["proyecto", "tipologia"]),
+            models.Index(fields=["estado", "fecha_entrega"]),
+            models.Index(fields=["beneficiario"]),
+        ]
         ordering = ['proyecto', 'codigo']
 
 

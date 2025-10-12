@@ -3,6 +3,11 @@ from core.models import Region, Comuna, Constructora
 from .models import Proyecto, Vivienda, TipologiaVivienda, Beneficiario, Telefono
 
 class ProyectoForm(forms.ModelForm):
+    constructora_rut = forms.CharField(
+        required=False,
+        widget=forms.TextInput(attrs={'class': 'form-control', 'readonly': 'readonly'}),
+        help_text='RUT de la constructora seleccionada'
+    )
     region = forms.ModelChoiceField(
         queryset=Region.objects.all(), 
         required=True,
@@ -13,11 +18,11 @@ class ProyectoForm(forms.ModelForm):
         required=True,
         widget=forms.Select(attrs={'class': 'form-select'})
     )
-    constructora = forms.CharField(
-        max_length=100,
+    constructora = forms.ModelChoiceField(
+        queryset=Constructora.objects.all(),
         required=True,
-        widget=forms.TextInput(attrs={'class': 'form-control'}),
-        help_text='Nombre de la constructora'
+        widget=forms.Select(attrs={'class': 'form-select'}),
+        empty_label='Seleccione una constructora'
     )
 
     class Meta:
@@ -29,7 +34,6 @@ class ProyectoForm(forms.ModelForm):
             'codigo': forms.TextInput(attrs={'class': 'form-control'}),
             'siglas': forms.TextInput(attrs={'class': 'form-control'}),
             'nombre': forms.TextInput(attrs={'class': 'form-control'}),
-            'constructora': forms.TextInput(attrs={'class': 'form-control'}),
             'fecha_entrega': forms.DateInput(attrs={'class': 'form-control', 'type': 'date'}),
             'fecha_termino_postventa': forms.DateInput(attrs={'class': 'form-control', 'type': 'date'}),
             'coordenadas_s': forms.NumberInput(attrs={'class': 'form-control', 'step': '0.00000001'}),
@@ -39,6 +43,18 @@ class ProyectoForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+
+        # Mostrar el RUT de la constructora seleccionada
+        if 'constructora' in self.data:
+            try:
+                constructora_id = int(self.data.get('constructora'))
+                constructora = Constructora.objects.filter(pk=constructora_id).first()
+                if constructora:
+                    self.fields['constructora_rut'].initial = constructora.rut
+            except (ValueError, TypeError):
+                pass
+        elif self.instance.pk and self.instance.constructora:
+            self.fields['constructora_rut'].initial = self.instance.constructora.rut
 
         if 'region' in self.data:
             try:

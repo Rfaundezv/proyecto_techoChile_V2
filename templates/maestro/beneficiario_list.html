@@ -3,16 +3,26 @@
 {% block title %}{{ titulo }} - {{ block.super }}{% endblock %}
 
 {% block content %}
-<div class="container mt-4">
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <h2>{{ titulo }}</h2>
-        <form method="get" class="d-flex" style="gap: 1rem;">
-            <input type="text" name="rut" class="form-control" placeholder="Buscar por RUT" value="{{ request.GET.rut|default:'' }}" style="max-width: 200px;">
-            <button type="submit" class="btn btn-outline-primary">Buscar</button>
-        </form>
-        <a href="{% url 'maestro_beneficiario_create' %}" class="btn btn-primary">
-            <i class="bi bi-plus-circle"></i> Crear Beneficiario
-        </a>
+<div class="container-fluid mt-4">
+    <div class="row mb-4">
+        <div class="col-12 col-md-6 mb-2 mb-md-0">
+            <h2 class="h4 mb-0">{{ titulo }}</h2>
+        </div>
+        <div class="col-12 col-md-6">
+            <div class="d-flex flex-column flex-sm-row gap-2 justify-content-md-end">
+                <form method="get" class="d-flex gap-2 flex-grow-1 flex-sm-grow-0">
+                    <input type="text" name="rut" class="form-control" placeholder="Buscar por RUT" value="{{ request.GET.rut|default:'' }}" style="max-width: 200px;">
+                    <button type="submit" class="btn btn-outline-primary btn-sm">
+                        <i class="bi bi-search"></i>
+                        <span class="d-none d-sm-inline">Buscar</span>
+                    </button>
+                </form>
+                <a href="{% url 'maestro_beneficiario_create' %}" class="btn btn-primary btn-sm">
+                    <i class="bi bi-plus-circle"></i> 
+                    <span class="d-none d-sm-inline">Crear Beneficiario</span>
+                </a>
+            </div>
+        </div>
     </div>
 
     {% if messages %}
@@ -25,26 +35,42 @@
     {% endif %}
 
     <div class="card">
-        <div class="card-body">
+    <div class="card-body p-0 p-md-3">
             <div class="table-responsive">
                 <table class="table table-hover">
                     <thead>
                         <tr>
                             <th>RUT</th>
                             <th>Nombre Completo</th>
-                            <th>Email</th>
-                            <th>Teléfonos</th>
-                            <th>Estado</th>
+                            <th class="d-none d-md-table-cell">Email</th>
+                            <th class="d-none d-lg-table-cell">Teléfonos</th>
+                            <th class="d-none d-sm-table-cell">Estado</th>
                             <th>Acciones</th>
                         </tr>
                     </thead>
                     <tbody>
                         {% for beneficiario in beneficiarios %}
                         <tr>
-                            <td>{{ beneficiario.rut|default:"-" }}</td>
-                            <td>{{ beneficiario }}</td>
-                            <td>{{ beneficiario.email|default:"-" }}</td>
                             <td>
+                                <div class="d-flex flex-column">
+                                    <span class="fw-bold">{{ beneficiario.rut|default:"-" }}</span>
+                                    <small class="text-muted d-sm-none">
+                                        {% if beneficiario.activo %}
+                                            <i class="bi bi-check-circle text-success"></i> Activo
+                                        {% else %}
+                                            <i class="bi bi-x-circle text-secondary"></i> Inactivo
+                                        {% endif %}
+                                    </small>
+                                </div>
+                            </td>
+                            <td>
+                                <div class="d-flex flex-column">
+                                    <span>{{ beneficiario }}</span>
+                                    <small class="text-muted d-md-none">{{ beneficiario.email|default:"Sin email" }}</small>
+                                </div>
+                            </td>
+                            <td class="d-none d-md-table-cell">{{ beneficiario.email|default:"-" }}</td>
+                            <td class="d-none d-lg-table-cell">
                                 {% with telefonos=beneficiario.telefonos.filter|default:"" %}
                                     {% if telefonos %}
                                         {{ telefonos|join:", " }}
@@ -53,7 +79,7 @@
                                     {% endif %}
                                 {% endwith %}
                             </td>
-                            <td>
+                            <td class="d-none d-sm-table-cell">
                                 {% if beneficiario.activo %}
                                     <span class="badge bg-success">Activo</span>
                                 {% else %}
@@ -61,15 +87,15 @@
                                 {% endif %}
                             </td>
                             <td>
-                                <div class="acciones-botones">
+                                <div class="d-flex gap-1 flex-wrap">
                                     <a href="{% url 'maestro_beneficiario_edit' beneficiario.pk %}" class="btn btn-sm btn-warning">
-                                        <i class="bi bi-pencil"></i> Editar
+                                        <i class="bi bi-pencil"></i> <span class="d-none d-md-inline">Editar</span>
                                     </a>
                                     <form method="post" action="{% url 'maestro_beneficiario_delete' beneficiario.pk %}" style="display:inline;">
                                         {% csrf_token %}
                                         <button type="submit" class="btn btn-sm btn-danger" 
                                                 onclick="return confirm('¿Esta seguro de Eliminar este beneficiario?')">
-                                            <i class="bi bi-trash"></i> Eliminar
+                                            <i class="bi bi-trash"></i> <span class="d-none d-md-inline">Eliminar</span>
                                         </button>
                                     </form>
                                 </div>

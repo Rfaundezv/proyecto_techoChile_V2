@@ -3,23 +3,8 @@
 {% block title %}{{ titulo }} - {{ block.super }}{% endblock %}
 
 {% block extra_css %}
-<style>
-    .form-control:focus, .form-select:focus {
-        border-color: #00a7e1;
-        box-shadow: 0 0 0 0.2rem rgba(0, 167, 225, 0.25);
-    }
-    .info-card {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        color: white;
-        border-radius: 10px;
-        padding: 20px;
-        margin-bottom: 20px;
-    }
-    .config-value {
-        font-size: 2rem;
-        font-weight: bold;
-    }
-</style>
+{% load static %}
+<link rel="stylesheet" href="{% static 'css/forms.css' %}">
 {% endblock %}
 
 {% block content %}

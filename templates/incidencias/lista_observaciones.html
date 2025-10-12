@@ -1,11 +1,66 @@
 {% extends 'base.html' %}
+{% load static %}
 {% block title %}{% if es_familia %}Mis Observaciones{% else %}Observaciones{% endif %} - TECHO CHILE{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/dynamic_titles.css' %}">
+<style>
+/* Modal completamente oscuro */
+.modal-content-techo {
+    background-color: #fff;
+    color: #222;
+}
+body.bg-dark .modal-content-techo,
+body.dark-mode .modal-content-techo {
+    background-color: #111 !important;
+    color: #e0e0e0 !important;
+    border: 1px solid #222 !important;
+}
+body.bg-dark .modal-content-techo .form-label,
+body.dark-mode .modal-content-techo .form-label {
+    color: #e0e0e0 !important;
+}
+body.bg-dark .modal-content-techo .form-control,
+body.dark-mode .modal-content-techo .form-control {
+    background-color: #181a1b !important;
+    color: #e0e0e0 !important;
+    border: 1px solid #222 !important;
+}
+body.bg-dark .modal-content-techo .form-select,
+body.dark-mode .modal-content-techo .form-select {
+    background-color: #181a1b !important;
+    color: #e0e0e0 !important;
+    border: 1px solid #222 !important;
+}
+body.bg-dark .modal-content-techo .modal-header,
+body.dark-mode .modal-content-techo .modal-header {
+    border-bottom: 1px solid #222 !important;
+}
+body.bg-dark .modal-content-techo .modal-footer,
+body.dark-mode .modal-content-techo .modal-footer {
+    border-top: 1px solid #222 !important;
+}
+body.bg-dark .modal-content-techo .btn-secondary,
+body.dark-mode .modal-content-techo .btn-secondary {
+    background-color: #222 !important;
+    color: #e0e0e0 !important;
+    border: none !important;
+}
+body.bg-dark .modal-content-techo .btn-techo-primary,
+body.dark-mode .modal-content-techo .btn-techo-primary {
+    background: linear-gradient(45deg, #2563eb, #1e40af) !important;
+    color: #fff !important;
+    border: none !important;
+    box-shadow: 0 2px 8px rgba(37, 99, 235, 0.3) !important;
+}
+</style>
+{% endblock %}
 
 {% block content %}
 <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
     <div>
-    <h2 class="section-title mb-1" style="color: #111 !important; background: none !important;">{% if es_familia %}Mis Observaciones{% else %}Observaciones{% endif %}</h2>
-    <p class="section-subtitle d-none d-md-block" style="color: #111 !important; background: none !important;">
+    <h2 class="section-title mb-1 dynamic-title dynamic-h2">{% if es_familia %}Mis Observaciones{% else %}Observaciones{% endif %}</h2>
+    <p class="section-subtitle d-none d-md-block dynamic-title dynamic-h5">
             {% if es_familia %}
                 Seguimiento de las observaciones de tu vivienda
             {% else %}
@@ -43,7 +98,7 @@
 <!-- Filtros de Búsqueda (NO mostrar para FAMILIA) -->
 {% if not es_familia %}
 <div class="chart-container mb-4">
-    <h5 class="mb-3">Filtros de Búsqueda</h5>
+    <h5 class="mb-3 dynamic-title dynamic-h5">Filtros de Búsqueda</h5>
     <form method="get">
         <div class="row g-2 g-md-3">
             <div class="col-12 col-md-4 col-lg-3">
@@ -54,6 +109,7 @@
                 <label class="form-label">N° Vivienda</label>
                 {{ form.numero_vivienda }}
             </div>
+            
             <div class="col-6 col-md-4 col-lg-2">
                 <label class="form-label">Estado</label>
                 {{ form.estado }}
@@ -62,13 +118,14 @@
                 <label class="form-label">Tipo</label>
                 {{ form.tipo }}
             </div>
-            <div class="col-12 col-md-6 col-lg-3">
-                <label class="form-label">Buscar</label>
-                {{ form.buscar }}
-            </div>
+           
         </div>
         <div class="row mt-3">
-            <div class="col-12">
+            <div class="col-12 d-flex align-items-end gap-3">
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" name="es_urgente" id="id_es_urgente" value="1" {% if request.GET.es_urgente %}checked{% endif %}>
+                    <label class="form-check-label" for="id_es_urgente">Solo urgentes</label>
+                </div>
                 <button type="submit" class="btn btn-primary me-2">
                     <i class="bi bi-search"></i> Buscar
                 </button>
@@ -85,7 +142,7 @@
 <div class="chart-container">
     <div class="d-flex justify-content-between align-items-center mb-3">
         <div>
-            <h5>Lista de Observaciones</h5>
+            <h5 class="dynamic-title dynamic-h5">Lista de Observaciones</h5>
             {% if request.GET.estado_nombre %}
                 <span class="badge bg-info">Filtrado por estado: {{ request.GET.estado_nombre }}</span>
             {% endif %}
@@ -408,7 +465,7 @@
 <!-- Modal para cambio de estado -->
 <div class="modal fade" id="modalCambioEstado" tabindex="-1">
     <div class="modal-dialog">
-        <div class="modal-content">
+        <div class="modal-content modal-content-techo">
             <div class="modal-header">
                 <h5 class="modal-title">Cambiar Estado de Observación</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
@@ -538,3 +595,4 @@ document.addEventListener('DOMContentLoaded', function() {
 </script>
 
 {% endblock %}
+    <script src="{% static 'js/incidencias_lista_observaciones.js' %}"></script>

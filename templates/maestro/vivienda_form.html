@@ -3,12 +3,8 @@
 {% block title %}{{ titulo }} - {{ block.super }}{% endblock %}
 
 {% block extra_css %}
-<style>
-    .form-control:focus, .form-select:focus {
-        border-color: #00a7e1;
-        box-shadow: 0 0 0 0.2rem rgba(0, 167, 225, 0.25);
-    }
-</style>
+{% load static %}
+<link rel="stylesheet" href="{% static 'css/forms.css' %}">
 {% endblock %}
 
 {% block content %}

@@ -1,0 +1,95 @@
+
+/* CSS adicional para badges de estados - agregar al final de techo_style.css */
+
+/* Timeline para seguimiento */
+.timeline-item {
+    position: relative;
+    margin-bottom: 1rem;
+}
+
+.timeline-item:last-child {
+    margin-bottom: 0;
+}
+
+/* Badges de estado con hover */
+.estado-badge {
+    transition: all 0.3s ease;
+    cursor: pointer !important;
+}
+
+.estado-badge:hover {
+    transform: scale(1.1);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+}
+
+/* Estados específicos */
+.badge-abierta { 
+    background: linear-gradient(45deg, #fbbf24, #f59e0b) !important;
+    color: white !important;
+}
+.badge-cerrada { 
+    background: linear-gradient(45deg, #22c55e, #16a34a) !important; 
+    color: white !important;
+}
+.badge-vencida, .badge-rechazada { 
+    background: linear-gradient(45deg, #ef4444, #dc2626) !important; 
+    color: white !important;
+}
+.badge-proceso, .badge-en-proceso { 
+    background: linear-gradient(45deg, #f97316, #ea580c) !important;
+    color: #fff !important;
+    border: 2px solid #ea580c !important;
+    box-shadow: 0 0 8px 2px rgba(249,115,22,0.15);
+    font-weight: 700;
+    text-shadow: 0 1px 2px rgba(0,0,0,0.15);
+}
+
+/* Alertas flotantes */
+.alert.position-fixed {
+    z-index: 9999;
+    min-width: 300px;
+}
+
+/* Botones de acción rápida */
+.btn-group-vertical .btn {
+    margin-bottom: 2px;
+}
+
+/* Modal mejorado */
+.modal-content {
+    border-radius: 12px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+}
+
+.modal-header {
+    background: linear-gradient(135deg, var(--techo-blue) 0%, var(--techo-dark-blue) 100%);
+    color: white;
+    border-radius: 12px 12px 0 0;
+}
+
+.modal-header .btn-close {
+    filter: invert(1);
+}
+
+/* Efectos hover para botones de estado */
+.cambiar-estado-btn:hover {
+    background: linear-gradient(45deg, #fbbf24, #f59e0b);
+    border-color: #fbbf24;
+    color: white;
+}
+
+/* Responsive para móviles */
+@media (max-width: 768px) {
+    .tabla-acciones {
+        min-width: 120px;
+    }
+
+    .btn-group-vertical .btn {
+        font-size: 0.8rem;
+        padding: 0.25rem 0.5rem;
+    }
+
+    .estado-badge {
+        font-size: 0.75rem;
+    }
+}

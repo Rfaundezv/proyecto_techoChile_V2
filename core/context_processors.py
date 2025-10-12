@@ -49,21 +49,22 @@ def global_stats_context(request):
         if user.rol and user.rol.nombre == 'CONSTRUCTORA' and getattr(user, 'empresa', None):
             # Solo mostrar estadísticas de SU constructora
             try:
-                empresa_usuario = user.empresa.strip().lower()
-                
-                # Proyectos de la constructora
-                proyectos_constructora = Proyecto.objects.filter(
-                    constructora__icontains=empresa_usuario
-                )
+                # Usar el nuevo campo constructora (ForeignKey)
+                if getattr(user, 'constructora', None):
+                    proyectos_constructora = Proyecto.objects.filter(constructora=user.constructora)
+                    observaciones_constructora = Observacion.objects.filter(vivienda__proyecto__constructora=user.constructora)
+                elif getattr(user, 'empresa', None):
+                    # Fallback al campo legacy
+                    empresa_usuario = user.empresa.strip().lower()
+                    proyectos_constructora = Proyecto.objects.filter(constructora__nombre__icontains=empresa_usuario)
+                    observaciones_constructora = Observacion.objects.filter(vivienda__proyecto__constructora__nombre__icontains=empresa_usuario)
+                else:
+                    proyectos_constructora = Proyecto.objects.none()
+                    observaciones_constructora = Observacion.objects.none()
                 
                 # Viviendas de esos proyectos
                 viviendas_constructora = Vivienda.objects.filter(
                     proyecto__in=proyectos_constructora
-                )
-                
-                # Observaciones de esas viviendas
-                observaciones_constructora = Observacion.objects.filter(
-                    vivienda__proyecto__constructora__icontains=empresa_usuario
                 )
                 
                 return {
@@ -109,6 +110,11 @@ def permisos_usuario(request):
             'rol_usuario': None,
         }
     
+    nombre_constructora = None
+    if hasattr(request.user, 'constructora') and request.user.constructora:
+        nombre_constructora = request.user.constructora.nombre
+    elif getattr(request.user, 'empresa', None):
+        nombre_constructora = request.user.empresa
     return {
         'es_admin': tiene_rol(request.user, 'ADMINISTRADOR'),
         'es_techo': tiene_rol(request.user, 'TECHO'),
@@ -117,6 +123,6 @@ def permisos_usuario(request):
         'es_familia': tiene_rol(request.user, 'FAMILIA'),
         'puede_panel_maestro': puede_acceder_panel_maestro(request.user),
         'rol_usuario': request.user.rol.nombre if request.user.rol else None,
-        'nombre_constructora': request.user.empresa if getattr(request.user, 'empresa', None) else None,
+        'nombre_constructora': nombre_constructora,
     }
 

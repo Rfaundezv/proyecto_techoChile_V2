@@ -58,7 +58,7 @@ def dashboard(request):
         obs_total = mis_observaciones.count()
         obs_abiertas = mis_observaciones.filter(estado__nombre='Abierta').count()
         obs_cerradas = mis_observaciones.filter(estado__nombre='Cerrada').count()
-        obs_urgentes = mis_observaciones.filter(prioridad='urgente', estado__nombre='Abierta').count()
+        obs_urgentes = mis_observaciones.filter(es_urgente=True, estado__nombre='Abierta').count()
         obs_vencidas = mis_observaciones.filter(fecha_vencimiento__lt=datetime.now().date(), estado__nombre='Abierta').count()
         
         # Últimas 5 observaciones de SU vivienda
@@ -97,10 +97,16 @@ def dashboard(request):
         # Obtener proyectos relacionados al usuario
         if user.is_superuser or (user.rol and user.rol.nombre == 'ADMINISTRADOR'):
             proyectos_user = Proyecto.objects.all()
-        elif user.rol and user.rol.nombre == 'CONSTRUCTORA' and getattr(user, 'empresa', None):
+        elif user.rol and user.rol.nombre == 'CONSTRUCTORA':
             # CONSTRUCTORA solo ve sus proyectos
-            empresa_usuario = user.empresa.strip().lower()
-            proyectos_user = Proyecto.objects.filter(constructora__icontains=empresa_usuario)
+            if getattr(user, 'constructora', None):
+                proyectos_user = Proyecto.objects.filter(constructora=user.constructora)
+            elif getattr(user, 'empresa', None):
+                # Fallback al campo legacy
+                empresa_usuario = user.empresa.strip().lower()
+                proyectos_user = Proyecto.objects.filter(constructora__nombre__icontains=empresa_usuario)
+            else:
+                proyectos_user = Proyecto.objects.none()
         else:
             proyectos_user = Proyecto.objects.filter(
                 Q(creado_por=user) | 
@@ -129,7 +135,7 @@ def dashboard(request):
         ).count()
         obs_urgentes = Observacion.objects.filter(
             vivienda__proyecto__in=proyectos_user,
-            prioridad='urgente',
+            es_urgente=True,
             estado__nombre='Abierta'
         ).count()
 
