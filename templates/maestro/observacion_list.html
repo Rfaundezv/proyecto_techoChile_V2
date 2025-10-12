@@ -6,7 +6,9 @@
 <div class="container-fluid mt-4">
     <div class="row mb-4">
         <div class="col-12 col-md-6 mb-2 mb-md-0">
-            <h2 class="h4 mb-0">{{ titulo }}</h2>
+              <h2 class="dashboard-title dashboard-h2 dynamic-title mb-1">
+                 <i class="bi bi-exclamation-triangle"></i> {{ titulo }}
+              </h2>
         </div>
         <div class="col-12 col-md-6 text-md-end">
             <a href="{% url 'incidencias:crear_observacion' %}" class="btn btn-primary btn-sm">

@@ -18,19 +18,15 @@
 <!-- ================================ -->
 <!-- DASHBOARD ESPECIAL PARA FAMILIA -->
 <!-- ================================ -->
-<div class="card bg-light border-primary shadow mb-4">
-    <div class="card-body">
-        <h2 class="card-title text-primary">Mi Vivienda</h2>
-        {% if mi_vivienda %}
-            <div class="card-text text-dark">
-                Información y seguimiento de tu vivienda - {{ mi_vivienda.proyecto.nombre }}
-            </div>
-        {% else %}
-            <div class="card-text text-warning">
-                No se encontró una vivienda asignada a tu cuenta
-            </div>
-        {% endif %}
-    </div>
+<div class="section-header">
+    <h2 class="dashboard-title dashboard-h2 dynamic-title mb-1">
+        <i class="bi bi-house-door"></i> Mi Vivienda
+    </h2>
+    {% if mi_vivienda %}
+    <p class="dashboard-title dashboard-h5 dynamic-title d-none d-md-block">Información y seguimiento de tu vivienda - {{ mi_vivienda.proyecto.nombre }}</p>
+    {% else %}
+    <p class="dashboard-title dashboard-h5 dynamic-title text-warning d-none d-md-block">No se encontró una vivienda asignada a tu cuenta</p>
+    {% endif %}
 </div>
 
 {% if sin_vivienda %}
@@ -192,8 +188,10 @@
 <!-- ====================================== -->
 <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
     <div>
-    <h2 class="section-title mb-1 dashboard-title dashboard-h2">Resumen de mi gestión</h2>
-    <p class="section-subtitle d-none d-md-block dashboard-title dashboard-h5">Panel de control con métricas clave de Techo Chile</p>
+    <h2 class="dashboard-title dashboard-h2 dynamic-title mb-1">
+        <i class="bi bi-bar-chart"></i> Resumen de mi gestión
+    </h2>
+    <p class="dashboard-title dashboard-h5 dynamic-title d-none d-md-block">Panel de control con métricas clave de Techo Chile</p>
     </div>
  
 </div>

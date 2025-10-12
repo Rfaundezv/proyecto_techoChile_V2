@@ -511,6 +511,7 @@ class BeneficiarioDelete(LoginRequiredMixin, RolRequiredMixin, SoftDeleteMixin, 
 class UsuarioList(LoginRequiredMixin, RolRequiredMixin, View):
     roles_permitidos = ['ADMINISTRADOR', 'TECHO']
     def get(self, request):
+        from .models import Rol
         rut = request.GET.get('rut', '').strip()
         correo = request.GET.get('correo', '').strip()
         rol = request.GET.get('rol', '').strip()
@@ -521,13 +522,18 @@ class UsuarioList(LoginRequiredMixin, RolRequiredMixin, View):
         if correo:
             usuarios = usuarios.filter(email__icontains=correo)
         if rol:
-            usuarios = usuarios.filter(rol__icontains=rol)
+            usuarios = usuarios.filter(rol__nombre=rol)
         if empresa:
             usuarios = usuarios.filter(empresa__icontains=empresa)
+        
+        # Obtener roles disponibles para el dropdown
+        roles_disponibles = Rol.objects.filter(activo=True).order_by('nombre')
+        
         return render(request, 'maestro/usuario_list.html', {
             'usuarios': usuarios,
             'titulo': 'Usuarios',
-            'request': request
+            'request': request,
+            'roles_disponibles': roles_disponibles
         })
 
 class UsuarioCreate(LoginRequiredMixin, RolRequiredMixin, View):

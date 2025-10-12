@@ -8,12 +8,7 @@
         <div class="col-md-10">
             <div class="card">
                 <div class="card-header">
-                    <div class="usuario-form-titulos">
-                        <h3>{{ titulo }}</h3>
-                        {% if subtitulo %}
-                            <div class="usuario-form-subtitulo">{{ subtitulo }}</div>
-                        {% endif %}
-                    </div>
+                    <h3>{{ titulo }}</h3>
                 </div>
                 <div class="card-body">
                     <form method="post">
@@ -130,7 +125,14 @@
                                     <div class="text-danger">{{ form.constructora.errors }}</div>
                                 {% endif %}
                             </div>
-                           
+                            <div class="col-md-6 mb-3">
+                                <label for="{{ form.empresa.id_for_label }}" class="form-label">Empresa (legacy)</label>
+                                {{ form.empresa }}
+                                {% if form.empresa.errors %}
+                                    <div class="text-danger">{{ form.empresa.errors }}</div>
+                                {% endif %}
+                                <small class="form-text text-muted">Campo legacy - usar Constructora arriba preferentemente</small>
+                            </div>
                         </div>
 
                         <div class="mb-3 form-check">

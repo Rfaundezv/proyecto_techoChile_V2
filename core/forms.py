@@ -120,6 +120,14 @@ class UsuarioForm(forms.ModelForm):
     def save(self, commit=True):
         usuario = super().save(commit=False)
         password = self.cleaned_data.get('password')
+        constructora = self.cleaned_data.get('constructora')
+        
+        # Sincronizar campo empresa con constructora para compatibilidad
+        if constructora:
+            usuario.empresa = constructora.nombre
+        elif not self.cleaned_data.get('empresa'):
+            # Si no hay constructora ni empresa, limpiar empresa
+            usuario.empresa = ''
         
         if password:
             usuario.set_password(password)
