@@ -4,15 +4,40 @@
 
 {% block content %}
 <div class="container-fluid mt-4">
-    <div class="row mb-4">
-        <div class="col-12 col-md-6 mb-2 mb-md-0">
+    <!-- Título -->
+    <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
+        <div>
             <h2 class="h4 mb-0">{{ titulo }}</h2>
         </div>
-        <div class="col-12 col-md-6 text-md-end">
+        <div class="d-flex gap-2 flex-wrap">
             <a href="{% url 'maestro_proyecto_create' %}" class="btn btn-primary btn-sm">
                 <i class="bi bi-plus-circle"></i> <span class="d-none d-sm-inline">Crear Proyecto</span>
             </a>
         </div>
+    </div>
+
+    <!-- Filtros -->
+    <div class="chart-container mb-4">
+        <form method="get" class="row g-2 align-items-end justify-content-start">
+            <div class="col-auto" style="min-width: 320px;">
+                <label class="form-label mb-1 fw-semibold">Búsqueda rápida</label>
+                <input type="text" class="form-control" name="search" placeholder="Código, nombre, constructora, región o comuna" value="{{ request.GET.search|default:'' }}">
+            </div>
+            <div class="col-auto" style="min-width: 220px;">
+                <label class="form-label mb-1 fw-semibold">Estado postventa</label>
+                <select name="estado" class="form-select">
+                    <option value="" {% if not request.GET.estado %}selected{% endif %}>Todos</option>
+                    <option value="vigente" {% if request.GET.estado == 'vigente' %}selected{% endif %}>Vigente</option>
+                    <option value="por_vencer" {% if request.GET.estado == 'por_vencer' %}selected{% endif %}>Por vencer</option>
+                    <option value="vencido" {% if request.GET.estado == 'vencido' %}selected{% endif %}>Vencido</option>
+                    <option value="sin_definir" {% if request.GET.estado == 'sin_definir' %}selected{% endif %}>Sin definir</option>
+                </select>
+            </div>
+            <div class="col-auto d-flex gap-2">
+                <button type="submit" class="btn btn-sm btn-primary fw-semibold px-3">Buscar</button>
+                <a href="{% url 'maestro_proyecto_list' %}" class="btn btn-sm btn-secondary fw-semibold px-3">Limpiar</a>
+            </div>
+        </form>
     </div>
 
     {% if messages %}

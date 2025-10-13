@@ -17,7 +17,7 @@ from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http import JsonResponse
-from django.db.models import Count, Q
+from django.db.models import Count, Q, F, Func
 from django.contrib import messages
 from .models import Comuna, Region
 from .decorators import rol_requerido, RolRequiredMixin
@@ -403,7 +403,10 @@ class ConstructoraList(LoginRequiredMixin, RolRequiredMixin, SoftDeleteMixin, Vi
         rut = request.GET.get('rut', '').strip()
         constructoras = Constructora.objects.filter(activo=True).select_related('region', 'comuna')
         if rut:
-            constructoras = constructoras.filter(rut__icontains=rut)
+            from django.db.models import Q
+            constructoras = constructoras.filter(
+                Q(rut__icontains=rut) | Q(nombre__icontains=rut)
+            )
         return render(request, 'maestro/constructora_list.html', {
             'constructoras': constructoras,
             'titulo': 'Constructoras',
@@ -584,7 +587,32 @@ class ProyectoList(LoginRequiredMixin, RolRequiredMixin, SoftDeleteMixin, View):
     list_url_name = 'maestro_proyecto_list'
 
     def get(self, request):
+        search = request.GET.get('search', '').strip()
+        estado = request.GET.get('estado', '').strip()
         proyectos = Proyecto.objects.filter(activo=True).select_related('region', 'comuna', 'creado_por')
+        
+        if search:
+            proyectos = proyectos.filter(
+                Q(codigo__icontains=search) |
+                Q(nombre__icontains=search) |
+                Q(constructora__nombre__icontains=search) |
+                Q(region__nombre__icontains=search) |
+                Q(comuna__nombre__icontains=search)
+            )
+        
+        if estado:
+            from datetime import datetime, timedelta
+            hoy = datetime.now().date()
+            dentro_30 = hoy + timedelta(days=30)
+            if estado == 'vigente':
+                proyectos = proyectos.filter(fecha_termino_postventa__gt=dentro_30)
+            elif estado == 'por_vencer':
+                proyectos = proyectos.filter(fecha_termino_postventa__gt=hoy, fecha_termino_postventa__lte=dentro_30)
+            elif estado == 'vencido':
+                proyectos = proyectos.filter(fecha_termino_postventa__lte=hoy)
+            elif estado == 'sin_definir':
+                proyectos = proyectos.filter(fecha_termino_postventa__isnull=True)
+        
         return render(request, 'maestro/proyecto_list.html', {'proyectos': proyectos, 'titulo': 'Proyectos'})
 
 class ProyectoCreate(LoginRequiredMixin, RolRequiredMixin, View):
@@ -638,7 +666,26 @@ class ViviendaList(LoginRequiredMixin, RolRequiredMixin, SoftDeleteMixin, View):
     list_url_name = 'maestro_vivienda_list'
 
     def get(self, request):
+        beneficiario = request.GET.get('beneficiario', '').strip()
+        codigo = request.GET.get('codigo', '').strip()
         viviendas = Vivienda.objects.filter(activa=True).select_related('proyecto', 'tipologia', 'beneficiario')
+        if beneficiario:
+            # Normalizar rut buscado (eliminar puntos y guion)
+            import re
+            rut_normalizado = re.sub(r'[^\dKk]', '', beneficiario)
+            from django.db import models
+            viviendas = viviendas.annotate(
+                rut_normalizado=models.Func(
+                    models.F('beneficiario__rut'),
+                    function='REPLACE',
+                    template="REPLACE(REPLACE(REPLACE(%(expressions)s, '.', ''), '-', ''), ' ', '')"
+                )
+            ).filter(
+                Q(rut_normalizado__icontains=rut_normalizado) |
+                Q(beneficiario__nombre__icontains=beneficiario)
+            )
+        if codigo:
+            viviendas = viviendas.filter(codigo__icontains=codigo)
         return render(request, 'maestro/vivienda_list.html', {'viviendas': viviendas, 'titulo': 'Viviendas'})
 
 class ViviendaCreate(LoginRequiredMixin, RolRequiredMixin, View):
@@ -709,8 +756,19 @@ class ObservacionList(LoginRequiredMixin, RolRequiredMixin, SoftDeleteMixin, Vie
         
         # Aplicar filtros
         if buscar_rut:
-            observaciones_list = observaciones_list.filter(
-                vivienda__beneficiario__rut__icontains=buscar_rut
+            # Permitir búsqueda por RUT con o sin formato (puntos/guion)
+            import re
+            from django.db import models
+            rut_normalizado = re.sub(r'[^\dKk]', '', buscar_rut)
+            observaciones_list = observaciones_list.annotate(
+                rut_normalizado=models.Func(
+                    models.F('vivienda__beneficiario__rut'),
+                    function='REPLACE',
+                    template="REPLACE(REPLACE(REPLACE(%(expressions)s, '.', ''), '-', ''), ' ', '')"
+                )
+            ).filter(
+                Q(rut_normalizado__icontains=rut_normalizado) |
+                Q(vivienda__beneficiario__nombre__icontains=buscar_rut)
             )
         
         if buscar_vivienda:

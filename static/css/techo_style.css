@@ -736,7 +736,7 @@ a .metric-card.info:hover .metric-label { color: rgba(255,255,255,0.9); }
 [data-theme="dark"] .form-techo,
 [data-theme="dark"] .avance-panel,
 [data-theme="dark"] .table-techo {
-    background: var(--techo-white);
+    background: var(--techo-white) !important;
     color: var(--text-color);
     border-color: var(--border-color);
 }

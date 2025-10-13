@@ -110,11 +110,7 @@
                                     <small class="text-muted d-md-none">{{ usuario.email }}</small>
                                     <small class="text-muted d-sm-none">
                                         {{ usuario.rol|default:"Sin rol" }}
-                                        {% if usuario.is_active %}
-                                            <i class="bi bi-check-circle text-success ms-1"></i>
-                                        {% else %}
-                                            <i class="bi bi-x-circle text-secondary ms-1"></i>
-                                        {% endif %}
+                                        
                                     </small>
                                 </div>
                             </td>

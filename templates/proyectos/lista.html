@@ -26,14 +26,25 @@
     </div>
 </div>
 
-<!-- Filtros -->
+<!-- Filtros (simplificados) -->
 <div class="chart-container mb-4">
-    <form method="get" class="row g-3">
-        <div class="col-md-6">
-            <input type="text" class="form-control" name="search" placeholder="Buscar proyectos..." value="{{ search }}">
+    <form method="get" class="row g-2 align-items-end justify-content-start">
+        <div class="col-auto" style="min-width: 280px;">
+            <label class="form-label mb-1">Búsqueda rápida</label>
+            <input type="text" class="form-control" name="search" placeholder="Código, nombre, constructora, región o comuna" value="{{ filtros.search|default:'' }}">
         </div>
-        <div class="col-md-3">
-            <button type="submit" class="btn btn-outline-primary">🔍 Buscar</button>
+        <div class="col-auto" style="min-width: 220px;">
+            <label class="form-label mb-1">Estado postventa</label>
+            <select name="estado" class="form-select">
+                <option value="" {% if not filtros.estado %}selected{% endif %}>Todos</option>
+                <option value="vigente" {% if filtros.estado == 'vigente' %}selected{% endif %}>Vigente</option>
+                <option value="por_vencer" {% if filtros.estado == 'por_vencer' %}selected{% endif %}>Por vencer</option>
+                <option value="vencido" {% if filtros.estado == 'vencido' %}selected{% endif %}>Vencido</option>
+                <option value="sin_definir" {% if filtros.estado == 'sin_definir' %}selected{% endif %}>Sin definir</option>
+            </select>
+        </div>
+        <div class="col-auto d-flex gap-2">
+            <button type="submit" class="btn btn-outline-primary flex-grow-1">🔍 Buscar</button>
             <a href="{% url 'proyectos:lista' %}" class="btn btn-outline-secondary">Limpiar</a>
         </div>
     </form>
@@ -60,8 +71,8 @@
                 <tr>
                     <td><strong>{{ proyecto.codigo }}</strong></td>
                     <td>{{ proyecto.nombre }}</td>
-                    <td>{{ proyecto.constructora }}</td>
-                    <td>{{ proyecto.comuna.nombre }}, {{ proyecto.region.nombre }}</td>
+                    <td>{{ proyecto.constructora|default_if_none:"-" }}</td>
+                    <td>{{ proyecto.comuna.nombre|default_if_none:"" }}{% if proyecto.comuna and proyecto.region %}, {% endif %}{{ proyecto.region.nombre|default_if_none:"" }}</td>
                     <td>{{ proyecto.fecha_entrega|date:"d/m/Y" }}</td>
                     <td>
                         <span class="badge {% if proyecto.estado_postventa == 'Vigente' %}bg-success{% elif proyecto.estado_postventa == 'Por vencer' %}bg-warning{% else %}bg-danger{% endif %}">
@@ -104,13 +115,13 @@
             <!-- Constructora -->
             <div class="mb-2">
                 <i class="bi bi-building"></i>
-                <span>{{ proyecto.constructora }}</span>
+                <span>{{ proyecto.constructora|default_if_none:"-" }}</span>
             </div>
 
             <!-- Ubicación -->
             <div class="mb-2">
                 <i class="bi bi-geo-alt"></i>
-                <small class="text-muted">{{ proyecto.comuna.nombre }}, {{ proyecto.region.nombre }}</small>
+                <small class="text-muted">{{ proyecto.comuna.nombre|default_if_none:"" }}{% if proyecto.comuna and proyecto.region %}, {% endif %}{{ proyecto.region.nombre|default_if_none:"" }}</small>
             </div>
 
             <!-- Fecha de entrega -->
@@ -143,7 +154,7 @@
         <ul class="pagination justify-content-center">
             {% if proyectos.has_previous %}
                 <li class="page-item">
-                    <a class="page-link" href="?page={{ proyectos.previous_page_number }}{% if search %}&search={{ search }}{% endif %}">Anterior</a>
+                    <a class="page-link" href="?page={{ proyectos.previous_page_number }}{% if filtros.search %}&search={{ filtros.search }}{% endif %}{% if filtros.estado %}&estado={{ filtros.estado }}{% endif %}">Anterior</a>
                 </li>
             {% endif %}
 
@@ -153,7 +164,7 @@
 
             {% if proyectos.has_next %}
                 <li class="page-item">
-                    <a class="page-link" href="?page={{ proyectos.next_page_number }}{% if search %}&search={{ search }}{% endif %}">Siguiente</a>
+                    <a class="page-link" href="?page={{ proyectos.next_page_number }}{% if filtros.search %}&search={{ filtros.search }}{% endif %}{% if filtros.estado %}&estado={{ filtros.estado }}{% endif %}">Siguiente</a>
                 </li>
             {% endif %}
         </ul>

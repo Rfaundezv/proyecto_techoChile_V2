@@ -24,6 +24,23 @@
         {% endfor %}
     {% endif %}
 
+    <!-- Filtros -->
+    <div class="chart-container mb-4">
+        <form method="get" class="row g-2 align-items-end justify-content-start">
+            <div class="col-auto" style="min-width: 280px;">
+                <label for="beneficiario" class="form-label mb-1 fw-semibold">RUT o Nombre Beneficiario</label>
+                <input type="text" id="beneficiario" name="beneficiario" class="form-control" value="{{ request.GET.beneficiario }}" placeholder="Ej: 12345678-9 o nombre">
+            </div>
+            <div class="col-auto" style="min-width: 200px;">
+                <label for="codigo" class="form-label mb-1 fw-semibold">Código Vivienda</label>
+                <input type="text" id="codigo" name="codigo" class="form-control" value="{{ request.GET.codigo }}" placeholder="Ej: VIV-001">
+            </div>
+            <div class="col-auto d-flex gap-2">
+                <button type="submit" class="btn btn-sm btn-primary fw-semibold px-3">Buscar</button>
+                <a href="{% url 'maestro_vivienda_list' %}" class="btn btn-sm btn-outline-primary fw-semibold px-3">Limpiar</a>
+            </div>
+        </form>
+    </div>
     <div class="card">
     <div class="card-body p-0 p-md-3">
             <div class="table-responsive">

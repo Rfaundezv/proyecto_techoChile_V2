@@ -41,23 +41,42 @@
 
 /* Estilos para títulos del dashboard que funcionen en ambos modos */
 .dashboard-title {
-    color: var(--bs-body-color) !important;
-    background: none !important;
-    font-weight: bold !important;
+    background: linear-gradient(135deg, #2563eb 0%, #1e40af 100%) !important;
+    color: white !important;
+    padding: 12px 20px !important;
+    border-radius: 8px !important;
+    font-weight: 700 !important;
+    text-shadow: 0 1px 2px rgba(0,0,0,0.2) !important;
+    box-shadow: 0 2px 8px rgba(37, 99, 235, 0.3) !important;
+    border: none !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 0.5rem !important;
 }
 
 .dashboard-h2 {
-    font-size: 2rem !important;
+    font-size: 1.8rem !important;
 }
 
-.dashboard-h4 {
+.dashboard-h3 {
     font-size: 1.5rem !important;
 }
 
+.dashboard-h4 {
+    font-size: 1.3rem !important;
+}
+
 .dashboard-h5 {
-    font-size: 1.15rem !important;
+    font-size: 1.1rem !important;
 }
 
 .dashboard-h6 {
     font-size: 1rem !important;
+}
+
+/* Estilos específicos para modo oscuro */
+[data-theme="dark"] .dashboard-title {
+    background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%) !important;
+    color: white !important;
+    box-shadow: 0 2px 8px rgba(59, 130, 246, 0.4) !important;
 }

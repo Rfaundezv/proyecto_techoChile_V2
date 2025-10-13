@@ -125,7 +125,8 @@
                     
                     <li class="nav-item ms-lg-auto">
                             <span class="nav-link text-muted small">
-                                <i class="bi bi-person-badge"></i> {{ user.nombre }}
+                                <i class="bi bi-person-badge"></i> {{ user.nombre }} - {{ user.email }}
+                                <br>
                                 {% if user.rol %}
                                     <span class="badge bg-primary ms-1">{{ user.rol.nombre }}</span>
                                 {% endif %}

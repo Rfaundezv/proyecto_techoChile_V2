@@ -17,18 +17,69 @@ from core.permisos import (
 def lista_proyectos(request):
     # Obtener todos los proyectos activos
     proyectos = Proyecto.objects.filter(activo=True).select_related('region', 'comuna', 'creado_por')
-    
+
     # Filtrar proyectos según el rol del usuario
     proyectos = filtrar_proyectos_por_rol(request.user, proyectos)
 
-    # Filtros de búsqueda
-    search = request.GET.get('search')
+    # Filtros de búsqueda (búsqueda rápida + filtros avanzados)
+    search = (request.GET.get('search') or '').strip()
+    codigo = (request.GET.get('codigo') or '').strip()
+    nombre = (request.GET.get('nombre') or '').strip()
+    constructora = (request.GET.get('constructora') or '').strip()
+    region = (request.GET.get('region') or '').strip()
+    comuna = (request.GET.get('comuna') or '').strip()
+    fecha_desde = (request.GET.get('fecha_desde') or '').strip()
+    fecha_hasta = (request.GET.get('fecha_hasta') or '').strip()
+    estado = (request.GET.get('estado') or '').strip()  # vigente | por_vencer | vencido | sin_definir
+
     if search:
         proyectos = proyectos.filter(
-            Q(codigo__icontains=search) | 
-            Q(nombre__icontains=search) |
-            Q(constructora__nombre__icontains=search)
+            Q(codigo__icontains=search)
+            | Q(nombre__icontains=search)
+            | Q(constructora__nombre__icontains=search)
+            | Q(region__nombre__icontains=search)
+            | Q(comuna__nombre__icontains=search)
         )
+
+    if codigo:
+        proyectos = proyectos.filter(codigo__icontains=codigo)
+    if nombre:
+        proyectos = proyectos.filter(nombre__icontains=nombre)
+    if constructora:
+        proyectos = proyectos.filter(constructora__nombre__icontains=constructora)
+    if region:
+        proyectos = proyectos.filter(region__nombre__icontains=region)
+    if comuna:
+        proyectos = proyectos.filter(comuna__nombre__icontains=comuna)
+
+    # Rango de fechas
+    from datetime import datetime, timedelta
+    fecha_format = '%Y-%m-%d'
+    if fecha_desde:
+        try:
+            f_desde = datetime.strptime(fecha_desde, fecha_format).date()
+            proyectos = proyectos.filter(fecha_entrega__gte=f_desde)
+        except ValueError:
+            pass
+    if fecha_hasta:
+        try:
+            f_hasta = datetime.strptime(fecha_hasta, fecha_format).date()
+            proyectos = proyectos.filter(fecha_entrega__lte=f_hasta)
+        except ValueError:
+            pass
+
+    # Estado Postventa (derivado de fecha_termino_postventa)
+    if estado:
+        hoy = datetime.now().date()
+        dentro_30 = hoy + timedelta(days=30)
+        if estado == 'vigente':
+            proyectos = proyectos.filter(fecha_termino_postventa__gt=dentro_30)
+        elif estado == 'por_vencer':
+            proyectos = proyectos.filter(fecha_termino_postventa__gt=hoy, fecha_termino_postventa__lte=dentro_30)
+        elif estado == 'vencido':
+            proyectos = proyectos.filter(fecha_termino_postventa__lte=hoy)
+        elif estado == 'sin_definir':
+            proyectos = proyectos.filter(fecha_termino_postventa__isnull=True)
 
     paginator = Paginator(proyectos, 10)
     page_number = request.GET.get('page')
@@ -36,13 +87,26 @@ def lista_proyectos(request):
 
     # Determinar si el usuario es familia
     es_familia = (
-        request.user.groups.filter(name='FAMILIA').exists() or 
-        (hasattr(request.user, 'rol') and request.user.rol and request.user.rol.nombre == 'FAMILIA')
+        request.user.groups.filter(name='FAMILIA').exists()
+        or (hasattr(request.user, 'rol') and request.user.rol and request.user.rol.nombre == 'FAMILIA')
     )
+
+    filtros = {
+        'search': search,
+        'codigo': codigo,
+        'nombre': nombre,
+        'constructora': constructora,
+        'region': region,
+        'comuna': comuna,
+        'fecha_desde': fecha_desde,
+        'fecha_hasta': fecha_hasta,
+        'estado': estado,
+    }
 
     context = {
         'proyectos': page_obj,
-        'search': search,
+        'search': search,  # compatibilidad con plantillas existentes
+        'filtros': filtros,
         'es_familia': es_familia,
     }
     return render(request, 'proyectos/lista.html', context)

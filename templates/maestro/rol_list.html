@@ -27,7 +27,6 @@
                     <thead>
                         <tr>
                             <th>Nombre</th>
-                            <th>Descripción</th>
                             <th>Estado</th>
                             <th>Acciones</th>
                         </tr>
@@ -35,41 +34,50 @@
                     <tbody>
                         {% for rol in roles %}
                         <tr>
-                            <td>{{ rol.get_nombre_display }}</td>
-                            <td>{{ rol.descripcion|truncatewords:10 }}</td>
                             <td>
-                                {% if rol.activo %}
-                                    <span class="badge bg-success">Activo</span>
-                                {% else %}
-                                    <span class="badge bg-secondary">Inactivo</span>
+                                <span>{{ rol.get_nombre_display }}</span>
+                                {% if rol.descripcion %}
+                                    <div class="d-none d-md-block mt-1">
+                                        <span class="small text-muted">{{ rol.descripcion|cut:rol.get_nombre_display|cut:' - ' }}</span>
+                                    </div>
                                 {% endif %}
                             </td>
-                            <td>
-                                <div class="acciones-botones">
-                                    <a href="{% url 'maestro_rol_edit' rol.pk %}" class="btn btn-sm btn-warning">
-                                        <i class="bi bi-pencil"></i> Editar
-                                    </a>
-                                    {% if rol.activo %}
-                                        <form method="post" action="{% url 'maestro_rol_delete' rol.pk %}" style="display:inline;">
-                                            {% csrf_token %}
-                                            <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('¿Desactivar este rol?')">
-                                                <i class="bi bi-trash"></i> Desactivar
-                                            </button>
-                                        </form>
-                                    {% else %}
-                                        <form method="post" action="{% url 'maestro_rol_activate' rol.pk %}" style="display:inline;">
-                                            {% csrf_token %}
-                                            <button type="submit" class="btn btn-sm btn-success" onclick="return confirm('¿Activar este rol?')">
-                                                <i class="bi bi-arrow-repeat"></i> Activar
-                                            </button>
-                                        </form>
-                                    {% endif %}
-                                </div>
-                            </td>
+                        <td>
+                            {% if rol.activo %}
+                                <span class="badge bg-success">Activo</span>
+                            {% else %}
+                                <span class="badge bg-secondary">Inactivo</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <div class="d-flex gap-1 flex-row">
+                                <a href="{% url 'maestro_rol_edit' rol.pk %}" class="btn btn-sm btn-warning">
+                                    <i class="bi bi-pencil"></i>
+                                    <span class="d-none d-md-inline ms-1 fw-semibold">Editar</span>
+                                </a>
+                                {% if rol.activo %}
+                                    <form method="post" action="{% url 'maestro_rol_delete' rol.pk %}" style="display:inline;">
+                                        {% csrf_token %}
+                                        <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('¿Desactivar este rol?')">
+                                            <i class="bi bi-trash"></i>
+                                            <span class="d-none d-md-inline ms-1 fw-semibold">Desactivar</span>
+                                        </button>
+                                    </form>
+                                {% else %}
+                                    <form method="post" action="{% url 'maestro_rol_activate' rol.pk %}" style="display:inline;">
+                                        {% csrf_token %}
+                                        <button type="submit" class="btn btn-sm btn-success" onclick="return confirm('¿Activar este rol?')">
+                                            <i class="bi bi-arrow-repeat"></i>
+                                            <span class="d-none d-md-inline ms-1 fw-semibold">Activar</span>
+                                        </button>
+                                    </form>
+                                {% endif %}
+                            </div>
+                        </td>
                         </tr>
                         {% empty %}
                         <tr>
-                            <td colspan="4" class="text-center">No hay roles registrados.</td>
+                            <td colspan="3" class="text-center">No hay roles registrados.</td>
                         </tr>
                         {% endfor %}
                     </tbody>
