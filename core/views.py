@@ -822,6 +822,66 @@ class ObservacionList(LoginRequiredMixin, RolRequiredMixin, SoftDeleteMixin, Vie
         }
         return render(request, 'maestro/observacion_list.html', context)
 
+class ObservacionCreate(LoginRequiredMixin, RolRequiredMixin, View):
+    roles_permitidos = ['ADMINISTRADOR', 'TECHO']
+    
+    def get(self, request):
+        from .forms import ObservacionForm
+        form = ObservacionForm()
+        return render(request, 'maestro/observacion_form.html', {
+            'form': form, 
+            'titulo': 'Crear Observación'
+        })
+
+    def post(self, request):
+        from .forms import ObservacionForm
+        form = ObservacionForm(request.POST, request.FILES)
+        if form.is_valid():
+            observacion = form.save(commit=False)
+            observacion.creado_por = request.user
+            
+            # Sincronizar es_urgente con prioridad
+            if observacion.es_urgente:
+                observacion.prioridad = 'urgente'
+            elif observacion.prioridad == 'urgente':
+                observacion.es_urgente = True
+            
+            observacion.save()
+            
+            # Procesar archivos adjuntos
+            archivos_adjuntos = request.FILES.getlist('archivos_adjuntos')
+            archivos_guardados = 0
+            
+            if archivos_adjuntos:
+                size_total = sum(archivo.size for archivo in archivos_adjuntos)
+                
+                # Validar tamaño total (10MB)
+                if size_total > 10 * 1024 * 1024:
+                    messages.error(request, f'El tamaño total de los archivos ({size_total / (1024*1024):.2f} MB) excede el límite de 10MB')
+                else:
+                    for archivo in archivos_adjuntos:
+                        try:
+                            ArchivoAdjuntoObservacion.objects.create(
+                                observacion=observacion,
+                                archivo=archivo,
+                                nombre_original=archivo.name,
+                                subido_por=request.user
+                            )
+                            archivos_guardados += 1
+                        except Exception as e:
+                            messages.warning(request, f'No se pudo guardar el archivo {archivo.name}: {str(e)}')
+            
+            mensaje = 'Observación creada exitosamente.'
+            if archivos_guardados > 0:
+                mensaje += f' Se adjuntaron {archivos_guardados} archivo(s).'
+            messages.success(request, mensaje)
+            return redirect('maestro_observacion_list')
+        
+        return render(request, 'maestro/observacion_form.html', {
+            'form': form, 
+            'titulo': 'Crear Observación'
+        })
+
 class ObservacionUpdate(LoginRequiredMixin, RolRequiredMixin, View):
     roles_permitidos = ['ADMINISTRADOR', 'TECHO']
     def get(self, request, pk):

@@ -63,6 +63,9 @@
                     <div class="col-md-6 mb-3">
                         <label for="{{ form.elemento.id_for_label }}" class="form-label">Elemento *</label>
                         {{ form.elemento }}
+                        <small class="form-text text-muted">
+                            Escriba el elemento o seleccione uno de la lista que aparecerá al elegir un recinto
+                        </small>
                         {% if form.elemento.errors %}
                             <div class="text-danger small">{{ form.elemento.errors.0 }}</div>
                         {% endif %}
@@ -194,6 +197,134 @@
 {% block extra_js %}
 <script>
 document.addEventListener('DOMContentLoaded', function() {
+    // Referencias a los elementos del formulario
+    const proyectoSelect = document.getElementById('{{ form.proyecto.id_for_label }}');
+    const viviendaSelect = document.getElementById('{{ form.vivienda.id_for_label }}');
+    const recintoSelect = document.getElementById('{{ form.recinto.id_for_label }}');
+    const elementoInput = document.getElementById('{{ form.elemento.id_for_label }}');
+
+    // Función para cargar elementos disponibles según el recinto seleccionado
+    function cargarElementosRecinto(recintoId) {
+        if (!recintoId || !elementoInput) return;
+
+        // Agregar un select temporal para mostrar elementos disponibles
+        let elementoSelect = document.getElementById('elemento-select-helper');
+        if (!elementoSelect) {
+            elementoSelect = document.createElement('select');
+            elementoSelect.id = 'elemento-select-helper';
+            elementoSelect.className = 'form-select';
+            elementoSelect.name = 'elemento_helper';
+            elementoInput.parentNode.appendChild(elementoSelect);
+        }
+
+        // Ocultar el campo de texto original y mostrar solo el select
+        elementoInput.style.display = 'none';
+        elementoSelect.style.display = 'block';
+
+        elementoSelect.innerHTML = '<option value="">Cargando elementos...</option>';
+
+        fetch(`/incidencias/ajax/elementos/?recinto_id=${recintoId}`)
+            .then(response => response.json())
+            .then(data => {
+                elementoSelect.innerHTML = '<option value="">Seleccionar elemento</option>';
+                if (data.elementos && data.elementos.length > 0) {
+                    data.elementos.forEach(function(elemento) {
+                        const option = document.createElement('option');
+                        option.value = elemento;
+                        option.textContent = elemento;
+                        // Marcar como seleccionado si coincide con el valor actual
+                        if (elementoInput.value === elemento) {
+                            option.selected = true;
+                        }
+                        elementoSelect.appendChild(option);
+                    });
+                } else {
+                    elementoSelect.innerHTML = '<option value="">No hay elementos disponibles</option>';
+                }
+            })
+            .catch(error => {
+                console.error('Error cargando elementos:', error);
+                elementoSelect.innerHTML = '<option value="">Error al cargar elementos</option>';
+            });
+    }
+
+    // Función para mostrar el campo de texto cuando no hay recinto
+    function mostrarCampoTextoElemento() {
+        const elementoSelect = document.getElementById('elemento-select-helper');
+        if (elementoSelect) {
+            elementoSelect.style.display = 'none';
+        }
+        if (elementoInput) {
+            elementoInput.style.display = 'block';
+        }
+    }
+
+    // Cargar recintos cuando cambia la vivienda
+    if (viviendaSelect && recintoSelect) {
+        viviendaSelect.addEventListener('change', function() {
+            const viviendaId = this.value;
+            recintoSelect.innerHTML = '<option value="">Cargando recintos...</option>';
+            
+            // Resetear el campo de elementos
+            mostrarCampoTextoElemento();
+            
+            if (viviendaId) {
+                fetch(`/incidencias/ajax/recintos-vivienda/?vivienda_id=${viviendaId}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        recintoSelect.innerHTML = '<option value="">Seleccionar recinto</option>';
+                        if (data.recintos && data.recintos.length > 0) {
+                            data.recintos.forEach(function(recinto) {
+                                const option = document.createElement('option');
+                                option.value = recinto.id;
+                                option.textContent = recinto.nombre;
+                                recintoSelect.appendChild(option);
+                            });
+                        } else {
+                            recintoSelect.innerHTML = '<option value="">No hay recintos disponibles</option>';
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error cargando recintos:', error);
+                        recintoSelect.innerHTML = '<option value="">Error al cargar recintos</option>';
+                    });
+            } else {
+                recintoSelect.innerHTML = '<option value="">Primero seleccione una vivienda</option>';
+            }
+        });
+    }
+
+    // Cargar elementos cuando se selecciona un recinto
+    if (recintoSelect) {
+        recintoSelect.addEventListener('change', function() {
+            const recintoId = this.value;
+            if (recintoId) {
+                cargarElementosRecinto(recintoId);
+            } else {
+                mostrarCampoTextoElemento();
+            }
+        });
+    }
+
+    // Manejar selección de elementos predefinidos
+    document.addEventListener('change', function(e) {
+        if (e.target.id === 'elemento-select-helper' && elementoInput) {
+            if (e.target.value) {
+                elementoInput.value = e.target.value;
+            }
+        }
+    });
+
+    // Inicializar el estado correcto al cargar la página
+    if (!recintoSelect || !recintoSelect.value) {
+        mostrarCampoTextoElemento();
+    }
+
+    // Cargar elementos al cargar la página si ya hay un recinto seleccionado (modo edición)
+    if (recintoSelect && recintoSelect.value) {
+        cargarElementosRecinto(recintoSelect.value);
+    }
+
     // Sistema de archivos acumulativos
     let archivosSeleccionados = [];
     const MAX_SIZE_TOTAL = 10 * 1024 * 1024; // 10MB en bytes

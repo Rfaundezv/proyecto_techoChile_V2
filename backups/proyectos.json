@@ -1,0 +1,4188 @@
+[
+{
+  "model": "proyectos.tipologiavivienda",
+  "pk": 1,
+  "fields": {
+    "codigo": 1,
+    "nombre": "Casa Básica 42m²",
+    "descripcion": "Casa básica de 1 dormitorio",
+    "activa": true
+  }
+},
+{
+  "model": "proyectos.tipologiavivienda",
+  "pk": 2,
+  "fields": {
+    "codigo": 2,
+    "nombre": "Casa 2 Dormitorios 55m²",
+    "descripcion": "Casa de 2 dormitorios",
+    "activa": true
+  }
+},
+{
+  "model": "proyectos.tipologiavivienda",
+  "pk": 3,
+  "fields": {
+    "codigo": 3,
+    "nombre": "Casa 3 Dormitorios 70m²",
+    "descripcion": "Casa de 3 dormitorios",
+    "activa": true
+  }
+},
+{
+  "model": "proyectos.tipologiavivienda",
+  "pk": 4,
+  "fields": {
+    "codigo": 4,
+    "nombre": "Tipología 4",
+    "descripcion": "",
+    "activa": true
+  }
+},
+{
+  "model": "proyectos.tipologiavivienda",
+  "pk": 5,
+  "fields": {
+    "codigo": 5,
+    "nombre": "Tipología 5",
+    "descripcion": "",
+    "activa": true
+  }
+},
+{
+  "model": "proyectos.tipologiavivienda",
+  "pk": 6,
+  "fields": {
+    "codigo": 6,
+    "nombre": "Tipología 6",
+    "descripcion": "",
+    "activa": true
+  }
+},
+{
+  "model": "proyectos.proyecto",
+  "pk": 1,
+  "fields": {
+    "codigo": "1",
+    "siglas": "proyecto 1",
+    "nombre": "Santa Bernardita",
+    "constructora": 1,
+    "constructora_legacy": "Constructora ABC",
+    "comuna": 118,
+    "region": 7,
+    "fecha_entrega": "2025-10-11",
+    "fecha_termino_postventa": "2026-07-17",
+    "coordenadas_s": null,
+    "coordenadas_w": null,
+    "activo": true,
+    "fecha_creacion": "2025-10-01T18:14:29.965Z",
+    "fecha_actualizacion": "2025-10-12T00:18:06.954Z",
+    "creado_por": 1
+  }
+},
+{
+  "model": "proyectos.proyecto",
+  "pk": 2,
+  "fields": {
+    "codigo": "10-LC1",
+    "siglas": "LC1",
+    "nombre": "NUEVA VIDA",
+    "constructora": 4,
+    "constructora_legacy": "DYR",
+    "comuna": 365,
+    "region": 17,
+    "fecha_entrega": "2025-10-11",
+    "fecha_termino_postventa": "2026-02-12",
+    "coordenadas_s": "-32.84573500",
+    "coordenadas_w": "-71.22701500",
+    "activo": true,
+    "fecha_creacion": "2025-10-02T20:25:40.304Z",
+    "fecha_actualizacion": "2025-10-12T00:18:06.953Z",
+    "creado_por": 2
+  }
+},
+{
+  "model": "proyectos.recinto",
+  "pk": 1,
+  "fields": {
+    "tipologia": 1,
+    "codigo": "01",
+    "nombre": "Estar-Comedor",
+    "descripcion": "",
+    "elementos_disponibles": [
+      "Pintura",
+      "Piso",
+      "Ventanas",
+      "Puertas"
+    ],
+    "activo": true
+  }
+},
+{
+  "model": "proyectos.recinto",
+  "pk": 2,
+  "fields": {
+    "tipologia": 1,
+    "codigo": "02",
+    "nombre": "Cocina",
+    "descripcion": "",
+    "elementos_disponibles": [
+      "Conexión gas",
+      "Enchufes",
+      "Lavaplatos",
+      "Mueble",
+      "Otro",
+      "Puerta a patio",
+      "Revestimiento",
+      "Ventana"
+    ],
+    "activo": true
+  }
+},
+{
+  "model": "proyectos.recinto",
+  "pk": 3,
+  "fields": {
+    "tipologia": 1,
+    "codigo": "03",
+    "nombre": "Dormitorio",
+    "descripcion": "",
+    "elementos_disponibles": [
+      "Pintura",
+      "Piso",
+      "Ventana",
+      "Closet"
+    ],
+    "activo": true
+  }
+},
+{
+  "model": "proyectos.recinto",
+  "pk": 4,
+  "fields": {
+    "tipologia": 1,
+    "codigo": "04",
+    "nombre": "Baño",
+    "descripcion": "",
+    "elementos_disponibles": [
+      "Cerámica de piso",
+      "Lavamanos",
+      "Luz",
+      "Otro",
+      "Pintura y sellos",
+      "Puerta",
+      "Revestimiento",
+      "Tina",
+      "Ventana",
+      "WC"
+    ],
+    "activo": true
+  }
+},
+{
+  "model": "proyectos.recinto",
+  "pk": 5,
+  "fields": {
+    "tipologia": 2,
+    "codigo": "01",
+    "nombre": "Estar-Comedor",
+    "descripcion": "",
+    "elementos_disponibles": [
+      "Pintura",
+      "Piso",
+      "Ventanas",
+      "Puertas"
+    ],
+    "activo": true
+  }
+},
+{
+  "model": "proyectos.recinto",
+  "pk": 6,
+  "fields": {
+    "tipologia": 2,
+    "codigo": "02",
+    "nombre": "Cocina",
+    "descripcion": "",
+    "elementos_disponibles": [
+      "Lavaplatos",
+      "Luz",
+      "Otro",
+      "Puerta a patio",
+      "Revestimiento",
+      "Ventana"
+    ],
+    "activo": true
+  }
+},
+{
+  "model": "proyectos.recinto",
+  "pk": 7,
+  "fields": {
+    "tipologia": 2,
+    "codigo": "03",
+    "nombre": "Dormitorio Principal",
+    "descripcion": "",
+    "elementos_disponibles": [
+      "Pintura",
+      "Piso",
+      "Ventana",
+      "Closet"
+    ],
+    "activo": true
+  }
+},
+{
+  "model": "proyectos.recinto",
+  "pk": 8,
+  "fields": {
+    "tipologia": 2,
+    "codigo": "04",
+    "nombre": "Dormitorio 2",
+    "descripcion": "",
+    "elementos_disponibles": [
+      "Pintura",
+      "Piso",
+      "Ventana",
+      "Closet"
+    ],
+    "activo": true
+  }
+},
+{
+  "model": "proyectos.recinto",
+  "pk": 9,
+  "fields": {
+    "tipologia": 2,
+    "codigo": "05",
+    "nombre": "Baño",
+    "descripcion": "",
+    "elementos_disponibles": [
+      "Cerámica de piso",
+      "Cielo",
+      "Lavamanos",
+      "Luz",
+      "Otro",
+      "Pintura y sellos",
+      "Puerta",
+      "Revestimiento",
+      "Tina",
+      "Ventana",
+      "WC"
+    ],
+    "activo": true
+  }
+},
+{
+  "model": "proyectos.recinto",
+  "pk": 10,
+  "fields": {
+    "tipologia": 2,
+    "codigo": "06",
+    "nombre": "Patio",
+    "descripcion": "",
+    "elementos_disponibles": [
+      "Piso",
+      "Muros",
+      "Desagües"
+    ],
+    "activo": true
+  }
+},
+{
+  "model": "proyectos.recinto",
+  "pk": 11,
+  "fields": {
+    "tipologia": 3,
+    "codigo": "01",
+    "nombre": "Estar-Comedor",
+    "descripcion": "",
+    "elementos_disponibles": [
+      "Pintura",
+      "Piso",
+      "Ventanas",
+      "Puertas"
+    ],
+    "activo": true
+  }
+},
+{
+  "model": "proyectos.recinto",
+  "pk": 12,
+  "fields": {
+    "tipologia": 3,
+    "codigo": "02",
+    "nombre": "Cocina",
+    "descripcion": "",
+    "elementos_disponibles": [
+      "Cielo",
+      "Enchufes",
+      "Lavaplatos",
+      "Mueble",
+      "Otro",
+      "Puerta a patio",
+      "Revestimiento",
+      "Ventana",
+      "grifería"
+    ],
+    "activo": true
+  }
+},
+{
+  "model": "proyectos.recinto",
+  "pk": 13,
+  "fields": {
+    "tipologia": 3,
+    "codigo": "03",
+    "nombre": "Dormitorio Principal",
+    "descripcion": "",
+    "elementos_disponibles": [
+      "Pintura",
+      "Piso",
+      "Ventana",
+      "Closet"
+    ],
+    "activo": true
+  }
+},
+{
+  "model": "proyectos.recinto",
+  "pk": 14,
+  "fields": {
+    "tipologia": 3,
+    "codigo": "04",
+    "nombre": "Dormitorio 2",
+    "descripcion": "",
+    "elementos_disponibles": [
+      "Pintura",
+      "Piso",
+      "Ventana",
+      "Closet"
+    ],
+    "activo": true
+  }
+},
+{
+  "model": "proyectos.recinto",
+  "pk": 15,
+  "fields": {
+    "tipologia": 3,
+    "codigo": "05",
+    "nombre": "Dormitorio 3",
+    "descripcion": "",
+    "elementos_disponibles": [
+      "Pintura",
+      "Piso",
+      "Ventana",
+      "Closet"
+    ],
+    "activo": true
+  }
+},
+{
+  "model": "proyectos.recinto",
+  "pk": 16,
+  "fields": {
+    "tipologia": 3,
+    "codigo": "06",
+    "nombre": "Baño",
+    "descripcion": "",
+    "elementos_disponibles": [
+      "Bota Agua",
+      "Cerámica de piso",
+      "Cielo",
+      "Otro",
+      "Pintura",
+      "Puerta",
+      "Revestimiento",
+      "sellos"
+    ],
+    "activo": true
+  }
+},
+{
+  "model": "proyectos.recinto",
+  "pk": 17,
+  "fields": {
+    "tipologia": 3,
+    "codigo": "07",
+    "nombre": "Patio",
+    "descripcion": "",
+    "elementos_disponibles": [
+      "Piso",
+      "Muros",
+      "Desagües"
+    ],
+    "activo": true
+  }
+},
+{
+  "model": "proyectos.recinto",
+  "pk": 18,
+  "fields": {
+    "tipologia": 3,
+    "codigo": "579",
+    "nombre": "Dormitorio 3 (Primer piso, fachada frontal)",
+    "descripcion": "",
+    "elementos_disponibles": [
+      "Cielo",
+      "Enchufes",
+      "Otro",
+      "Piso",
+      "Puerta",
+      "Revestimiento",
+      "Ventana"
+    ],
+    "activo": true
+  }
+},
+{
+  "model": "proyectos.recinto",
+  "pk": 19,
+  "fields": {
+    "tipologia": 3,
+    "codigo": "574",
+    "nombre": "Estar - comedor",
+    "descripcion": "",
+    "elementos_disponibles": [
+      "Cielo",
+      "Enchufes",
+      "Otro",
+      "Piso",
+      "Puerta",
+      "Ventanas",
+      "tabiques"
+    ],
+    "activo": true
+  }
+},
+{
+  "model": "proyectos.recinto",
+  "pk": 21,
+  "fields": {
+    "tipologia": 1,
+    "codigo": "550",
+    "nombre": "Estar - comedor",
+    "descripcion": "",
+    "elementos_disponibles": [
+      "Cielo",
+      "Enchufes",
+      "Interruptores",
+      "Piso",
+      "Puerta",
+      "Tablero Eléctrico",
+      "Ventanas",
+      "tabiques"
+    ],
+    "activo": true
+  }
+},
+{
+  "model": "proyectos.recinto",
+  "pk": 22,
+  "fields": {
+    "tipologia": 2,
+    "codigo": "562",
+    "nombre": "Estar - comedor",
+    "descripcion": "",
+    "elementos_disponibles": [
+      "Cielo",
+      "Otro",
+      "Puerta",
+      "tabiques"
+    ],
+    "activo": true
+  }
+},
+{
+  "model": "proyectos.recinto",
+  "pk": 23,
+  "fields": {
+    "tipologia": 1,
+    "codigo": "548",
+    "nombre": "Fachada posterior",
+    "descripcion": "",
+    "elementos_disponibles": [
+      "Calefont",
+      "Canales y Cierre entre patios",
+      "Lavadero",
+      "Nicho Gas",
+      "Puerta a patio",
+      "Revestimiento",
+      "Ventanas"
+    ],
+    "activo": true
+  }
+},
+{
+  "model": "proyectos.recinto",
+  "pk": 24,
+  "fields": {
+    "tipologia": 3,
+    "codigo": "580",
+    "nombre": "Dormitorio 1 (Segundo piso, fachada frontal)",
+    "descripcion": "",
+    "elementos_disponibles": [
+      "Cerámica de piso",
+      "Cielo",
+      "Enchufes",
+      "Luz",
+      "Otro",
+      "Puerta",
+      "Revestimiento",
+      "Ventana"
+    ],
+    "activo": true
+  }
+},
+{
+  "model": "proyectos.recinto",
+  "pk": 25,
+  "fields": {
+    "tipologia": 3,
+    "codigo": "577",
+    "nombre": "Dormitorio 2 (Segundo piso, fachada trasera)",
+    "descripcion": "",
+    "elementos_disponibles": [
+      "Cielo",
+      "Closet",
+      "Luz",
+      "Otro",
+      "Piso",
+      "Puerta",
+      "Revestimiento",
+      "Ventanas"
+    ],
+    "activo": true
+  }
+},
+{
+  "model": "proyectos.recinto",
+  "pk": 26,
+  "fields": {
+    "tipologia": 2,
+    "codigo": "564",
+    "nombre": "Logia",
+    "descripcion": "",
+    "elementos_disponibles": [
+      "Cielo",
+      "Conexión lavadora",
+      "Piso"
+    ],
+    "activo": true
+  }
+},
+{
+  "model": "proyectos.recinto",
+  "pk": 30,
+  "fields": {
+    "tipologia": 3,
+    "codigo": "573",
+    "nombre": "Fachadas laterales",
+    "descripcion": "",
+    "elementos_disponibles": [
+      "Cierre entre patios",
+      "Revestimiento",
+      "Ventanas"
+    ],
+    "activo": true
+  }
+},
+{
+  "model": "proyectos.recinto",
+  "pk": 31,
+  "fields": {
+    "tipologia": 4,
+    "codigo": "590",
+    "nombre": "Dormitorio 2 (Segundo piso, fachada trasera)",
+    "descripcion": "",
+    "elementos_disponibles": [
+      "Revestimiento"
+    ],
+    "activo": true
+  }
+},
+{
+  "model": "proyectos.recinto",
+  "pk": 32,
+  "fields": {
+    "tipologia": 2,
+    "codigo": "560",
+    "nombre": "Fachada posterior",
+    "descripcion": "",
+    "elementos_disponibles": [
+      "Lavadero",
+      "Nicho Gas",
+      "Puerta a patio",
+      "Revestimiento"
+    ],
+    "activo": true
+  }
+},
+{
+  "model": "proyectos.recinto",
+  "pk": 33,
+  "fields": {
+    "tipologia": 1,
+    "codigo": "555",
+    "nombre": "Dormitorio 1 (Segundo piso, fachada frontal)",
+    "descripcion": "",
+    "elementos_disponibles": [
+      "Cielo",
+      "Closet",
+      "Enchufes",
+      "Otro",
+      "Piso",
+      "Puerta",
+      "Revestimiento",
+      "Ventana",
+      "bota agua"
+    ],
+    "activo": true
+  }
+},
+{
+  "model": "proyectos.recinto",
+  "pk": 34,
+  "fields": {
+    "tipologia": 1,
+    "codigo": "557",
+    "nombre": "Balcon",
+    "descripcion": "",
+    "elementos_disponibles": [
+      "Bota Agua",
+      "Puerta",
+      "Revestimiento",
+      "sellos"
+    ],
+    "activo": true
+  }
+},
+{
+  "model": "proyectos.recinto",
+  "pk": 35,
+  "fields": {
+    "tipologia": 1,
+    "codigo": "553",
+    "nombre": "Dormitorio 2 (Segundo piso, fachada trasera)",
+    "descripcion": "",
+    "elementos_disponibles": [
+      "Cielo",
+      "Closet",
+      "Enchufes",
+      "Piso",
+      "Puerta",
+      "Revestimiento",
+      "Ventanas"
+    ],
+    "activo": true
+  }
+},
+{
+  "model": "proyectos.recinto",
+  "pk": 36,
+  "fields": {
+    "tipologia": 2,
+    "codigo": "570",
+    "nombre": "Otro",
+    "descripcion": "",
+    "elementos_disponibles": [],
+    "activo": true
+  }
+},
+{
+  "model": "proyectos.recinto",
+  "pk": 39,
+  "fields": {
+    "tipologia": 3,
+    "codigo": "572",
+    "nombre": "Fachada posterior",
+    "descripcion": "",
+    "elementos_disponibles": [
+      "Calefont",
+      "Canales y Cierre entre patios",
+      "Lavadero",
+      "Luz exterior",
+      "Nicho Gas",
+      "Puerta a patio",
+      "Revestimiento",
+      "Ventanas"
+    ],
+    "activo": true
+  }
+},
+{
+  "model": "proyectos.recinto",
+  "pk": 40,
+  "fields": {
+    "tipologia": 2,
+    "codigo": "567",
+    "nombre": "Dormitorio 1 (Segundo piso, fachada frontal)",
+    "descripcion": "",
+    "elementos_disponibles": [
+      "Cielo",
+      "Closet",
+      "Enchufes",
+      "Otro",
+      "Piso",
+      "Puerta",
+      "Revestimiento",
+      "bota agua"
+    ],
+    "activo": true
+  }
+},
+{
+  "model": "proyectos.recinto",
+  "pk": 41,
+  "fields": {
+    "tipologia": 3,
+    "codigo": "582",
+    "nombre": "Balcon",
+    "descripcion": "",
+    "elementos_disponibles": [],
+    "activo": true
+  }
+},
+{
+  "model": "proyectos.recinto",
+  "pk": 42,
+  "fields": {
+    "tipologia": 3,
+    "codigo": "578",
+    "nombre": "Escalera",
+    "descripcion": "",
+    "elementos_disponibles": [
+      "Cielo",
+      "Peldaños",
+      "Revestimiento",
+      "Ventana"
+    ],
+    "activo": true
+  }
+},
+{
+  "model": "proyectos.recinto",
+  "pk": 43,
+  "fields": {
+    "tipologia": 2,
+    "codigo": "569",
+    "nombre": "Balcon",
+    "descripcion": "",
+    "elementos_disponibles": [
+      "Bota Agua",
+      "Cerámica de piso",
+      "Puerta"
+    ],
+    "activo": true
+  }
+},
+{
+  "model": "proyectos.recinto",
+  "pk": 44,
+  "fields": {
+    "tipologia": 3,
+    "codigo": "576",
+    "nombre": "Logia",
+    "descripcion": "",
+    "elementos_disponibles": [
+      "Cielo",
+      "Conexión lavadora",
+      "Luz",
+      "Otro",
+      "Revestimiento",
+      "sellos"
+    ],
+    "activo": true
+  }
+},
+{
+  "model": "proyectos.recinto",
+  "pk": 45,
+  "fields": {
+    "tipologia": 2,
+    "codigo": "565",
+    "nombre": "Dormitorio 2 (Segundo piso, fachada trasera)",
+    "descripcion": "",
+    "elementos_disponibles": [
+      "Cielo",
+      "Enchufes",
+      "Piso",
+      "Revestimiento"
+    ],
+    "activo": true
+  }
+},
+{
+  "model": "proyectos.recinto",
+  "pk": 46,
+  "fields": {
+    "tipologia": 2,
+    "codigo": "566",
+    "nombre": "Escalera",
+    "descripcion": "",
+    "elementos_disponibles": [
+      "Peldaños",
+      "Revestimiento"
+    ],
+    "activo": true
+  }
+},
+{
+  "model": "proyectos.recinto",
+  "pk": 47,
+  "fields": {
+    "tipologia": 2,
+    "codigo": "559",
+    "nombre": "Fachada frontal",
+    "descripcion": "",
+    "elementos_disponibles": [
+      "Acceso",
+      "Puerta Acceso",
+      "Revestimiento",
+      "Tapa cámara inspección y cámara de registro"
+    ],
+    "activo": true
+  }
+},
+{
+  "model": "proyectos.recinto",
+  "pk": 48,
+  "fields": {
+    "tipologia": 6,
+    "codigo": "612",
+    "nombre": "Fachada posterior",
+    "descripcion": "",
+    "elementos_disponibles": [
+      "Canales y Cierre entre patios",
+      "Ventanas"
+    ],
+    "activo": true
+  }
+},
+{
+  "model": "proyectos.recinto",
+  "pk": 49,
+  "fields": {
+    "tipologia": 6,
+    "codigo": "620",
+    "nombre": "Otro",
+    "descripcion": "",
+    "elementos_disponibles": [],
+    "activo": true
+  }
+},
+{
+  "model": "proyectos.recinto",
+  "pk": 50,
+  "fields": {
+    "tipologia": 6,
+    "codigo": "615",
+    "nombre": "Cocina",
+    "descripcion": "",
+    "elementos_disponibles": [
+      "Cielo",
+      "Lavaplatos",
+      "Otro",
+      "Puerta a patio",
+      "Ventana"
+    ],
+    "activo": true
+  }
+},
+{
+  "model": "proyectos.recinto",
+  "pk": 51,
+  "fields": {
+    "tipologia": 1,
+    "codigo": "547",
+    "nombre": "Fachada frontal",
+    "descripcion": "",
+    "elementos_disponibles": [
+      "Acceso",
+      "Puerta Acceso",
+      "Revestimiento"
+    ],
+    "activo": true
+  }
+},
+{
+  "model": "proyectos.recinto",
+  "pk": 52,
+  "fields": {
+    "tipologia": 6,
+    "codigo": "610",
+    "nombre": "Fachada frontal",
+    "descripcion": "",
+    "elementos_disponibles": [
+      "Luz exterior",
+      "Revestimiento",
+      "Ventanas"
+    ],
+    "activo": true
+  }
+},
+{
+  "model": "proyectos.recinto",
+  "pk": 53,
+  "fields": {
+    "tipologia": 1,
+    "codigo": "558",
+    "nombre": "Otro",
+    "descripcion": "",
+    "elementos_disponibles": [],
+    "activo": true
+  }
+},
+{
+  "model": "proyectos.recinto",
+  "pk": 54,
+  "fields": {
+    "tipologia": 1,
+    "codigo": "552",
+    "nombre": "Logia",
+    "descripcion": "",
+    "elementos_disponibles": [
+      "Cielo",
+      "Conexión lavadora",
+      "Otro",
+      "Revestimiento"
+    ],
+    "activo": true
+  }
+},
+{
+  "model": "proyectos.recinto",
+  "pk": 55,
+  "fields": {
+    "tipologia": 1,
+    "codigo": "554",
+    "nombre": "Escalera",
+    "descripcion": "",
+    "elementos_disponibles": [
+      "Peldaños",
+      "Revestimiento"
+    ],
+    "activo": true
+  }
+},
+{
+  "model": "proyectos.recinto",
+  "pk": 56,
+  "fields": {
+    "tipologia": 3,
+    "codigo": "571",
+    "nombre": "Fachada frontal",
+    "descripcion": "",
+    "elementos_disponibles": [
+      "Acceso",
+      "Malla cierre",
+      "Medidor de Agua",
+      "Medidor de Luz",
+      "Puerta Acceso",
+      "Revestimiento",
+      "Tapa cámara inspección y cámara de registro"
+    ],
+    "activo": true
+  }
+},
+{
+  "model": "proyectos.recinto",
+  "pk": 57,
+  "fields": {
+    "tipologia": 6,
+    "codigo": "613",
+    "nombre": "Fachadas laterales",
+    "descripcion": "",
+    "elementos_disponibles": [
+      "Nicho de Gas",
+      "Revestimiento"
+    ],
+    "activo": true
+  }
+},
+{
+  "model": "proyectos.recinto",
+  "pk": 58,
+  "fields": {
+    "tipologia": 6,
+    "codigo": "619",
+    "nombre": "Baño",
+    "descripcion": "",
+    "elementos_disponibles": [
+      "Cerámica de piso",
+      "Lavamanos",
+      "Otro",
+      "Puerta",
+      "Tina",
+      "Ventana",
+      "WC"
+    ],
+    "activo": true
+  }
+},
+{
+  "model": "proyectos.recinto",
+  "pk": 59,
+  "fields": {
+    "tipologia": 6,
+    "codigo": "617",
+    "nombre": "Dormitorio 1 (fachada trasera)",
+    "descripcion": "",
+    "elementos_disponibles": [
+      "Piso",
+      "Puerta",
+      "Revestimiento",
+      "Ventana"
+    ],
+    "activo": true
+  }
+},
+{
+  "model": "proyectos.recinto",
+  "pk": 60,
+  "fields": {
+    "tipologia": 6,
+    "codigo": "618",
+    "nombre": "Dormitorio 2 (Da hacia fachada frontal)",
+    "descripcion": "",
+    "elementos_disponibles": [
+      "Cielo",
+      "Closet",
+      "Interruptor",
+      "Otro",
+      "Puerta",
+      "Revestimiento",
+      "Ventana"
+    ],
+    "activo": true
+  }
+},
+{
+  "model": "proyectos.recinto",
+  "pk": 61,
+  "fields": {
+    "tipologia": 6,
+    "codigo": "614",
+    "nombre": "Estar - comedor",
+    "descripcion": "",
+    "elementos_disponibles": [
+      "Otro",
+      "Piso",
+      "Puerta",
+      "tabiques"
+    ],
+    "activo": true
+  }
+},
+{
+  "model": "proyectos.recinto",
+  "pk": 62,
+  "fields": {
+    "tipologia": 5,
+    "codigo": "607",
+    "nombre": "Baño",
+    "descripcion": "",
+    "elementos_disponibles": [
+      "Otro"
+    ],
+    "activo": true
+  }
+},
+{
+  "model": "proyectos.recinto",
+  "pk": 63,
+  "fields": {
+    "tipologia": 4,
+    "codigo": "592",
+    "nombre": "Dormitorio 3 (Primer piso, fachada frontal)",
+    "descripcion": "",
+    "elementos_disponibles": [
+      "Cielo"
+    ],
+    "activo": true
+  }
+},
+{
+  "model": "proyectos.recinto",
+  "pk": 64,
+  "fields": {
+    "tipologia": 4,
+    "codigo": "585",
+    "nombre": "Fachada posterior",
+    "descripcion": "",
+    "elementos_disponibles": [
+      "Lavadero"
+    ],
+    "activo": true
+  }
+},
+{
+  "model": "proyectos.recinto",
+  "pk": 65,
+  "fields": {
+    "tipologia": 4,
+    "codigo": "593",
+    "nombre": "Dormitorio 1 (Segundo piso, fachada frontal)",
+    "descripcion": "",
+    "elementos_disponibles": [
+      "Revestimiento"
+    ],
+    "activo": true
+  }
+},
+{
+  "model": "proyectos.recinto",
+  "pk": 66,
+  "fields": {
+    "tipologia": 5,
+    "codigo": "601",
+    "nombre": "Cocina",
+    "descripcion": "",
+    "elementos_disponibles": [
+      "Revestimiento"
+    ],
+    "activo": true
+  }
+},
+{
+  "model": "proyectos.recinto",
+  "pk": 67,
+  "fields": {
+    "tipologia": 5,
+    "codigo": "604",
+    "nombre": "Escalera",
+    "descripcion": "",
+    "elementos_disponibles": [
+      "Peldaños"
+    ],
+    "activo": true
+  }
+},
+{
+  "model": "proyectos.recinto",
+  "pk": 68,
+  "fields": {
+    "tipologia": 3,
+    "codigo": "583",
+    "nombre": "Otro",
+    "descripcion": "",
+    "elementos_disponibles": [],
+    "activo": true
+  }
+},
+{
+  "model": "proyectos.recinto",
+  "pk": 69,
+  "fields": {
+    "tipologia": 1,
+    "codigo": "549",
+    "nombre": "Fachada laterales",
+    "descripcion": "",
+    "elementos_disponibles": [
+      "Revestimiento"
+    ],
+    "activo": true
+  }
+},
+{
+  "model": "proyectos.recinto",
+  "pk": 70,
+  "fields": {
+    "tipologia": 4,
+    "codigo": "594",
+    "nombre": "Baño",
+    "descripcion": "",
+    "elementos_disponibles": [
+      "Bota Agua",
+      "Cerámica de piso",
+      "Otro"
+    ],
+    "activo": true
+  }
+},
+{
+  "model": "proyectos.recinto",
+  "pk": 71,
+  "fields": {
+    "tipologia": 6,
+    "codigo": "611",
+    "nombre": "Acceso (fachada frontal)",
+    "descripcion": "",
+    "elementos_disponibles": [
+      "Rampa",
+      "baranda",
+      "pavimento"
+    ],
+    "activo": true
+  }
+},
+{
+  "model": "proyectos.recinto",
+  "pk": 72,
+  "fields": {
+    "tipologia": 6,
+    "codigo": "616",
+    "nombre": "Logia",
+    "descripcion": "",
+    "elementos_disponibles": [
+      "Otro"
+    ],
+    "activo": true
+  }
+},
+{
+  "model": "proyectos.recinto",
+  "pk": 73,
+  "fields": {
+    "tipologia": 2,
+    "codigo": "561",
+    "nombre": "Fachada laterales",
+    "descripcion": "",
+    "elementos_disponibles": [
+      "Revestimiento",
+      "Ventanas"
+    ],
+    "activo": true
+  }
+},
+{
+  "model": "proyectos.recinto",
+  "pk": 74,
+  "fields": {
+    "tipologia": 5,
+    "codigo": "605",
+    "nombre": "Dormitorio 3 (Primer piso, fachada frontal)",
+    "descripcion": "",
+    "elementos_disponibles": [
+      "Cielo",
+      "Piso",
+      "Puerta"
+    ],
+    "activo": true
+  }
+},
+{
+  "model": "proyectos.recinto",
+  "pk": 75,
+  "fields": {
+    "tipologia": 4,
+    "codigo": "588",
+    "nombre": "Cocina",
+    "descripcion": "",
+    "elementos_disponibles": [
+      "Lavaplatos"
+    ],
+    "activo": true
+  }
+},
+{
+  "model": "proyectos.recinto",
+  "pk": 76,
+  "fields": {
+    "tipologia": 5,
+    "codigo": "609",
+    "nombre": "Otro",
+    "descripcion": "",
+    "elementos_disponibles": [],
+    "activo": true
+  }
+},
+{
+  "model": "proyectos.recinto",
+  "pk": 77,
+  "fields": {
+    "tipologia": 5,
+    "codigo": "606",
+    "nombre": "Dormitorio 1 (Segundo piso, fachada frontal)",
+    "descripcion": "",
+    "elementos_disponibles": [
+      "Cerámica de piso",
+      "Cielo",
+      "Otro",
+      "Puerta"
+    ],
+    "activo": true
+  }
+},
+{
+  "model": "proyectos.recinto",
+  "pk": 78,
+  "fields": {
+    "tipologia": 5,
+    "codigo": "597",
+    "nombre": "Fachada frontal",
+    "descripcion": "",
+    "elementos_disponibles": [
+      "Medidor de Agua",
+      "Puerta Acceso"
+    ],
+    "activo": true
+  }
+},
+{
+  "model": "proyectos.beneficiario",
+  "pk": 1,
+  "fields": {
+    "nombre": "LUIS ANTONIO",
+    "apellido_paterno": "ALVARADO",
+    "apellido_materno": "PLAZA",
+    "rut": "11.222.531-5",
+    "email": "",
+    "activo": true
+  }
+},
+{
+  "model": "proyectos.beneficiario",
+  "pk": 2,
+  "fields": {
+    "nombre": "GLADYS DEL CARMEN",
+    "apellido_paterno": "APABLAZA",
+    "apellido_materno": "FREZ",
+    "rut": "5.954.230-3",
+    "email": "",
+    "activo": true
+  }
+},
+{
+  "model": "proyectos.beneficiario",
+  "pk": 3,
+  "fields": {
+    "nombre": "FRANCESCA DIANA",
+    "apellido_paterno": "SILVA",
+    "apellido_materno": "BRITO",
+    "rut": "4.051.644-1",
+    "email": "",
+    "activo": true
+  }
+},
+{
+  "model": "proyectos.beneficiario",
+  "pk": 4,
+  "fields": {
+    "nombre": "ORLANDO ENRIQUE",
+    "apellido_paterno": "ARAVENA",
+    "apellido_materno": "ARAVENA",
+    "rut": "7.351.173-9",
+    "email": "",
+    "activo": true
+  }
+},
+{
+  "model": "proyectos.beneficiario",
+  "pk": 5,
+  "fields": {
+    "nombre": "ISABEL ROSA",
+    "apellido_paterno": "MOLINA",
+    "apellido_materno": "GOMEZ",
+    "rut": "2.105.778-9",
+    "email": "",
+    "activo": true
+  }
+},
+{
+  "model": "proyectos.beneficiario",
+  "pk": 6,
+  "fields": {
+    "nombre": "ELIANA DEL CARMEN",
+    "apellido_paterno": "ARAVENA",
+    "apellido_materno": "SANHUEZA",
+    "rut": "9.193.812-K",
+    "email": "",
+    "activo": true
+  }
+},
+{
+  "model": "proyectos.beneficiario",
+  "pk": 7,
+  "fields": {
+    "nombre": "MARGARITA LUISA",
+    "apellido_paterno": "ARAVENA",
+    "apellido_materno": "SANHUEZA",
+    "rut": "8.624.859-K",
+    "email": "",
+    "activo": true
+  }
+},
+{
+  "model": "proyectos.beneficiario",
+  "pk": 8,
+  "fields": {
+    "nombre": "SENÉN DEL CARMEN",
+    "apellido_paterno": "BARRAZA",
+    "apellido_materno": "PIZARRO",
+    "rut": "5.182.582-9",
+    "email": "",
+    "activo": true
+  }
+},
+{
+  "model": "proyectos.beneficiario",
+  "pk": 9,
+  "fields": {
+    "nombre": "MARÍA ELIANA",
+    "apellido_paterno": "BRICEÑO",
+    "apellido_materno": "VERGARA",
+    "rut": "8.897.775-0",
+    "email": "",
+    "activo": true
+  }
+},
+{
+  "model": "proyectos.beneficiario",
+  "pk": 10,
+  "fields": {
+    "nombre": "ANGELA DE LAS MERCEDES",
+    "apellido_paterno": "VELASQUEZ",
+    "apellido_materno": "APABLAZA",
+    "rut": "4.923.087-7",
+    "email": "",
+    "activo": true
+  }
+},
+{
+  "model": "proyectos.beneficiario",
+  "pk": 11,
+  "fields": {
+    "nombre": "LAURA ANDREA",
+    "apellido_paterno": "BRITO",
+    "apellido_materno": "VELÁSQUEZ",
+    "rut": "13.541.280-5",
+    "email": "",
+    "activo": true
+  }
+},
+{
+  "model": "proyectos.beneficiario",
+  "pk": 12,
+  "fields": {
+    "nombre": "JEANETTE VERÓNICA",
+    "apellido_paterno": "BRUNA",
+    "apellido_materno": "MUÑOZ",
+    "rut": "11.195.360-0",
+    "email": "",
+    "activo": true
+  }
+},
+{
+  "model": "proyectos.beneficiario",
+  "pk": 13,
+  "fields": {
+    "nombre": "CLAUDIA FRANCISCA",
+    "apellido_paterno": "BUGUEÑO",
+    "apellido_materno": "PIZARRO",
+    "rut": "19.048.066-6",
+    "email": "",
+    "activo": true
+  }
+},
+{
+  "model": "proyectos.beneficiario",
+  "pk": 14,
+  "fields": {
+    "nombre": "CARLA YESENIA",
+    "apellido_paterno": "BUSTAMANTE",
+    "apellido_materno": "ARAVENA",
+    "rut": "17.208.922-4",
+    "email": "",
+    "activo": true
+  }
+},
+{
+  "model": "proyectos.beneficiario",
+  "pk": 15,
+  "fields": {
+    "nombre": "GUILLERMO",
+    "apellido_paterno": "BUSTAMANTE",
+    "apellido_materno": "",
+    "rut": "2.703.000-9",
+    "email": "",
+    "activo": true
+  }
+},
+{
+  "model": "proyectos.beneficiario",
+  "pk": 16,
+  "fields": {
+    "nombre": "WALDO JOSÉ",
+    "apellido_paterno": "CÁCERES",
+    "apellido_materno": "MOLINA",
+    "rut": "16.539.492-5",
+    "email": "",
+    "activo": true
+  }
+},
+{
+  "model": "proyectos.beneficiario",
+  "pk": 17,
+  "fields": {
+    "nombre": "CLARIZA DEL CARMEN",
+    "apellido_paterno": "CAMUS",
+    "apellido_materno": "JENERAL",
+    "rut": "5.483.368-7",
+    "email": "",
+    "activo": true
+  }
+},
+{
+  "model": "proyectos.beneficiario",
+  "pk": 18,
+  "fields": {
+    "nombre": "ANA MARÍA",
+    "apellido_paterno": "CANELO",
+    "apellido_materno": "FIGUEROA",
+    "rut": "8.384.568-6",
+    "email": "",
+    "activo": true
+  }
+},
+{
+  "model": "proyectos.beneficiario",
+  "pk": 19,
+  "fields": {
+    "nombre": "LUIS ANTONIO",
+    "apellido_paterno": "CID",
+    "apellido_materno": "CASTILLO",
+    "rut": "16.365.007-K",
+    "email": "",
+    "activo": true
+  }
+},
+{
+  "model": "proyectos.beneficiario",
+  "pk": 20,
+  "fields": {
+    "nombre": "REBECA DEL CARMEN",
+    "apellido_paterno": "COFRÉ",
+    "apellido_materno": "OLIVARES",
+    "rut": "12.952.598-3",
+    "email": "",
+    "activo": true
+  }
+},
+{
+  "model": "proyectos.beneficiario",
+  "pk": 21,
+  "fields": {
+    "nombre": "MARÍA VERÓNICA",
+    "apellido_paterno": "CORTEZ",
+    "apellido_materno": "CARDEMIL",
+    "rut": "9.547.723-2",
+    "email": "",
+    "activo": true
+  }
+},
+{
+  "model": "proyectos.beneficiario",
+  "pk": 22,
+  "fields": {
+    "nombre": "CARLA JAVIERA",
+    "apellido_paterno": "CUELLO",
+    "apellido_materno": "HUERTA",
+    "rut": "18.510.325-0",
+    "email": "",
+    "activo": true
+  }
+},
+{
+  "model": "proyectos.beneficiario",
+  "pk": 23,
+  "fields": {
+    "nombre": "JOSÉ MIGUEL",
+    "apellido_paterno": "DONOSO",
+    "apellido_materno": "ARAVENA",
+    "rut": "15.818.040-5",
+    "email": "",
+    "activo": true
+  }
+},
+{
+  "model": "proyectos.beneficiario",
+  "pk": 24,
+  "fields": {
+    "nombre": "JAIME FRANCISCO",
+    "apellido_paterno": "DONOSO",
+    "apellido_materno": "MIÑO",
+    "rut": "8.676.713-9",
+    "email": "",
+    "activo": true
+  }
+},
+{
+  "model": "proyectos.beneficiario",
+  "pk": 25,
+  "fields": {
+    "nombre": "RAÚL ERNESTO",
+    "apellido_paterno": "ESPINOZA",
+    "apellido_materno": "FERNÁNDEZ",
+    "rut": "8.070.443-7",
+    "email": "",
+    "activo": true
+  }
+},
+{
+  "model": "proyectos.beneficiario",
+  "pk": 26,
+  "fields": {
+    "nombre": "EVELYN MACARENA",
+    "apellido_paterno": "FIGUEROA",
+    "apellido_materno": "MATURANA",
+    "rut": "15.063.219-6",
+    "email": "",
+    "activo": true
+  }
+},
+{
+  "model": "proyectos.beneficiario",
+  "pk": 27,
+  "fields": {
+    "nombre": "ELENA DEL TRÁNSITO",
+    "apellido_paterno": "HENRÍQUEZ",
+    "apellido_materno": "CORTÉS",
+    "rut": "4.748.093-0",
+    "email": "",
+    "activo": true
+  }
+},
+{
+  "model": "proyectos.beneficiario",
+  "pk": 28,
+  "fields": {
+    "nombre": "JONNY FABIAN",
+    "apellido_paterno": "TOLEDE",
+    "apellido_materno": "LEDEZMA",
+    "rut": "18.660.750-3",
+    "email": "",
+    "activo": true
+  }
+},
+{
+  "model": "proyectos.beneficiario",
+  "pk": 29,
+  "fields": {
+    "nombre": "LUIS EDUARDO",
+    "apellido_paterno": "HERRERA",
+    "apellido_materno": "HERRERA",
+    "rut": "7.975.298-3",
+    "email": "",
+    "activo": true
+  }
+},
+{
+  "model": "proyectos.beneficiario",
+  "pk": 30,
+  "fields": {
+    "nombre": "ALEJANDRA DEL CARMEN",
+    "apellido_paterno": "HUERTA",
+    "apellido_materno": "GÓMEZ",
+    "rut": "11.970.839-7",
+    "email": "",
+    "activo": true
+  }
+},
+{
+  "model": "proyectos.beneficiario",
+  "pk": 31,
+  "fields": {
+    "nombre": "ROSA MARÍA",
+    "apellido_paterno": "HUERTA",
+    "apellido_materno": "GÓMEZ",
+    "rut": "12.819.349-9",
+    "email": "",
+    "activo": true
+  }
+},
+{
+  "model": "proyectos.beneficiario",
+  "pk": 32,
+  "fields": {
+    "nombre": "LIDIA ELIZABETH",
+    "apellido_paterno": "LARA",
+    "apellido_materno": "VARGAS",
+    "rut": "7.142.783-8",
+    "email": "",
+    "activo": true
+  }
+},
+{
+  "model": "proyectos.beneficiario",
+  "pk": 33,
+  "fields": {
+    "nombre": "RICARDO ALEJANDRO",
+    "apellido_paterno": "LARA",
+    "apellido_materno": "BRICEÑO",
+    "rut": "9.562.641-6",
+    "email": "",
+    "activo": true
+  }
+},
+{
+  "model": "proyectos.beneficiario",
+  "pk": 34,
+  "fields": {
+    "nombre": "PEDRO ANTONIO",
+    "apellido_paterno": "LASTRA",
+    "apellido_materno": "GUTIÉRREZ",
+    "rut": "7.462.556-8",
+    "email": "",
+    "activo": true
+  }
+},
+{
+  "model": "proyectos.beneficiario",
+  "pk": 35,
+  "fields": {
+    "nombre": "AMELIA JANETTE",
+    "apellido_paterno": "LEDEZMA",
+    "apellido_materno": "HENRÍQUEZ",
+    "rut": "8.634.522-6",
+    "email": "",
+    "activo": true
+  }
+},
+{
+  "model": "proyectos.beneficiario",
+  "pk": 36,
+  "fields": {
+    "nombre": "CRISTINA DEL CARMEN",
+    "apellido_paterno": "LEDEZMA",
+    "apellido_materno": "HENRÍQUEZ",
+    "rut": "12.819.363-4",
+    "email": "",
+    "activo": true
+  }
+},
+{
+  "model": "proyectos.beneficiario",
+  "pk": 37,
+  "fields": {
+    "nombre": "JACQUELINE DE LAS MERCEDES",
+    "apellido_paterno": "LEYTON",
+    "apellido_materno": "REYES",
+    "rut": "9.667.068-0",
+    "email": "",
+    "activo": true
+  }
+},
+{
+  "model": "proyectos.beneficiario",
+  "pk": 38,
+  "fields": {
+    "nombre": "MARÍA MERCEDES",
+    "apellido_paterno": "LÓPEZ",
+    "apellido_materno": "OLIVARES",
+    "rut": "7.673.420-8",
+    "email": "",
+    "activo": true
+  }
+},
+{
+  "model": "proyectos.beneficiario",
+  "pk": 39,
+  "fields": {
+    "nombre": "ENRIQUE ORLANDO",
+    "apellido_paterno": "LÓPEZ",
+    "apellido_materno": "PÉREZ",
+    "rut": "5.611.348-7",
+    "email": "",
+    "activo": true
+  }
+},
+{
+  "model": "proyectos.beneficiario",
+  "pk": 40,
+  "fields": {
+    "nombre": "ROSA DEL ROSARIO",
+    "apellido_paterno": "MATURANA",
+    "apellido_materno": "HERRERA",
+    "rut": "6.954.437-1",
+    "email": "",
+    "activo": true
+  }
+},
+{
+  "model": "proyectos.beneficiario",
+  "pk": 41,
+  "fields": {
+    "nombre": "YURI ELIZABETH",
+    "apellido_paterno": "MEDINA",
+    "apellido_materno": "FERNÁNDEZ",
+    "rut": "9.059.429-K",
+    "email": "",
+    "activo": true
+  }
+},
+{
+  "model": "proyectos.beneficiario",
+  "pk": 42,
+  "fields": {
+    "nombre": "MARÍA DEL CARMEN",
+    "apellido_paterno": "MEJÍAS",
+    "apellido_materno": "ASTUDILLO",
+    "rut": "10.953.116-2",
+    "email": "",
+    "activo": true
+  }
+},
+{
+  "model": "proyectos.beneficiario",
+  "pk": 43,
+  "fields": {
+    "nombre": "MARÍA VIOLETA",
+    "apellido_paterno": "MENDOZA",
+    "apellido_materno": "ROJAS",
+    "rut": "8.396.858-3",
+    "email": "",
+    "activo": true
+  }
+},
+{
+  "model": "proyectos.beneficiario",
+  "pk": 44,
+  "fields": {
+    "nombre": "LUIS ALBERTO",
+    "apellido_paterno": "MINAY",
+    "apellido_materno": "BRIONES",
+    "rut": "11.136.550-4",
+    "email": "",
+    "activo": true
+  }
+},
+{
+  "model": "proyectos.beneficiario",
+  "pk": 45,
+  "fields": {
+    "nombre": "JOHANNA ANDREA",
+    "apellido_paterno": "MINAY",
+    "apellido_materno": "FARÍAS",
+    "rut": "14.253.017-1",
+    "email": "",
+    "activo": true
+  }
+},
+{
+  "model": "proyectos.beneficiario",
+  "pk": 46,
+  "fields": {
+    "nombre": "CECILIA DEL CARMEN",
+    "apellido_paterno": "MOLINA",
+    "apellido_materno": "GÓMEZ",
+    "rut": "11.387.874-6",
+    "email": "",
+    "activo": true
+  }
+},
+{
+  "model": "proyectos.beneficiario",
+  "pk": 47,
+  "fields": {
+    "nombre": "RICARDO ALFONSO",
+    "apellido_paterno": "MOLINA",
+    "apellido_materno": "MOLINA",
+    "rut": "10.440.576-2",
+    "email": "",
+    "activo": true
+  }
+},
+{
+  "model": "proyectos.beneficiario",
+  "pk": 48,
+  "fields": {
+    "nombre": "FRANCISCO JAVIER",
+    "apellido_paterno": "MOLINA",
+    "apellido_materno": "PIZARRO",
+    "rut": "16.539.333-3",
+    "email": "",
+    "activo": true
+  }
+},
+{
+  "model": "proyectos.beneficiario",
+  "pk": 49,
+  "fields": {
+    "nombre": "CARLA LISSETTE",
+    "apellido_paterno": "NÚÑEZ",
+    "apellido_materno": "CORVACHO",
+    "rut": "17.655.036-8",
+    "email": "",
+    "activo": true
+  }
+},
+{
+  "model": "proyectos.beneficiario",
+  "pk": 50,
+  "fields": {
+    "nombre": "OLIVER HÉCTOR",
+    "apellido_paterno": "OLIVARES",
+    "apellido_materno": "POZO",
+    "rut": "13.763.412-0",
+    "email": "",
+    "activo": true
+  }
+},
+{
+  "model": "proyectos.beneficiario",
+  "pk": 51,
+  "fields": {
+    "nombre": "KARINA ALEJANDRA",
+    "apellido_paterno": "OLMOS",
+    "apellido_materno": "CAMUS",
+    "rut": "16.540.045-3",
+    "email": "",
+    "activo": true
+  }
+},
+{
+  "model": "proyectos.beneficiario",
+  "pk": 52,
+  "fields": {
+    "nombre": "LUIS HUMBERTO",
+    "apellido_paterno": "ORMEÑO",
+    "apellido_materno": "CAÑETE",
+    "rut": "4.800.003-7",
+    "email": "",
+    "activo": true
+  }
+},
+{
+  "model": "proyectos.beneficiario",
+  "pk": 53,
+  "fields": {
+    "nombre": "MIRIAM PATRICIA",
+    "apellido_paterno": "PÁEZ",
+    "apellido_materno": "ARAVENA",
+    "rut": "11.732.531-8",
+    "email": "",
+    "activo": true
+  }
+},
+{
+  "model": "proyectos.beneficiario",
+  "pk": 54,
+  "fields": {
+    "nombre": "ELEAZAR JOSUE",
+    "apellido_paterno": "PARRAGUEZ",
+    "apellido_materno": "TOLEDO",
+    "rut": "18.018.112-1",
+    "email": "",
+    "activo": true
+  }
+},
+{
+  "model": "proyectos.beneficiario",
+  "pk": 55,
+  "fields": {
+    "nombre": "LORENA DEL CARMEN",
+    "apellido_paterno": "PAZ",
+    "apellido_materno": "AHUMADA",
+    "rut": "10.542.927-4",
+    "email": "",
+    "activo": true
+  }
+},
+{
+  "model": "proyectos.beneficiario",
+  "pk": 56,
+  "fields": {
+    "nombre": "LUIS RUBÉN",
+    "apellido_paterno": "PAZ",
+    "apellido_materno": "LÓPEZ",
+    "rut": "5.423.268-3",
+    "email": "",
+    "activo": true
+  }
+},
+{
+  "model": "proyectos.beneficiario",
+  "pk": 57,
+  "fields": {
+    "nombre": "ANA MARÍA",
+    "apellido_paterno": "PEREIRA",
+    "apellido_materno": "GARRIDO",
+    "rut": "9.492.436-7",
+    "email": "",
+    "activo": true
+  }
+},
+{
+  "model": "proyectos.beneficiario",
+  "pk": 58,
+  "fields": {
+    "nombre": "FABIOLA ROSA",
+    "apellido_paterno": "PINEDA",
+    "apellido_materno": "SEPÚLVEDA",
+    "rut": "13.753.985-3",
+    "email": "",
+    "activo": true
+  }
+},
+{
+  "model": "proyectos.beneficiario",
+  "pk": 59,
+  "fields": {
+    "nombre": "OLGA ESTER",
+    "apellido_paterno": "PINOCHET",
+    "apellido_materno": "ARANCIBIA",
+    "rut": "9.025.989-K",
+    "email": "",
+    "activo": true
+  }
+},
+{
+  "model": "proyectos.beneficiario",
+  "pk": 60,
+  "fields": {
+    "nombre": "CLAUDIA CECILIA",
+    "apellido_paterno": "PIZARRO",
+    "apellido_materno": "TAPIA",
+    "rut": "10.905.629-4",
+    "email": "",
+    "activo": true
+  }
+},
+{
+  "model": "proyectos.beneficiario",
+  "pk": 61,
+  "fields": {
+    "nombre": "MARÍA CRISTINA",
+    "apellido_paterno": "PIZARRO",
+    "apellido_materno": "VELÁSQUEZ",
+    "rut": "11.010.283-6",
+    "email": "",
+    "activo": true
+  }
+},
+{
+  "model": "proyectos.beneficiario",
+  "pk": 62,
+  "fields": {
+    "nombre": "EVA MAGDALENA",
+    "apellido_paterno": "RAIN",
+    "apellido_materno": "TAPIA",
+    "rut": "15.817.866-4",
+    "email": "",
+    "activo": true
+  }
+},
+{
+  "model": "proyectos.beneficiario",
+  "pk": 63,
+  "fields": {
+    "nombre": "NOEMÍ MARLENE",
+    "apellido_paterno": "RAIN",
+    "apellido_materno": "TAPIA",
+    "rut": "12.952.089-2",
+    "email": "",
+    "activo": true
+  }
+},
+{
+  "model": "proyectos.beneficiario",
+  "pk": 64,
+  "fields": {
+    "nombre": "CARLOS ENRIQUE",
+    "apellido_paterno": "RETAMAL",
+    "apellido_materno": "FIERRO",
+    "rut": "7.591.691-4",
+    "email": "",
+    "activo": true
+  }
+},
+{
+  "model": "proyectos.beneficiario",
+  "pk": 65,
+  "fields": {
+    "nombre": "CARLOS MANUEL",
+    "apellido_paterno": "RETAMAL",
+    "apellido_materno": "SALINAS",
+    "rut": "13.187.655-6",
+    "email": "",
+    "activo": true
+  }
+},
+{
+  "model": "proyectos.beneficiario",
+  "pk": 66,
+  "fields": {
+    "nombre": "NELLY ISABEL",
+    "apellido_paterno": "RETAMAL",
+    "apellido_materno": "SALINAS",
+    "rut": "15.063.012-6",
+    "email": "",
+    "activo": true
+  }
+},
+{
+  "model": "proyectos.beneficiario",
+  "pk": 67,
+  "fields": {
+    "nombre": "KENY SUSANA",
+    "apellido_paterno": "REYES",
+    "apellido_materno": "LEDEZMA",
+    "rut": "13.365.524-7",
+    "email": "",
+    "activo": true
+  }
+},
+{
+  "model": "proyectos.beneficiario",
+  "pk": 68,
+  "fields": {
+    "nombre": "LORENA ISABEL",
+    "apellido_paterno": "REYES",
+    "apellido_materno": "LEDEZMA",
+    "rut": "13.763.394-9",
+    "email": "",
+    "activo": true
+  }
+},
+{
+  "model": "proyectos.beneficiario",
+  "pk": 69,
+  "fields": {
+    "nombre": "ANA DE LAS MERCEDES",
+    "apellido_paterno": "RIVERA",
+    "apellido_materno": "BERNAL",
+    "rut": "7.280.581-K",
+    "email": "",
+    "activo": true
+  }
+},
+{
+  "model": "proyectos.beneficiario",
+  "pk": 70,
+  "fields": {
+    "nombre": "ARTURO DEL CARMEN",
+    "apellido_paterno": "RIVERA",
+    "apellido_materno": "PLAZA",
+    "rut": "8.030.627-K",
+    "email": "",
+    "activo": true
+  }
+},
+{
+  "model": "proyectos.beneficiario",
+  "pk": 71,
+  "fields": {
+    "nombre": "NIEVE ALBINA",
+    "apellido_paterno": "ROBLEDO",
+    "apellido_materno": "VERGARA",
+    "rut": "9.828.399-4",
+    "email": "",
+    "activo": true
+  }
+},
+{
+  "model": "proyectos.beneficiario",
+  "pk": 72,
+  "fields": {
+    "nombre": "JESSICA LORETO",
+    "apellido_paterno": "ROJAS",
+    "apellido_materno": "CANELO",
+    "rut": "13.764.259-K",
+    "email": "",
+    "activo": true
+  }
+},
+{
+  "model": "proyectos.beneficiario",
+  "pk": 73,
+  "fields": {
+    "nombre": "FRANCISCO JAVIER",
+    "apellido_paterno": "SOTO",
+    "apellido_materno": "BUSTAMANTE",
+    "rut": "5.626.524-4",
+    "email": "",
+    "activo": true
+  }
+},
+{
+  "model": "proyectos.beneficiario",
+  "pk": 74,
+  "fields": {
+    "nombre": "OLGA MARÍA",
+    "apellido_paterno": "ROZAS",
+    "apellido_materno": "TOBAR",
+    "rut": "8.783.477-8",
+    "email": "",
+    "activo": true
+  }
+},
+{
+  "model": "proyectos.beneficiario",
+  "pk": 75,
+  "fields": {
+    "nombre": "ANA MARÍA",
+    "apellido_paterno": "SEPÚLVEDA",
+    "apellido_materno": "MAUREIRA",
+    "rut": "7.281.531-9",
+    "email": "test@test.cl",
+    "activo": true
+  }
+},
+{
+  "model": "proyectos.beneficiario",
+  "pk": 76,
+  "fields": {
+    "nombre": "ROSA DE LAS MERCEDES",
+    "apellido_paterno": "SEPÚLVEDA",
+    "apellido_materno": "MAUREIRA",
+    "rut": "6.398.111-7",
+    "email": "",
+    "activo": true
+  }
+},
+{
+  "model": "proyectos.beneficiario",
+  "pk": 77,
+  "fields": {
+    "nombre": "ANA MARÍA",
+    "apellido_paterno": "SILVA",
+    "apellido_materno": "CAMUS",
+    "rut": "15.063.342-7",
+    "email": "",
+    "activo": true
+  }
+},
+{
+  "model": "proyectos.beneficiario",
+  "pk": 78,
+  "fields": {
+    "nombre": "HILDA DE LAS MERCEDES",
+    "apellido_paterno": "TOBAR",
+    "apellido_materno": "VELÁSQUEZ",
+    "rut": "10.598.146-5",
+    "email": "",
+    "activo": true
+  }
+},
+{
+  "model": "proyectos.beneficiario",
+  "pk": 79,
+  "fields": {
+    "nombre": "JUAN BAUTISTA",
+    "apellido_paterno": "TOLEDO",
+    "apellido_materno": "HERRERA",
+    "rut": "6.482.911-4",
+    "email": "",
+    "activo": true
+  }
+},
+{
+  "model": "proyectos.beneficiario",
+  "pk": 80,
+  "fields": {
+    "nombre": "RACHEL ALICIA",
+    "apellido_paterno": "TOLEDO",
+    "apellido_materno": "HERRERA",
+    "rut": "10.167.065-1",
+    "email": "",
+    "activo": true
+  }
+},
+{
+  "model": "proyectos.beneficiario",
+  "pk": 81,
+  "fields": {
+    "nombre": "SAMUEL SEGUNDO",
+    "apellido_paterno": "TOLEDO",
+    "apellido_materno": "HERRERA",
+    "rut": "6.097.611-2",
+    "email": "",
+    "activo": true
+  }
+},
+{
+  "model": "proyectos.beneficiario",
+  "pk": 83,
+  "fields": {
+    "nombre": "CINTHYA FRANCESCA",
+    "apellido_paterno": "VARGAS",
+    "apellido_materno": "QUIÑONES",
+    "rut": "16.287.835-2",
+    "email": "",
+    "activo": true
+  }
+},
+{
+  "model": "proyectos.beneficiario",
+  "pk": 84,
+  "fields": {
+    "nombre": "DANILO ANTONIO",
+    "apellido_paterno": "VELÁSQUEZ",
+    "apellido_materno": "MOLINA",
+    "rut": "14.387.305-6",
+    "email": "",
+    "activo": true
+  }
+},
+{
+  "model": "proyectos.beneficiario",
+  "pk": 85,
+  "fields": {
+    "nombre": "MARÍA ELENA",
+    "apellido_paterno": "VELÁSQUEZ",
+    "apellido_materno": "TAPIA",
+    "rut": "5.506.779-1",
+    "email": "",
+    "activo": true
+  }
+},
+{
+  "model": "proyectos.beneficiario",
+  "pk": 86,
+  "fields": {
+    "nombre": "KAREN ELOÍSA",
+    "apellido_paterno": "VERGARA",
+    "apellido_materno": "NAVARRO",
+    "rut": "13.763.387-6",
+    "email": "",
+    "activo": true
+  }
+},
+{
+  "model": "proyectos.beneficiario",
+  "pk": 87,
+  "fields": {
+    "nombre": "MARGARITA DEL CARMEN",
+    "apellido_paterno": "HERRERA",
+    "apellido_materno": "VALDIVIA",
+    "rut": "4.919.264-9",
+    "email": "",
+    "activo": true
+  }
+},
+{
+  "model": "proyectos.beneficiario",
+  "pk": 89,
+  "fields": {
+    "nombre": "Rodrigo",
+    "apellido_paterno": "Faundez",
+    "apellido_materno": "Vidal",
+    "rut": "13.496.544-4",
+    "email": "rfaundez.rodrigo@gmail.com",
+    "activo": true
+  }
+},
+{
+  "model": "proyectos.beneficiario",
+  "pk": 90,
+  "fields": {
+    "nombre": "Juan",
+    "apellido_paterno": "Pérez",
+    "apellido_materno": "González",
+    "rut": "12345678-9",
+    "email": "familia@beneficiario.cl",
+    "activo": true
+  }
+},
+{
+  "model": "proyectos.beneficiario",
+  "pk": 93,
+  "fields": {
+    "nombre": "María",
+    "apellido_paterno": "González",
+    "apellido_materno": "López",
+    "rut": "98765432-1",
+    "email": "maria.gonzalez@beneficiario.cl",
+    "activo": true
+  }
+},
+{
+  "model": "proyectos.beneficiario",
+  "pk": 94,
+  "fields": {
+    "nombre": "Rodrigo",
+    "apellido_paterno": "Vidal",
+    "apellido_materno": "Andrade",
+    "rut": "13722575-1",
+    "email": "rod.faundez@duocuc.cl",
+    "activo": true
+  }
+},
+{
+  "model": "proyectos.telefono",
+  "pk": 2,
+  "fields": {
+    "beneficiario": 89,
+    "numero": "999996687",
+    "activo": true
+  }
+},
+{
+  "model": "proyectos.telefono",
+  "pk": 3,
+  "fields": {
+    "beneficiario": 75,
+    "numero": "999999999",
+    "activo": true
+  }
+},
+{
+  "model": "proyectos.vivienda",
+  "pk": 1,
+  "fields": {
+    "proyecto": 1,
+    "tipologia": 1,
+    "codigo": "1",
+    "familia_beneficiaria": "Faundez",
+    "beneficiario": null,
+    "estado": "entregada",
+    "fecha_entrega": "2026-02-02",
+    "fecha_inicio_postventa": null,
+    "fecha_termino_postventa": null,
+    "observaciones_generales": "",
+    "activa": false,
+    "fecha_creacion": "2025-10-01T19:46:19.376Z",
+    "fecha_actualizacion": "2025-10-11T15:46:29.355Z"
+  }
+},
+{
+  "model": "proyectos.vivienda",
+  "pk": 2,
+  "fields": {
+    "proyecto": 2,
+    "tipologia": 3,
+    "codigo": "758",
+    "familia_beneficiaria": "JAIME FRANCISCO DONOSO MIÑO",
+    "beneficiario": 24,
+    "estado": "construccion",
+    "fecha_entrega": null,
+    "fecha_inicio_postventa": null,
+    "fecha_termino_postventa": null,
+    "observaciones_generales": "",
+    "activa": true,
+    "fecha_creacion": "2025-10-02T20:36:06.487Z",
+    "fecha_actualizacion": "2025-10-02T21:08:24.937Z"
+  }
+},
+{
+  "model": "proyectos.vivienda",
+  "pk": 3,
+  "fields": {
+    "proyecto": 2,
+    "tipologia": 1,
+    "codigo": "748",
+    "familia_beneficiaria": "CARLA YESENIA BUSTAMANTE ARAVENA",
+    "beneficiario": 14,
+    "estado": "construccion",
+    "fecha_entrega": null,
+    "fecha_inicio_postventa": null,
+    "fecha_termino_postventa": null,
+    "observaciones_generales": "",
+    "activa": true,
+    "fecha_creacion": "2025-10-02T20:36:06.493Z",
+    "fecha_actualizacion": "2025-10-02T21:08:24.847Z"
+  }
+},
+{
+  "model": "proyectos.vivienda",
+  "pk": 4,
+  "fields": {
+    "proyecto": 2,
+    "tipologia": 2,
+    "codigo": "759",
+    "familia_beneficiaria": "RAÚL ERNESTO ESPINOZA FERNÁNDEZ",
+    "beneficiario": 25,
+    "estado": "construccion",
+    "fecha_entrega": null,
+    "fecha_inicio_postventa": null,
+    "fecha_termino_postventa": null,
+    "observaciones_generales": "",
+    "activa": true,
+    "fecha_creacion": "2025-10-02T20:36:06.499Z",
+    "fecha_actualizacion": "2025-10-02T21:08:24.946Z"
+  }
+},
+{
+  "model": "proyectos.vivienda",
+  "pk": 5,
+  "fields": {
+    "proyecto": 2,
+    "tipologia": 2,
+    "codigo": "735",
+    "familia_beneficiaria": "LUIS ANTONIO ALVARADO PLAZA",
+    "beneficiario": 1,
+    "estado": "construccion",
+    "fecha_entrega": null,
+    "fecha_inicio_postventa": null,
+    "fecha_termino_postventa": null,
+    "observaciones_generales": "",
+    "activa": true,
+    "fecha_creacion": "2025-10-02T20:36:06.506Z",
+    "fecha_actualizacion": "2025-10-02T21:08:24.713Z"
+  }
+},
+{
+  "model": "proyectos.vivienda",
+  "pk": 6,
+  "fields": {
+    "proyecto": 2,
+    "tipologia": 4,
+    "codigo": "740",
+    "familia_beneficiaria": "ELIANA DEL CARMEN ARAVENA SANHUEZA",
+    "beneficiario": 6,
+    "estado": "construccion",
+    "fecha_entrega": null,
+    "fecha_inicio_postventa": null,
+    "fecha_termino_postventa": null,
+    "observaciones_generales": "",
+    "activa": true,
+    "fecha_creacion": "2025-10-02T20:36:06.511Z",
+    "fecha_actualizacion": "2025-10-02T21:08:24.775Z"
+  }
+},
+{
+  "model": "proyectos.vivienda",
+  "pk": 7,
+  "fields": {
+    "proyecto": 2,
+    "tipologia": 3,
+    "codigo": "753",
+    "familia_beneficiaria": "LUIS ANTONIO CID CASTILLO",
+    "beneficiario": 19,
+    "estado": "construccion",
+    "fecha_entrega": null,
+    "fecha_inicio_postventa": null,
+    "fecha_termino_postventa": null,
+    "observaciones_generales": "",
+    "activa": true,
+    "fecha_creacion": "2025-10-02T20:36:06.516Z",
+    "fecha_actualizacion": "2025-10-02T21:08:24.894Z"
+  }
+},
+{
+  "model": "proyectos.vivienda",
+  "pk": 8,
+  "fields": {
+    "proyecto": 2,
+    "tipologia": 3,
+    "codigo": "760",
+    "familia_beneficiaria": "EVELYN MACARENA FIGUEROA MATURANA",
+    "beneficiario": 26,
+    "estado": "construccion",
+    "fecha_entrega": null,
+    "fecha_inicio_postventa": null,
+    "fecha_termino_postventa": null,
+    "observaciones_generales": "",
+    "activa": true,
+    "fecha_creacion": "2025-10-02T20:36:06.523Z",
+    "fecha_actualizacion": "2025-10-02T21:08:24.956Z"
+  }
+},
+{
+  "model": "proyectos.vivienda",
+  "pk": 9,
+  "fields": {
+    "proyecto": 2,
+    "tipologia": 3,
+    "codigo": "750",
+    "familia_beneficiaria": "WALDO JOSÉ CÁCERES MOLINA",
+    "beneficiario": 16,
+    "estado": "construccion",
+    "fecha_entrega": null,
+    "fecha_inicio_postventa": null,
+    "fecha_termino_postventa": null,
+    "observaciones_generales": "",
+    "activa": true,
+    "fecha_creacion": "2025-10-02T20:36:06.529Z",
+    "fecha_actualizacion": "2025-10-02T21:08:24.866Z"
+  }
+},
+{
+  "model": "proyectos.vivienda",
+  "pk": 10,
+  "fields": {
+    "proyecto": 2,
+    "tipologia": 3,
+    "codigo": "754",
+    "familia_beneficiaria": "REBECA DEL CARMEN COFRÉ OLIVARES",
+    "beneficiario": 20,
+    "estado": "construccion",
+    "fecha_entrega": null,
+    "fecha_inicio_postventa": null,
+    "fecha_termino_postventa": null,
+    "observaciones_generales": "",
+    "activa": true,
+    "fecha_creacion": "2025-10-02T20:36:06.535Z",
+    "fecha_actualizacion": "2025-10-02T21:08:24.902Z"
+  }
+},
+{
+  "model": "proyectos.vivienda",
+  "pk": 11,
+  "fields": {
+    "proyecto": 2,
+    "tipologia": 2,
+    "codigo": "743",
+    "familia_beneficiaria": "MARÍA ELIANA BRICEÑO VERGARA",
+    "beneficiario": 9,
+    "estado": "construccion",
+    "fecha_entrega": null,
+    "fecha_inicio_postventa": null,
+    "fecha_termino_postventa": null,
+    "observaciones_generales": "",
+    "activa": true,
+    "fecha_creacion": "2025-10-02T20:36:06.541Z",
+    "fecha_actualizacion": "2025-10-02T21:08:24.802Z"
+  }
+},
+{
+  "model": "proyectos.vivienda",
+  "pk": 12,
+  "fields": {
+    "proyecto": 2,
+    "tipologia": 1,
+    "codigo": "737",
+    "familia_beneficiaria": "FRANCESCA DIANA SILVA BRITO",
+    "beneficiario": 3,
+    "estado": "construccion",
+    "fecha_entrega": null,
+    "fecha_inicio_postventa": null,
+    "fecha_termino_postventa": null,
+    "observaciones_generales": "",
+    "activa": true,
+    "fecha_creacion": "2025-10-02T20:36:06.547Z",
+    "fecha_actualizacion": "2025-10-02T21:08:24.730Z"
+  }
+},
+{
+  "model": "proyectos.vivienda",
+  "pk": 13,
+  "fields": {
+    "proyecto": 2,
+    "tipologia": 1,
+    "codigo": "747",
+    "familia_beneficiaria": "CLAUDIA FRANCISCA BUGUEÑO PIZARRO",
+    "beneficiario": 13,
+    "estado": "construccion",
+    "fecha_entrega": null,
+    "fecha_inicio_postventa": null,
+    "fecha_termino_postventa": null,
+    "observaciones_generales": "",
+    "activa": true,
+    "fecha_creacion": "2025-10-02T20:36:06.553Z",
+    "fecha_actualizacion": "2025-10-02T21:08:24.839Z"
+  }
+},
+{
+  "model": "proyectos.vivienda",
+  "pk": 14,
+  "fields": {
+    "proyecto": 2,
+    "tipologia": 6,
+    "codigo": "739",
+    "familia_beneficiaria": "ISABEL ROSA MOLINA GOMEZ",
+    "beneficiario": 5,
+    "estado": "construccion",
+    "fecha_entrega": null,
+    "fecha_inicio_postventa": null,
+    "fecha_termino_postventa": null,
+    "observaciones_generales": "",
+    "activa": true,
+    "fecha_creacion": "2025-10-02T20:36:06.559Z",
+    "fecha_actualizacion": "2025-10-02T21:08:24.765Z"
+  }
+},
+{
+  "model": "proyectos.vivienda",
+  "pk": 15,
+  "fields": {
+    "proyecto": 2,
+    "tipologia": 1,
+    "codigo": "751",
+    "familia_beneficiaria": "CLARIZA DEL CARMEN CAMUS JENERAL",
+    "beneficiario": 17,
+    "estado": "construccion",
+    "fecha_entrega": null,
+    "fecha_inicio_postventa": null,
+    "fecha_termino_postventa": null,
+    "observaciones_generales": "",
+    "activa": true,
+    "fecha_creacion": "2025-10-02T20:36:06.564Z",
+    "fecha_actualizacion": "2025-10-02T21:08:24.875Z"
+  }
+},
+{
+  "model": "proyectos.vivienda",
+  "pk": 16,
+  "fields": {
+    "proyecto": 2,
+    "tipologia": 1,
+    "codigo": "749",
+    "familia_beneficiaria": "GUILLERMO BUSTAMANTE",
+    "beneficiario": 15,
+    "estado": "construccion",
+    "fecha_entrega": null,
+    "fecha_inicio_postventa": null,
+    "fecha_termino_postventa": null,
+    "observaciones_generales": "",
+    "activa": true,
+    "fecha_creacion": "2025-10-02T20:36:06.570Z",
+    "fecha_actualizacion": "2025-10-02T21:08:24.856Z"
+  }
+},
+{
+  "model": "proyectos.vivienda",
+  "pk": 17,
+  "fields": {
+    "proyecto": 2,
+    "tipologia": 3,
+    "codigo": "742",
+    "familia_beneficiaria": "SENÉN DEL CARMEN BARRAZA PIZARRO",
+    "beneficiario": 8,
+    "estado": "construccion",
+    "fecha_entrega": null,
+    "fecha_inicio_postventa": null,
+    "fecha_termino_postventa": null,
+    "observaciones_generales": "",
+    "activa": true,
+    "fecha_creacion": "2025-10-02T20:36:06.576Z",
+    "fecha_actualizacion": "2025-10-02T21:08:24.793Z"
+  }
+},
+{
+  "model": "proyectos.vivienda",
+  "pk": 18,
+  "fields": {
+    "proyecto": 2,
+    "tipologia": 3,
+    "codigo": "757",
+    "familia_beneficiaria": "JOSÉ MIGUEL DONOSO ARAVENA",
+    "beneficiario": 23,
+    "estado": "construccion",
+    "fecha_entrega": null,
+    "fecha_inicio_postventa": null,
+    "fecha_termino_postventa": null,
+    "observaciones_generales": "",
+    "activa": true,
+    "fecha_creacion": "2025-10-02T20:36:06.581Z",
+    "fecha_actualizacion": "2025-10-02T21:08:24.928Z"
+  }
+},
+{
+  "model": "proyectos.vivienda",
+  "pk": 19,
+  "fields": {
+    "proyecto": 2,
+    "tipologia": 3,
+    "codigo": "746",
+    "familia_beneficiaria": "JEANETTE VERÓNICA BRUNA MUÑOZ",
+    "beneficiario": 12,
+    "estado": "construccion",
+    "fecha_entrega": null,
+    "fecha_inicio_postventa": null,
+    "fecha_termino_postventa": null,
+    "observaciones_generales": "",
+    "activa": true,
+    "fecha_creacion": "2025-10-02T20:36:06.587Z",
+    "fecha_actualizacion": "2025-10-02T21:08:24.829Z"
+  }
+},
+{
+  "model": "proyectos.vivienda",
+  "pk": 20,
+  "fields": {
+    "proyecto": 2,
+    "tipologia": 1,
+    "codigo": "761",
+    "familia_beneficiaria": "ELENA DEL TRÁNSITO HENRÍQUEZ CORTÉS",
+    "beneficiario": 27,
+    "estado": "construccion",
+    "fecha_entrega": null,
+    "fecha_inicio_postventa": null,
+    "fecha_termino_postventa": null,
+    "observaciones_generales": "",
+    "activa": true,
+    "fecha_creacion": "2025-10-02T20:36:06.593Z",
+    "fecha_actualizacion": "2025-10-02T21:08:24.965Z"
+  }
+},
+{
+  "model": "proyectos.vivienda",
+  "pk": 21,
+  "fields": {
+    "proyecto": 2,
+    "tipologia": 5,
+    "codigo": "755",
+    "familia_beneficiaria": "MARÍA VERÓNICA CORTEZ CARDEMIL",
+    "beneficiario": 21,
+    "estado": "construccion",
+    "fecha_entrega": null,
+    "fecha_inicio_postventa": null,
+    "fecha_termino_postventa": null,
+    "observaciones_generales": "",
+    "activa": true,
+    "fecha_creacion": "2025-10-02T20:36:06.598Z",
+    "fecha_actualizacion": "2025-10-02T21:08:24.911Z"
+  }
+},
+{
+  "model": "proyectos.vivienda",
+  "pk": 22,
+  "fields": {
+    "proyecto": 2,
+    "tipologia": 6,
+    "codigo": "736",
+    "familia_beneficiaria": "GLADYS DEL CARMEN APABLAZA FREZ",
+    "beneficiario": 2,
+    "estado": "construccion",
+    "fecha_entrega": null,
+    "fecha_inicio_postventa": null,
+    "fecha_termino_postventa": null,
+    "observaciones_generales": "",
+    "activa": true,
+    "fecha_creacion": "2025-10-02T20:36:06.605Z",
+    "fecha_actualizacion": "2025-10-02T21:08:24.721Z"
+  }
+},
+{
+  "model": "proyectos.vivienda",
+  "pk": 23,
+  "fields": {
+    "proyecto": 2,
+    "tipologia": 3,
+    "codigo": "756",
+    "familia_beneficiaria": "CARLA JAVIERA CUELLO HUERTA",
+    "beneficiario": 22,
+    "estado": "construccion",
+    "fecha_entrega": null,
+    "fecha_inicio_postventa": null,
+    "fecha_termino_postventa": null,
+    "observaciones_generales": "",
+    "activa": true,
+    "fecha_creacion": "2025-10-02T20:36:06.611Z",
+    "fecha_actualizacion": "2025-10-02T21:08:24.920Z"
+  }
+},
+{
+  "model": "proyectos.vivienda",
+  "pk": 24,
+  "fields": {
+    "proyecto": 2,
+    "tipologia": 6,
+    "codigo": "744",
+    "familia_beneficiaria": "ANGELA DE LAS MERCEDES VELASQUEZ APABLAZA",
+    "beneficiario": 10,
+    "estado": "construccion",
+    "fecha_entrega": null,
+    "fecha_inicio_postventa": null,
+    "fecha_termino_postventa": null,
+    "observaciones_generales": "",
+    "activa": true,
+    "fecha_creacion": "2025-10-02T20:36:06.617Z",
+    "fecha_actualizacion": "2025-10-02T21:08:24.811Z"
+  }
+},
+{
+  "model": "proyectos.vivienda",
+  "pk": 25,
+  "fields": {
+    "proyecto": 2,
+    "tipologia": 1,
+    "codigo": "741",
+    "familia_beneficiaria": "MARGARITA LUISA ARAVENA SANHUEZA",
+    "beneficiario": 7,
+    "estado": "construccion",
+    "fecha_entrega": null,
+    "fecha_inicio_postventa": null,
+    "fecha_termino_postventa": null,
+    "observaciones_generales": "",
+    "activa": true,
+    "fecha_creacion": "2025-10-02T20:36:06.622Z",
+    "fecha_actualizacion": "2025-10-02T21:08:24.784Z"
+  }
+},
+{
+  "model": "proyectos.vivienda",
+  "pk": 26,
+  "fields": {
+    "proyecto": 2,
+    "tipologia": 6,
+    "codigo": "752",
+    "familia_beneficiaria": "ANA MARÍA CANELO FIGUEROA",
+    "beneficiario": 18,
+    "estado": "construccion",
+    "fecha_entrega": null,
+    "fecha_inicio_postventa": null,
+    "fecha_termino_postventa": null,
+    "observaciones_generales": "",
+    "activa": true,
+    "fecha_creacion": "2025-10-02T20:36:06.627Z",
+    "fecha_actualizacion": "2025-10-02T21:08:24.884Z"
+  }
+},
+{
+  "model": "proyectos.vivienda",
+  "pk": 27,
+  "fields": {
+    "proyecto": 2,
+    "tipologia": 2,
+    "codigo": "745",
+    "familia_beneficiaria": "LAURA ANDREA BRITO VELÁSQUEZ",
+    "beneficiario": 11,
+    "estado": "construccion",
+    "fecha_entrega": null,
+    "fecha_inicio_postventa": null,
+    "fecha_termino_postventa": null,
+    "observaciones_generales": "",
+    "activa": true,
+    "fecha_creacion": "2025-10-02T20:36:06.633Z",
+    "fecha_actualizacion": "2025-10-02T21:08:24.820Z"
+  }
+},
+{
+  "model": "proyectos.vivienda",
+  "pk": 28,
+  "fields": {
+    "proyecto": 2,
+    "tipologia": 3,
+    "codigo": "738",
+    "familia_beneficiaria": "ORLANDO ENRIQUE ARAVENA ARAVENA",
+    "beneficiario": 4,
+    "estado": "construccion",
+    "fecha_entrega": null,
+    "fecha_inicio_postventa": null,
+    "fecha_termino_postventa": null,
+    "observaciones_generales": "",
+    "activa": true,
+    "fecha_creacion": "2025-10-02T20:36:06.639Z",
+    "fecha_actualizacion": "2025-10-02T21:08:24.757Z"
+  }
+},
+{
+  "model": "proyectos.vivienda",
+  "pk": 29,
+  "fields": {
+    "proyecto": 2,
+    "tipologia": 2,
+    "codigo": "781",
+    "familia_beneficiaria": "RICARDO ALFONSO MOLINA MOLINA",
+    "beneficiario": 47,
+    "estado": "construccion",
+    "fecha_entrega": null,
+    "fecha_inicio_postventa": null,
+    "fecha_termino_postventa": null,
+    "observaciones_generales": "",
+    "activa": true,
+    "fecha_creacion": "2025-10-02T20:36:06.645Z",
+    "fecha_actualizacion": "2025-10-02T21:08:25.154Z"
+  }
+},
+{
+  "model": "proyectos.vivienda",
+  "pk": 30,
+  "fields": {
+    "proyecto": 2,
+    "tipologia": 3,
+    "codigo": "774",
+    "familia_beneficiaria": "ROSA DEL ROSARIO MATURANA HERRERA",
+    "beneficiario": 40,
+    "estado": "construccion",
+    "fecha_entrega": null,
+    "fecha_inicio_postventa": null,
+    "fecha_termino_postventa": null,
+    "observaciones_generales": "",
+    "activa": true,
+    "fecha_creacion": "2025-10-02T20:36:06.650Z",
+    "fecha_actualizacion": "2025-10-02T21:08:25.089Z"
+  }
+},
+{
+  "model": "proyectos.vivienda",
+  "pk": 31,
+  "fields": {
+    "proyecto": 2,
+    "tipologia": 2,
+    "codigo": "778",
+    "familia_beneficiaria": "LUIS ALBERTO MINAY BRIONES",
+    "beneficiario": 44,
+    "estado": "construccion",
+    "fecha_entrega": null,
+    "fecha_inicio_postventa": null,
+    "fecha_termino_postventa": null,
+    "observaciones_generales": "",
+    "activa": true,
+    "fecha_creacion": "2025-10-02T20:36:06.656Z",
+    "fecha_actualizacion": "2025-10-02T21:08:25.126Z"
+  }
+},
+{
+  "model": "proyectos.vivienda",
+  "pk": 32,
+  "fields": {
+    "proyecto": 2,
+    "tipologia": 1,
+    "codigo": "784",
+    "familia_beneficiaria": "OLIVER HÉCTOR OLIVARES POZO",
+    "beneficiario": 50,
+    "estado": "construccion",
+    "fecha_entrega": null,
+    "fecha_inicio_postventa": null,
+    "fecha_termino_postventa": null,
+    "observaciones_generales": "",
+    "activa": true,
+    "fecha_creacion": "2025-10-02T20:36:06.660Z",
+    "fecha_actualizacion": "2025-10-02T21:08:25.181Z"
+  }
+},
+{
+  "model": "proyectos.vivienda",
+  "pk": 33,
+  "fields": {
+    "proyecto": 2,
+    "tipologia": 1,
+    "codigo": "769",
+    "familia_beneficiaria": "AMELIA JANETTE LEDEZMA HENRÍQUEZ",
+    "beneficiario": 35,
+    "estado": "construccion",
+    "fecha_entrega": null,
+    "fecha_inicio_postventa": null,
+    "fecha_termino_postventa": null,
+    "observaciones_generales": "",
+    "activa": true,
+    "fecha_creacion": "2025-10-02T20:36:06.665Z",
+    "fecha_actualizacion": "2025-10-02T21:08:25.042Z"
+  }
+},
+{
+  "model": "proyectos.vivienda",
+  "pk": 34,
+  "fields": {
+    "proyecto": 2,
+    "tipologia": 6,
+    "codigo": "786",
+    "familia_beneficiaria": "LUIS HUMBERTO ORMEÑO CAÑETE",
+    "beneficiario": 52,
+    "estado": "construccion",
+    "fecha_entrega": null,
+    "fecha_inicio_postventa": null,
+    "fecha_termino_postventa": null,
+    "observaciones_generales": "",
+    "activa": true,
+    "fecha_creacion": "2025-10-02T20:36:06.672Z",
+    "fecha_actualizacion": "2025-10-02T21:08:25.201Z"
+  }
+},
+{
+  "model": "proyectos.vivienda",
+  "pk": 35,
+  "fields": {
+    "proyecto": 2,
+    "tipologia": 3,
+    "codigo": "783",
+    "familia_beneficiaria": "CARLA LISSETTE NÚÑEZ CORVACHO",
+    "beneficiario": 49,
+    "estado": "construccion",
+    "fecha_entrega": null,
+    "fecha_inicio_postventa": null,
+    "fecha_termino_postventa": null,
+    "observaciones_generales": "",
+    "activa": true,
+    "fecha_creacion": "2025-10-02T20:36:06.677Z",
+    "fecha_actualizacion": "2025-10-02T21:08:25.173Z"
+  }
+},
+{
+  "model": "proyectos.vivienda",
+  "pk": 36,
+  "fields": {
+    "proyecto": 2,
+    "tipologia": 2,
+    "codigo": "788",
+    "familia_beneficiaria": "ELEAZAR JOSUE PARRAGUEZ TOLEDO",
+    "beneficiario": 54,
+    "estado": "construccion",
+    "fecha_entrega": null,
+    "fecha_inicio_postventa": null,
+    "fecha_termino_postventa": null,
+    "observaciones_generales": "",
+    "activa": true,
+    "fecha_creacion": "2025-10-02T20:36:06.683Z",
+    "fecha_actualizacion": "2025-10-02T21:08:25.220Z"
+  }
+},
+{
+  "model": "proyectos.vivienda",
+  "pk": 37,
+  "fields": {
+    "proyecto": 2,
+    "tipologia": 2,
+    "codigo": "779",
+    "familia_beneficiaria": "JOHANNA ANDREA MINAY FARÍAS",
+    "beneficiario": 45,
+    "estado": "construccion",
+    "fecha_entrega": null,
+    "fecha_inicio_postventa": null,
+    "fecha_termino_postventa": null,
+    "observaciones_generales": "",
+    "activa": true,
+    "fecha_creacion": "2025-10-02T20:36:06.690Z",
+    "fecha_actualizacion": "2025-10-02T21:08:25.135Z"
+  }
+},
+{
+  "model": "proyectos.vivienda",
+  "pk": 38,
+  "fields": {
+    "proyecto": 2,
+    "tipologia": 1,
+    "codigo": "773",
+    "familia_beneficiaria": "ENRIQUE ORLANDO LÓPEZ PÉREZ",
+    "beneficiario": 39,
+    "estado": "construccion",
+    "fecha_entrega": null,
+    "fecha_inicio_postventa": null,
+    "fecha_termino_postventa": null,
+    "observaciones_generales": "",
+    "activa": true,
+    "fecha_creacion": "2025-10-02T20:36:06.694Z",
+    "fecha_actualizacion": "2025-10-02T21:08:25.079Z"
+  }
+},
+{
+  "model": "proyectos.vivienda",
+  "pk": 39,
+  "fields": {
+    "proyecto": 2,
+    "tipologia": 3,
+    "codigo": "789",
+    "familia_beneficiaria": "LORENA DEL CARMEN PAZ AHUMADA",
+    "beneficiario": 55,
+    "estado": "construccion",
+    "fecha_entrega": null,
+    "fecha_inicio_postventa": null,
+    "fecha_termino_postventa": null,
+    "observaciones_generales": "",
+    "activa": true,
+    "fecha_creacion": "2025-10-02T20:36:06.700Z",
+    "fecha_actualizacion": "2025-10-02T21:08:25.232Z"
+  }
+},
+{
+  "model": "proyectos.vivienda",
+  "pk": 40,
+  "fields": {
+    "proyecto": 2,
+    "tipologia": 2,
+    "codigo": "771",
+    "familia_beneficiaria": "JACQUELINE DE LAS MERCEDES LEYTON REYES",
+    "beneficiario": 37,
+    "estado": "construccion",
+    "fecha_entrega": null,
+    "fecha_inicio_postventa": null,
+    "fecha_termino_postventa": null,
+    "observaciones_generales": "",
+    "activa": true,
+    "fecha_creacion": "2025-10-02T20:36:06.705Z",
+    "fecha_actualizacion": "2025-10-02T21:08:25.059Z"
+  }
+},
+{
+  "model": "proyectos.vivienda",
+  "pk": 41,
+  "fields": {
+    "proyecto": 2,
+    "tipologia": 3,
+    "codigo": "767",
+    "familia_beneficiaria": "RICARDO ALEJANDRO LARA BRICEÑO",
+    "beneficiario": 33,
+    "estado": "construccion",
+    "fecha_entrega": null,
+    "fecha_inicio_postventa": null,
+    "fecha_termino_postventa": null,
+    "observaciones_generales": "",
+    "activa": true,
+    "fecha_creacion": "2025-10-02T20:36:06.710Z",
+    "fecha_actualizacion": "2025-10-02T21:08:25.022Z"
+  }
+},
+{
+  "model": "proyectos.vivienda",
+  "pk": 42,
+  "fields": {
+    "proyecto": 2,
+    "tipologia": 6,
+    "codigo": "762",
+    "familia_beneficiaria": "JONNY FABIAN  TOLEDE LEDEZMA",
+    "beneficiario": 28,
+    "estado": "construccion",
+    "fecha_entrega": null,
+    "fecha_inicio_postventa": null,
+    "fecha_termino_postventa": null,
+    "observaciones_generales": "",
+    "activa": true,
+    "fecha_creacion": "2025-10-02T20:36:06.716Z",
+    "fecha_actualizacion": "2025-10-02T21:08:24.975Z"
+  }
+},
+{
+  "model": "proyectos.vivienda",
+  "pk": 43,
+  "fields": {
+    "proyecto": 2,
+    "tipologia": 1,
+    "codigo": "780",
+    "familia_beneficiaria": "CECILIA DEL CARMEN MOLINA GÓMEZ",
+    "beneficiario": 46,
+    "estado": "construccion",
+    "fecha_entrega": null,
+    "fecha_inicio_postventa": null,
+    "fecha_termino_postventa": null,
+    "observaciones_generales": "",
+    "activa": true,
+    "fecha_creacion": "2025-10-02T20:36:06.722Z",
+    "fecha_actualizacion": "2025-10-02T21:08:25.144Z"
+  }
+},
+{
+  "model": "proyectos.vivienda",
+  "pk": 44,
+  "fields": {
+    "proyecto": 2,
+    "tipologia": 1,
+    "codigo": "768",
+    "familia_beneficiaria": "PEDRO ANTONIO LASTRA GUTIÉRREZ",
+    "beneficiario": 34,
+    "estado": "construccion",
+    "fecha_entrega": null,
+    "fecha_inicio_postventa": null,
+    "fecha_termino_postventa": null,
+    "observaciones_generales": "",
+    "activa": true,
+    "fecha_creacion": "2025-10-02T20:36:06.727Z",
+    "fecha_actualizacion": "2025-10-02T21:08:25.032Z"
+  }
+},
+{
+  "model": "proyectos.vivienda",
+  "pk": 45,
+  "fields": {
+    "proyecto": 2,
+    "tipologia": 1,
+    "codigo": "765",
+    "familia_beneficiaria": "ROSA MARÍA HUERTA GÓMEZ",
+    "beneficiario": 31,
+    "estado": "construccion",
+    "fecha_entrega": null,
+    "fecha_inicio_postventa": null,
+    "fecha_termino_postventa": null,
+    "observaciones_generales": "",
+    "activa": true,
+    "fecha_creacion": "2025-10-02T20:36:06.733Z",
+    "fecha_actualizacion": "2025-10-02T21:08:25.002Z"
+  }
+},
+{
+  "model": "proyectos.vivienda",
+  "pk": 46,
+  "fields": {
+    "proyecto": 2,
+    "tipologia": 1,
+    "codigo": "772",
+    "familia_beneficiaria": "MARÍA MERCEDES LÓPEZ OLIVARES",
+    "beneficiario": 38,
+    "estado": "construccion",
+    "fecha_entrega": null,
+    "fecha_inicio_postventa": null,
+    "fecha_termino_postventa": null,
+    "observaciones_generales": "",
+    "activa": true,
+    "fecha_creacion": "2025-10-02T20:36:06.739Z",
+    "fecha_actualizacion": "2025-10-02T21:08:25.070Z"
+  }
+},
+{
+  "model": "proyectos.vivienda",
+  "pk": 47,
+  "fields": {
+    "proyecto": 2,
+    "tipologia": 3,
+    "codigo": "770",
+    "familia_beneficiaria": "CRISTINA DEL CARMEN LEDEZMA HENRÍQUEZ",
+    "beneficiario": 36,
+    "estado": "construccion",
+    "fecha_entrega": null,
+    "fecha_inicio_postventa": null,
+    "fecha_termino_postventa": null,
+    "observaciones_generales": "",
+    "activa": true,
+    "fecha_creacion": "2025-10-02T20:36:06.745Z",
+    "fecha_actualizacion": "2025-10-02T21:08:25.050Z"
+  }
+},
+{
+  "model": "proyectos.vivienda",
+  "pk": 48,
+  "fields": {
+    "proyecto": 2,
+    "tipologia": 3,
+    "codigo": "776",
+    "familia_beneficiaria": "MARÍA DEL CARMEN MEJÍAS ASTUDILLO",
+    "beneficiario": 42,
+    "estado": "construccion",
+    "fecha_entrega": null,
+    "fecha_inicio_postventa": null,
+    "fecha_termino_postventa": null,
+    "observaciones_generales": "",
+    "activa": true,
+    "fecha_creacion": "2025-10-02T20:36:06.750Z",
+    "fecha_actualizacion": "2025-10-02T21:08:25.107Z"
+  }
+},
+{
+  "model": "proyectos.vivienda",
+  "pk": 49,
+  "fields": {
+    "proyecto": 2,
+    "tipologia": 2,
+    "codigo": "775",
+    "familia_beneficiaria": "YURI ELIZABETH MEDINA FERNÁNDEZ",
+    "beneficiario": 41,
+    "estado": "construccion",
+    "fecha_entrega": null,
+    "fecha_inicio_postventa": null,
+    "fecha_termino_postventa": null,
+    "observaciones_generales": "",
+    "activa": true,
+    "fecha_creacion": "2025-10-02T20:36:06.756Z",
+    "fecha_actualizacion": "2025-10-02T21:08:25.098Z"
+  }
+},
+{
+  "model": "proyectos.vivienda",
+  "pk": 50,
+  "fields": {
+    "proyecto": 2,
+    "tipologia": 1,
+    "codigo": "777",
+    "familia_beneficiaria": "MARÍA VIOLETA MENDOZA ROJAS",
+    "beneficiario": 43,
+    "estado": "construccion",
+    "fecha_entrega": null,
+    "fecha_inicio_postventa": null,
+    "fecha_termino_postventa": null,
+    "observaciones_generales": "",
+    "activa": true,
+    "fecha_creacion": "2025-10-02T20:36:06.762Z",
+    "fecha_actualizacion": "2025-10-02T21:08:25.116Z"
+  }
+},
+{
+  "model": "proyectos.vivienda",
+  "pk": 51,
+  "fields": {
+    "proyecto": 2,
+    "tipologia": 3,
+    "codigo": "787",
+    "familia_beneficiaria": "MIRIAM PATRICIA PÁEZ ARAVENA",
+    "beneficiario": 53,
+    "estado": "construccion",
+    "fecha_entrega": null,
+    "fecha_inicio_postventa": null,
+    "fecha_termino_postventa": null,
+    "observaciones_generales": "",
+    "activa": true,
+    "fecha_creacion": "2025-10-02T20:36:06.767Z",
+    "fecha_actualizacion": "2025-10-02T21:08:25.210Z"
+  }
+},
+{
+  "model": "proyectos.vivienda",
+  "pk": 52,
+  "fields": {
+    "proyecto": 2,
+    "tipologia": 1,
+    "codigo": "766",
+    "familia_beneficiaria": "LIDIA ELIZABETH LARA VARGAS",
+    "beneficiario": 32,
+    "estado": "construccion",
+    "fecha_entrega": null,
+    "fecha_inicio_postventa": null,
+    "fecha_termino_postventa": null,
+    "observaciones_generales": "",
+    "activa": true,
+    "fecha_creacion": "2025-10-02T20:36:06.774Z",
+    "fecha_actualizacion": "2025-10-02T21:08:25.013Z"
+  }
+},
+{
+  "model": "proyectos.vivienda",
+  "pk": 53,
+  "fields": {
+    "proyecto": 2,
+    "tipologia": 3,
+    "codigo": "764",
+    "familia_beneficiaria": "ALEJANDRA DEL CARMEN HUERTA GÓMEZ",
+    "beneficiario": 30,
+    "estado": "construccion",
+    "fecha_entrega": null,
+    "fecha_inicio_postventa": null,
+    "fecha_termino_postventa": null,
+    "observaciones_generales": "",
+    "activa": true,
+    "fecha_creacion": "2025-10-02T20:36:06.778Z",
+    "fecha_actualizacion": "2025-10-02T21:08:24.993Z"
+  }
+},
+{
+  "model": "proyectos.vivienda",
+  "pk": 54,
+  "fields": {
+    "proyecto": 2,
+    "tipologia": 3,
+    "codigo": "785",
+    "familia_beneficiaria": "KARINA ALEJANDRA OLMOS CAMUS",
+    "beneficiario": 51,
+    "estado": "construccion",
+    "fecha_entrega": null,
+    "fecha_inicio_postventa": null,
+    "fecha_termino_postventa": null,
+    "observaciones_generales": "",
+    "activa": true,
+    "fecha_creacion": "2025-10-02T20:36:06.784Z",
+    "fecha_actualizacion": "2025-10-02T21:08:25.191Z"
+  }
+},
+{
+  "model": "proyectos.vivienda",
+  "pk": 55,
+  "fields": {
+    "proyecto": 2,
+    "tipologia": 1,
+    "codigo": "763",
+    "familia_beneficiaria": "LUIS EDUARDO HERRERA HERRERA",
+    "beneficiario": 29,
+    "estado": "construccion",
+    "fecha_entrega": null,
+    "fecha_inicio_postventa": null,
+    "fecha_termino_postventa": null,
+    "observaciones_generales": "",
+    "activa": true,
+    "fecha_creacion": "2025-10-02T20:36:06.790Z",
+    "fecha_actualizacion": "2025-10-02T21:08:24.984Z"
+  }
+},
+{
+  "model": "proyectos.vivienda",
+  "pk": 56,
+  "fields": {
+    "proyecto": 2,
+    "tipologia": 3,
+    "codigo": "782",
+    "familia_beneficiaria": "FRANCISCO JAVIER MOLINA PIZARRO",
+    "beneficiario": 48,
+    "estado": "construccion",
+    "fecha_entrega": null,
+    "fecha_inicio_postventa": null,
+    "fecha_termino_postventa": null,
+    "observaciones_generales": "",
+    "activa": true,
+    "fecha_creacion": "2025-10-02T20:36:06.795Z",
+    "fecha_actualizacion": "2025-10-02T21:08:25.162Z"
+  }
+},
+{
+  "model": "proyectos.vivienda",
+  "pk": 57,
+  "fields": {
+    "proyecto": 2,
+    "tipologia": 3,
+    "codigo": "790",
+    "familia_beneficiaria": "LUIS RUBÉN PAZ LÓPEZ",
+    "beneficiario": 56,
+    "estado": "construccion",
+    "fecha_entrega": null,
+    "fecha_inicio_postventa": null,
+    "fecha_termino_postventa": null,
+    "observaciones_generales": "",
+    "activa": true,
+    "fecha_creacion": "2025-10-02T20:36:06.800Z",
+    "fecha_actualizacion": "2025-10-02T21:08:25.244Z"
+  }
+},
+{
+  "model": "proyectos.vivienda",
+  "pk": 58,
+  "fields": {
+    "proyecto": 2,
+    "tipologia": 3,
+    "codigo": "792",
+    "familia_beneficiaria": "FABIOLA ROSA PINEDA SEPÚLVEDA",
+    "beneficiario": 58,
+    "estado": "construccion",
+    "fecha_entrega": null,
+    "fecha_inicio_postventa": null,
+    "fecha_termino_postventa": null,
+    "observaciones_generales": "",
+    "activa": true,
+    "fecha_creacion": "2025-10-02T20:36:06.806Z",
+    "fecha_actualizacion": "2025-10-02T21:08:25.268Z"
+  }
+},
+{
+  "model": "proyectos.vivienda",
+  "pk": 59,
+  "fields": {
+    "proyecto": 2,
+    "tipologia": 3,
+    "codigo": "800",
+    "familia_beneficiaria": "NELLY ISABEL RETAMAL SALINAS",
+    "beneficiario": 66,
+    "estado": "construccion",
+    "fecha_entrega": null,
+    "fecha_inicio_postventa": null,
+    "fecha_termino_postventa": null,
+    "observaciones_generales": "",
+    "activa": true,
+    "fecha_creacion": "2025-10-02T20:36:06.811Z",
+    "fecha_actualizacion": "2025-10-02T21:08:25.345Z"
+  }
+},
+{
+  "model": "proyectos.vivienda",
+  "pk": 60,
+  "fields": {
+    "proyecto": 2,
+    "tipologia": 1,
+    "codigo": "798",
+    "familia_beneficiaria": "CARLOS ENRIQUE RETAMAL FIERRO",
+    "beneficiario": 64,
+    "estado": "construccion",
+    "fecha_entrega": null,
+    "fecha_inicio_postventa": null,
+    "fecha_termino_postventa": null,
+    "observaciones_generales": "",
+    "activa": true,
+    "fecha_creacion": "2025-10-02T20:36:06.817Z",
+    "fecha_actualizacion": "2025-10-02T21:08:25.326Z"
+  }
+},
+{
+  "model": "proyectos.vivienda",
+  "pk": 61,
+  "fields": {
+    "proyecto": 2,
+    "tipologia": 3,
+    "codigo": "814",
+    "familia_beneficiaria": "RACHEL ALICIA TOLEDO HERRERA",
+    "beneficiario": 80,
+    "estado": "construccion",
+    "fecha_entrega": null,
+    "fecha_inicio_postventa": null,
+    "fecha_termino_postventa": null,
+    "observaciones_generales": "",
+    "activa": true,
+    "fecha_creacion": "2025-10-02T20:36:06.824Z",
+    "fecha_actualizacion": "2025-10-02T21:08:25.478Z"
+  }
+},
+{
+  "model": "proyectos.vivienda",
+  "pk": 62,
+  "fields": {
+    "proyecto": 2,
+    "tipologia": 1,
+    "codigo": "810",
+    "familia_beneficiaria": "ROSA DE LAS MERCEDES SEPÚLVEDA MAUREIRA",
+    "beneficiario": 76,
+    "estado": "construccion",
+    "fecha_entrega": null,
+    "fecha_inicio_postventa": null,
+    "fecha_termino_postventa": null,
+    "observaciones_generales": "",
+    "activa": true,
+    "fecha_creacion": "2025-10-02T20:36:06.829Z",
+    "fecha_actualizacion": "2025-10-02T21:08:25.440Z"
+  }
+},
+{
+  "model": "proyectos.vivienda",
+  "pk": 63,
+  "fields": {
+    "proyecto": 2,
+    "tipologia": 3,
+    "codigo": "796",
+    "familia_beneficiaria": "EVA MAGDALENA RAIN TAPIA",
+    "beneficiario": 62,
+    "estado": "construccion",
+    "fecha_entrega": null,
+    "fecha_inicio_postventa": null,
+    "fecha_termino_postventa": null,
+    "observaciones_generales": "",
+    "activa": true,
+    "fecha_creacion": "2025-10-02T20:36:06.835Z",
+    "fecha_actualizacion": "2025-10-02T21:08:25.308Z"
+  }
+},
+{
+  "model": "proyectos.vivienda",
+  "pk": 64,
+  "fields": {
+    "proyecto": 2,
+    "tipologia": 3,
+    "codigo": "801",
+    "familia_beneficiaria": "KENY SUSANA REYES LEDEZMA",
+    "beneficiario": 67,
+    "estado": "construccion",
+    "fecha_entrega": null,
+    "fecha_inicio_postventa": null,
+    "fecha_termino_postventa": null,
+    "observaciones_generales": "",
+    "activa": true,
+    "fecha_creacion": "2025-10-02T20:36:06.842Z",
+    "fecha_actualizacion": "2025-10-02T21:08:25.356Z"
+  }
+},
+{
+  "model": "proyectos.vivienda",
+  "pk": 65,
+  "fields": {
+    "proyecto": 2,
+    "tipologia": 1,
+    "codigo": "813",
+    "familia_beneficiaria": "JUAN BAUTISTA TOLEDO HERRERA",
+    "beneficiario": 79,
+    "estado": "construccion",
+    "fecha_entrega": null,
+    "fecha_inicio_postventa": null,
+    "fecha_termino_postventa": null,
+    "observaciones_generales": "",
+    "activa": true,
+    "fecha_creacion": "2025-10-02T20:36:06.846Z",
+    "fecha_actualizacion": "2025-10-02T21:08:25.470Z"
+  }
+},
+{
+  "model": "proyectos.vivienda",
+  "pk": 66,
+  "fields": {
+    "proyecto": 2,
+    "tipologia": 1,
+    "codigo": "812",
+    "familia_beneficiaria": "HILDA DE LAS MERCEDES TOBAR VELÁSQUEZ",
+    "beneficiario": 78,
+    "estado": "construccion",
+    "fecha_entrega": null,
+    "fecha_inicio_postventa": null,
+    "fecha_termino_postventa": null,
+    "observaciones_generales": "",
+    "activa": true,
+    "fecha_creacion": "2025-10-02T20:36:06.853Z",
+    "fecha_actualizacion": "2025-10-02T21:08:25.459Z"
+  }
+},
+{
+  "model": "proyectos.vivienda",
+  "pk": 67,
+  "fields": {
+    "proyecto": 2,
+    "tipologia": 2,
+    "codigo": "805",
+    "familia_beneficiaria": "NIEVE ALBINA ROBLEDO VERGARA",
+    "beneficiario": 71,
+    "estado": "construccion",
+    "fecha_entrega": null,
+    "fecha_inicio_postventa": null,
+    "fecha_termino_postventa": null,
+    "observaciones_generales": "",
+    "activa": true,
+    "fecha_creacion": "2025-10-02T20:36:06.858Z",
+    "fecha_actualizacion": "2025-10-02T21:08:25.394Z"
+  }
+},
+{
+  "model": "proyectos.vivienda",
+  "pk": 68,
+  "fields": {
+    "proyecto": 2,
+    "tipologia": 2,
+    "codigo": "815",
+    "familia_beneficiaria": "SAMUEL SEGUNDO TOLEDO HERRERA",
+    "beneficiario": 81,
+    "estado": "construccion",
+    "fecha_entrega": null,
+    "fecha_inicio_postventa": null,
+    "fecha_termino_postventa": null,
+    "observaciones_generales": "",
+    "activa": true,
+    "fecha_creacion": "2025-10-02T20:36:06.864Z",
+    "fecha_actualizacion": "2025-10-02T21:08:25.488Z"
+  }
+},
+{
+  "model": "proyectos.vivienda",
+  "pk": 69,
+  "fields": {
+    "proyecto": 2,
+    "tipologia": 3,
+    "codigo": "806",
+    "familia_beneficiaria": "JESSICA LORETO ROJAS CANELO",
+    "beneficiario": 72,
+    "estado": "construccion",
+    "fecha_entrega": null,
+    "fecha_inicio_postventa": null,
+    "fecha_termino_postventa": null,
+    "observaciones_generales": "",
+    "activa": true,
+    "fecha_creacion": "2025-10-02T20:36:06.869Z",
+    "fecha_actualizacion": "2025-10-02T21:08:25.404Z"
+  }
+},
+{
+  "model": "proyectos.vivienda",
+  "pk": 70,
+  "fields": {
+    "proyecto": 2,
+    "tipologia": 3,
+    "codigo": "799",
+    "familia_beneficiaria": "CARLOS MANUEL RETAMAL SALINAS",
+    "beneficiario": 65,
+    "estado": "construccion",
+    "fecha_entrega": null,
+    "fecha_inicio_postventa": null,
+    "fecha_termino_postventa": null,
+    "observaciones_generales": "",
+    "activa": true,
+    "fecha_creacion": "2025-10-02T20:36:06.875Z",
+    "fecha_actualizacion": "2025-10-02T21:08:25.336Z"
+  }
+},
+{
+  "model": "proyectos.vivienda",
+  "pk": 71,
+  "fields": {
+    "proyecto": 2,
+    "tipologia": 5,
+    "codigo": "817",
+    "familia_beneficiaria": "CINTHYA FRANCESCA VARGAS QUIÑONES",
+    "beneficiario": 83,
+    "estado": "construccion",
+    "fecha_entrega": null,
+    "fecha_inicio_postventa": null,
+    "fecha_termino_postventa": null,
+    "observaciones_generales": "",
+    "activa": true,
+    "fecha_creacion": "2025-10-02T20:36:06.879Z",
+    "fecha_actualizacion": "2025-10-02T21:08:25.506Z"
+  }
+},
+{
+  "model": "proyectos.vivienda",
+  "pk": 72,
+  "fields": {
+    "proyecto": 2,
+    "tipologia": 1,
+    "codigo": "803",
+    "familia_beneficiaria": "ANA DE LAS MERCEDES RIVERA BERNAL",
+    "beneficiario": 69,
+    "estado": "construccion",
+    "fecha_entrega": null,
+    "fecha_inicio_postventa": null,
+    "fecha_termino_postventa": null,
+    "observaciones_generales": "",
+    "activa": true,
+    "fecha_creacion": "2025-10-02T20:36:06.886Z",
+    "fecha_actualizacion": "2025-10-02T21:08:25.376Z"
+  }
+},
+{
+  "model": "proyectos.vivienda",
+  "pk": 73,
+  "fields": {
+    "proyecto": 2,
+    "tipologia": 3,
+    "codigo": "791",
+    "familia_beneficiaria": "ANA MARÍA PEREIRA GARRIDO",
+    "beneficiario": 57,
+    "estado": "construccion",
+    "fecha_entrega": null,
+    "fecha_inicio_postventa": null,
+    "fecha_termino_postventa": null,
+    "observaciones_generales": "",
+    "activa": true,
+    "fecha_creacion": "2025-10-02T20:36:06.891Z",
+    "fecha_actualizacion": "2025-10-02T21:08:25.254Z"
+  }
+},
+{
+  "model": "proyectos.vivienda",
+  "pk": 74,
+  "fields": {
+    "proyecto": 2,
+    "tipologia": 3,
+    "codigo": "795",
+    "familia_beneficiaria": "MARÍA CRISTINA PIZARRO VELÁSQUEZ",
+    "beneficiario": 61,
+    "estado": "construccion",
+    "fecha_entrega": null,
+    "fecha_inicio_postventa": null,
+    "fecha_termino_postventa": null,
+    "observaciones_generales": "",
+    "activa": true,
+    "fecha_creacion": "2025-10-02T20:36:06.897Z",
+    "fecha_actualizacion": "2025-10-02T21:08:25.297Z"
+  }
+},
+{
+  "model": "proyectos.vivienda",
+  "pk": 75,
+  "fields": {
+    "proyecto": 2,
+    "tipologia": 2,
+    "codigo": "807",
+    "familia_beneficiaria": "FRANCISCO JAVIER SOTO BUSTAMANTE",
+    "beneficiario": 73,
+    "estado": "construccion",
+    "fecha_entrega": null,
+    "fecha_inicio_postventa": null,
+    "fecha_termino_postventa": null,
+    "observaciones_generales": "",
+    "activa": true,
+    "fecha_creacion": "2025-10-02T20:36:06.903Z",
+    "fecha_actualizacion": "2025-10-02T21:08:25.412Z"
+  }
+},
+{
+  "model": "proyectos.vivienda",
+  "pk": 76,
+  "fields": {
+    "proyecto": 2,
+    "tipologia": 6,
+    "codigo": "816",
+    "familia_beneficiaria": "nan",
+    "beneficiario": null,
+    "estado": "construccion",
+    "fecha_entrega": null,
+    "fecha_inicio_postventa": null,
+    "fecha_termino_postventa": null,
+    "observaciones_generales": "",
+    "activa": true,
+    "fecha_creacion": "2025-10-02T20:36:06.909Z",
+    "fecha_actualizacion": "2025-10-02T21:10:57.454Z"
+  }
+},
+{
+  "model": "proyectos.vivienda",
+  "pk": 77,
+  "fields": {
+    "proyecto": 2,
+    "tipologia": 3,
+    "codigo": "797",
+    "familia_beneficiaria": "NOEMÍ MARLENE RAIN TAPIA",
+    "beneficiario": 63,
+    "estado": "construccion",
+    "fecha_entrega": null,
+    "fecha_inicio_postventa": null,
+    "fecha_termino_postventa": null,
+    "observaciones_generales": "",
+    "activa": true,
+    "fecha_creacion": "2025-10-02T20:36:06.914Z",
+    "fecha_actualizacion": "2025-10-02T21:08:25.316Z"
+  }
+},
+{
+  "model": "proyectos.vivienda",
+  "pk": 78,
+  "fields": {
+    "proyecto": 2,
+    "tipologia": 2,
+    "codigo": "809",
+    "familia_beneficiaria": "ANA MARÍA SEPÚLVEDA MAUREIRA",
+    "beneficiario": 75,
+    "estado": "construccion",
+    "fecha_entrega": null,
+    "fecha_inicio_postventa": null,
+    "fecha_termino_postventa": null,
+    "observaciones_generales": "",
+    "activa": true,
+    "fecha_creacion": "2025-10-02T20:36:06.921Z",
+    "fecha_actualizacion": "2025-10-02T21:08:25.430Z"
+  }
+},
+{
+  "model": "proyectos.vivienda",
+  "pk": 79,
+  "fields": {
+    "proyecto": 2,
+    "tipologia": 3,
+    "codigo": "793",
+    "familia_beneficiaria": "OLGA ESTER PINOCHET ARANCIBIA",
+    "beneficiario": 59,
+    "estado": "construccion",
+    "fecha_entrega": null,
+    "fecha_inicio_postventa": null,
+    "fecha_termino_postventa": null,
+    "observaciones_generales": "",
+    "activa": true,
+    "fecha_creacion": "2025-10-02T20:36:06.926Z",
+    "fecha_actualizacion": "2025-10-02T21:08:25.279Z"
+  }
+},
+{
+  "model": "proyectos.vivienda",
+  "pk": 80,
+  "fields": {
+    "proyecto": 2,
+    "tipologia": 3,
+    "codigo": "804",
+    "familia_beneficiaria": "ARTURO DEL CARMEN RIVERA PLAZA",
+    "beneficiario": 70,
+    "estado": "construccion",
+    "fecha_entrega": null,
+    "fecha_inicio_postventa": null,
+    "fecha_termino_postventa": null,
+    "observaciones_generales": "",
+    "activa": true,
+    "fecha_creacion": "2025-10-02T20:36:06.932Z",
+    "fecha_actualizacion": "2025-10-02T21:08:25.385Z"
+  }
+},
+{
+  "model": "proyectos.vivienda",
+  "pk": 81,
+  "fields": {
+    "proyecto": 2,
+    "tipologia": 2,
+    "codigo": "802",
+    "familia_beneficiaria": "LORENA ISABEL REYES LEDEZMA",
+    "beneficiario": 68,
+    "estado": "construccion",
+    "fecha_entrega": null,
+    "fecha_inicio_postventa": null,
+    "fecha_termino_postventa": null,
+    "observaciones_generales": "",
+    "activa": true,
+    "fecha_creacion": "2025-10-02T20:36:06.938Z",
+    "fecha_actualizacion": "2025-10-02T21:08:25.365Z"
+  }
+},
+{
+  "model": "proyectos.vivienda",
+  "pk": 82,
+  "fields": {
+    "proyecto": 2,
+    "tipologia": 3,
+    "codigo": "811",
+    "familia_beneficiaria": "ANA MARÍA SILVA CAMUS",
+    "beneficiario": 77,
+    "estado": "construccion",
+    "fecha_entrega": null,
+    "fecha_inicio_postventa": null,
+    "fecha_termino_postventa": null,
+    "observaciones_generales": "",
+    "activa": true,
+    "fecha_creacion": "2025-10-02T20:36:06.943Z",
+    "fecha_actualizacion": "2025-10-02T21:08:25.449Z"
+  }
+},
+{
+  "model": "proyectos.vivienda",
+  "pk": 83,
+  "fields": {
+    "proyecto": 2,
+    "tipologia": 3,
+    "codigo": "808",
+    "familia_beneficiaria": "OLGA MARÍA ROZAS TOBAR",
+    "beneficiario": 74,
+    "estado": "construccion",
+    "fecha_entrega": null,
+    "fecha_inicio_postventa": null,
+    "fecha_termino_postventa": null,
+    "observaciones_generales": "",
+    "activa": true,
+    "fecha_creacion": "2025-10-02T20:36:06.949Z",
+    "fecha_actualizacion": "2025-10-02T21:08:25.422Z"
+  }
+},
+{
+  "model": "proyectos.vivienda",
+  "pk": 84,
+  "fields": {
+    "proyecto": 2,
+    "tipologia": 4,
+    "codigo": "794",
+    "familia_beneficiaria": "CLAUDIA CECILIA PIZARRO TAPIA",
+    "beneficiario": 60,
+    "estado": "construccion",
+    "fecha_entrega": null,
+    "fecha_inicio_postventa": null,
+    "fecha_termino_postventa": null,
+    "observaciones_generales": "",
+    "activa": true,
+    "fecha_creacion": "2025-10-02T20:36:06.956Z",
+    "fecha_actualizacion": "2025-10-02T21:08:25.288Z"
+  }
+},
+{
+  "model": "proyectos.vivienda",
+  "pk": 85,
+  "fields": {
+    "proyecto": 2,
+    "tipologia": 6,
+    "codigo": "818",
+    "familia_beneficiaria": "DANILO ANTONIO VELÁSQUEZ MOLINA",
+    "beneficiario": 84,
+    "estado": "construccion",
+    "fecha_entrega": null,
+    "fecha_inicio_postventa": null,
+    "fecha_termino_postventa": null,
+    "observaciones_generales": "",
+    "activa": true,
+    "fecha_creacion": "2025-10-02T20:36:06.961Z",
+    "fecha_actualizacion": "2025-10-02T21:08:25.514Z"
+  }
+},
+{
+  "model": "proyectos.vivienda",
+  "pk": 86,
+  "fields": {
+    "proyecto": 2,
+    "tipologia": 3,
+    "codigo": "820",
+    "familia_beneficiaria": "KAREN ELOÍSA VERGARA NAVARRO",
+    "beneficiario": 86,
+    "estado": "construccion",
+    "fecha_entrega": null,
+    "fecha_inicio_postventa": null,
+    "fecha_termino_postventa": null,
+    "observaciones_generales": "",
+    "activa": true,
+    "fecha_creacion": "2025-10-02T20:36:06.966Z",
+    "fecha_actualizacion": "2025-10-02T21:08:25.532Z"
+  }
+},
+{
+  "model": "proyectos.vivienda",
+  "pk": 87,
+  "fields": {
+    "proyecto": 2,
+    "tipologia": 6,
+    "codigo": "819",
+    "familia_beneficiaria": "MARÍA ELENA VELÁSQUEZ TAPIA",
+    "beneficiario": 85,
+    "estado": "construccion",
+    "fecha_entrega": null,
+    "fecha_inicio_postventa": null,
+    "fecha_termino_postventa": null,
+    "observaciones_generales": "",
+    "activa": true,
+    "fecha_creacion": "2025-10-02T20:36:06.973Z",
+    "fecha_actualizacion": "2025-10-02T21:08:25.524Z"
+  }
+},
+{
+  "model": "proyectos.vivienda",
+  "pk": 88,
+  "fields": {
+    "proyecto": 2,
+    "tipologia": 6,
+    "codigo": "822",
+    "familia_beneficiaria": "MARGARITA DEL CARMEN HERRERA VALDIVIA",
+    "beneficiario": 87,
+    "estado": "construccion",
+    "fecha_entrega": null,
+    "fecha_inicio_postventa": null,
+    "fecha_termino_postventa": null,
+    "observaciones_generales": "",
+    "activa": true,
+    "fecha_creacion": "2025-10-02T20:36:06.978Z",
+    "fecha_actualizacion": "2025-10-02T21:08:25.541Z"
+  }
+},
+{
+  "model": "proyectos.vivienda",
+  "pk": 91,
+  "fields": {
+    "proyecto": 2,
+    "tipologia": 1,
+    "codigo": "V-PRUEBA-001",
+    "familia_beneficiaria": "Juan Pérez",
+    "beneficiario": 90,
+    "estado": "entregada",
+    "fecha_entrega": null,
+    "fecha_inicio_postventa": null,
+    "fecha_termino_postventa": null,
+    "observaciones_generales": "",
+    "activa": true,
+    "fecha_creacion": "2025-10-04T15:01:58.087Z",
+    "fecha_actualizacion": "2025-10-04T15:01:58.087Z"
+  }
+},
+{
+  "model": "proyectos.vivienda",
+  "pk": 92,
+  "fields": {
+    "proyecto": 2,
+    "tipologia": 1,
+    "codigo": "V-PRUEBA-002",
+    "familia_beneficiaria": "María González",
+    "beneficiario": null,
+    "estado": "entregada",
+    "fecha_entrega": null,
+    "fecha_inicio_postventa": null,
+    "fecha_termino_postventa": null,
+    "observaciones_generales": "",
+    "activa": true,
+    "fecha_creacion": "2025-10-04T15:08:36.359Z",
+    "fecha_actualizacion": "2025-10-04T15:08:36.359Z"
+  }
+},
+{
+  "model": "proyectos.vivienda",
+  "pk": 93,
+  "fields": {
+    "proyecto": 2,
+    "tipologia": 1,
+    "codigo": "V-TEST-3968",
+    "familia_beneficiaria": "María González",
+    "beneficiario": 93,
+    "estado": "entregada",
+    "fecha_entrega": null,
+    "fecha_inicio_postventa": null,
+    "fecha_termino_postventa": null,
+    "observaciones_generales": "",
+    "activa": true,
+    "fecha_creacion": "2025-10-04T15:09:20.843Z",
+    "fecha_actualizacion": "2025-10-04T15:09:20.843Z"
+  }
+},
+{
+  "model": "proyectos.vivienda",
+  "pk": 94,
+  "fields": {
+    "proyecto": 2,
+    "tipologia": 3,
+    "codigo": "004",
+    "familia_beneficiaria": "Rodrigo Faundez Vidal",
+    "beneficiario": 89,
+    "estado": "construccion",
+    "fecha_entrega": null,
+    "fecha_inicio_postventa": null,
+    "fecha_termino_postventa": null,
+    "observaciones_generales": "Entrega Diciembre",
+    "activa": true,
+    "fecha_creacion": "2025-10-11T15:34:19.543Z",
+    "fecha_actualizacion": "2025-10-13T18:03:12.993Z"
+  }
+},
+{
+  "model": "proyectos.vivienda",
+  "pk": 95,
+  "fields": {
+    "proyecto": 1,
+    "tipologia": 1,
+    "codigo": "3",
+    "familia_beneficiaria": "Rodrigo Vidal Andrade",
+    "beneficiario": 94,
+    "estado": "construccion",
+    "fecha_entrega": "2025-10-12",
+    "fecha_inicio_postventa": null,
+    "fecha_termino_postventa": null,
+    "observaciones_generales": "",
+    "activa": true,
+    "fecha_creacion": "2025-10-11T16:34:18.385Z",
+    "fecha_actualizacion": "2025-10-11T16:34:18.385Z"
+  }
+}
+]

@@ -1,0 +1,110 @@
+[
+{
+  "model": "incidencias.archivoadjuntoobservacion",
+  "pk": 10,
+  "fields": {
+    "observacion": 1482,
+    "archivo": "observaciones/2025/10/fondo_de_pantalla_2_gOZ8LQ8.jpg",
+    "nombre_original": "fondo de pantalla 2.jpg",
+    "descripcion": "",
+    "fecha_subida": "2025-10-04T16:32:02.121Z",
+    "subido_por": 10
+  }
+},
+{
+  "model": "incidencias.archivoadjuntoobservacion",
+  "pk": 11,
+  "fields": {
+    "observacion": 1484,
+    "archivo": "observaciones/2025/10/cabbana_del_misterio_h658X0M.png",
+    "nombre_original": "cabbana del misterio.png",
+    "descripcion": "",
+    "fecha_subida": "2025-10-04T16:47:52.682Z",
+    "subido_por": 10
+  }
+},
+{
+  "model": "incidencias.archivoadjuntoobservacion",
+  "pk": 12,
+  "fields": {
+    "observacion": 1483,
+    "archivo": "observaciones/2025/10/fondo_de_pantalla_2_VoYvNhc.jpg",
+    "nombre_original": "fondo de pantalla 2.jpg",
+    "descripcion": "",
+    "fecha_subida": "2025-10-09T19:03:34.632Z",
+    "subido_por": 1
+  }
+},
+{
+  "model": "incidencias.archivoadjuntoobservacion",
+  "pk": 13,
+  "fields": {
+    "observacion": 1483,
+    "archivo": "observaciones/2025/10/fondo_de_pantalla_gravity_falls_1vZFjWg.jpg",
+    "nombre_original": "fondo de pantalla gravity falls.jpg",
+    "descripcion": "",
+    "fecha_subida": "2025-10-09T19:03:47.522Z",
+    "subido_por": 1
+  }
+},
+{
+  "model": "incidencias.archivoadjuntoobservacion",
+  "pk": 14,
+  "fields": {
+    "observacion": 1485,
+    "archivo": "observaciones/2025/10/cabbana_del_misterio_yZC27sB.png",
+    "nombre_original": "cabbana del misterio.png",
+    "descripcion": "",
+    "fecha_subida": "2025-10-09T19:44:37.628Z",
+    "subido_por": 10
+  }
+},
+{
+  "model": "incidencias.archivoadjuntoobservacion",
+  "pk": 15,
+  "fields": {
+    "observacion": 1485,
+    "archivo": "observaciones/2025/10/fondo_de_pantalla_gravity_falls_hCqHdcs.jpg",
+    "nombre_original": "fondo de pantalla gravity falls.jpg",
+    "descripcion": "",
+    "fecha_subida": "2025-10-09T20:11:30.362Z",
+    "subido_por": 10
+  }
+},
+{
+  "model": "incidencias.archivoadjuntoobservacion",
+  "pk": 16,
+  "fields": {
+    "observacion": 1486,
+    "archivo": "observaciones/2025/10/v_1.jpg",
+    "nombre_original": "v (1).jpg",
+    "descripcion": "",
+    "fecha_subida": "2025-10-11T13:30:42.007Z",
+    "subido_por": 17
+  }
+},
+{
+  "model": "incidencias.archivoadjuntoobservacion",
+  "pk": 17,
+  "fields": {
+    "observacion": 1487,
+    "archivo": "observaciones/2025/10/img_2_vgGERLn.jpg",
+    "nombre_original": "img_2.jpg",
+    "descripcion": "",
+    "fecha_subida": "2025-10-11T17:01:44.346Z",
+    "subido_por": 1
+  }
+},
+{
+  "model": "incidencias.archivoadjuntoobservacion",
+  "pk": 18,
+  "fields": {
+    "observacion": 1487,
+    "archivo": "observaciones/2025/10/cabbana_del_misterio_epEhshw.png",
+    "nombre_original": "cabbana del misterio.png",
+    "descripcion": "",
+    "fecha_subida": "2025-10-11T19:28:13.712Z",
+    "subido_por": 1
+  }
+}
+]

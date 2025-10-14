@@ -1,0 +1,96 @@
+[
+{
+  "model": "incidencias.tipoobservacion",
+  "pk": 1,
+  "fields": {
+    "nombre": "General",
+    "descripcion": "Observación general",
+    "activo": true
+  }
+},
+{
+  "model": "incidencias.tipoobservacion",
+  "pk": 2,
+  "fields": {
+    "nombre": "Estructural",
+    "descripcion": "Problemas estructurales",
+    "activo": true
+  }
+},
+{
+  "model": "incidencias.tipoobservacion",
+  "pk": 3,
+  "fields": {
+    "nombre": "Instalaciones",
+    "descripcion": "Instalaciones eléctricas, agua, gas",
+    "activo": true
+  }
+},
+{
+  "model": "incidencias.tipoobservacion",
+  "pk": 4,
+  "fields": {
+    "nombre": "Terminaciones",
+    "descripcion": "Pintura, pisos, azulejos",
+    "activo": true
+  }
+},
+{
+  "model": "incidencias.tipoobservacion",
+  "pk": 5,
+  "fields": {
+    "nombre": "Carpintería",
+    "descripcion": "Puertas, ventanas, muebles",
+    "activo": true
+  }
+},
+{
+  "model": "incidencias.tipoobservacion",
+  "pk": 6,
+  "fields": {
+    "nombre": "Sanitario",
+    "descripcion": "Baños, grifería, sanitarios",
+    "activo": true
+  }
+},
+{
+  "model": "incidencias.estadoobservacion",
+  "pk": 1,
+  "fields": {
+    "codigo": 1,
+    "nombre": "Abierta",
+    "descripcion": "Observación registrada, pendiente de atención",
+    "activo": true
+  }
+},
+{
+  "model": "incidencias.estadoobservacion",
+  "pk": 2,
+  "fields": {
+    "codigo": 2,
+    "nombre": "En Proceso",
+    "descripcion": "Observación en proceso de resolución",
+    "activo": true
+  }
+},
+{
+  "model": "incidencias.estadoobservacion",
+  "pk": 3,
+  "fields": {
+    "codigo": 3,
+    "nombre": "Cerrada",
+    "descripcion": "Observación resuelta y cerrada",
+    "activo": true
+  }
+},
+{
+  "model": "incidencias.estadoobservacion",
+  "pk": 4,
+  "fields": {
+    "codigo": 4,
+    "nombre": "Rechazada",
+    "descripcion": "Observación rechazada o no procede",
+    "activo": true
+  }
+}
+]

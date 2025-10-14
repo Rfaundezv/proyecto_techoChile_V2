@@ -7,7 +7,7 @@
     {% load static %}
     <link href="{% static 'css/bootstrap.min.css' %}" rel="stylesheet">
     <link rel="stylesheet" href="{% static 'css/bootstrap-icons.css' %}">
-    <link href="{% static 'css/techo_style.css' %}?v={{ timestamp }}" rel="stylesheet">
+    <link href="{% static 'css/techo_style.css' %}?v=2025101403" rel="stylesheet">
     <script src="{% static 'js/chart.js' %}"></script>
 </head>
 <body>
@@ -95,6 +95,14 @@
                             <i class="bi bi-exclamation-triangle"></i> Observaciones
                         </a>
                     </li>
+                    <!-- Enlace móvil prominente -->
+                    <li class="nav-item d-md-none">
+                        <a class="nav-link" 
+                           href="{% url 'incidencias:observaciones_movil' %}?v={{ timestamp }}"
+                           style="background-color: #e3f2fd; color: #1976d2; border-radius: 6px; font-weight: 600;">
+                            <i class="bi bi-phone-vibrate"></i> Chequeo Móvil
+                        </a>
+                    </li>
                     {% endif %}
                     
                     {% if es_familia %}
@@ -102,6 +110,14 @@
                         <a class="nav-link {% if 'incidencias' in request.resolver_match.namespace %}active{% endif %}" 
                            href="{% url 'incidencias:lista_observaciones' %}">
                             <i class="bi bi-exclamation-triangle"></i> Mis Observaciones
+                        </a>
+                    </li>
+                    <!-- Enlace móvil prominente para familias -->
+                    <li class="nav-item d-md-none">
+                        <a class="nav-link" 
+                           href="{% url 'incidencias:observaciones_movil' %}?v={{ timestamp }}"
+                           style="background-color: #e8f5e8; color: #2e7d32; border-radius: 6px; font-weight: 600;">
+                            <i class="bi bi-phone-vibrate"></i> Chequeo Móvil
                         </a>
                     </li>
                     {% endif %}
@@ -117,7 +133,8 @@
                     
                     {% if not es_familia %}
                     <li class="nav-item">
-                        <a class="nav-link" href="#">
+                        <a class="nav-link {% if 'reportes' in request.resolver_match.namespace %}active{% endif %}" 
+                           href="{% url 'reportes:index' %}">
                             <i class="bi bi-file-earmark-text"></i> Reportes
                         </a>
                     </li>
@@ -165,6 +182,69 @@
             {% block content %}{% endblock %}
         </div>
     </main>
+
+    <!-- Botón flotante para versión móvil -->
+    {% if 'incidencias' in request.resolver_match.namespace and not es_familia %}
+    <div class="mobile-fab d-md-none">
+        <a href="{% url 'incidencias:observaciones_movil' %}?v={{ timestamp }}" 
+           class="fab-button"
+           title="Ir a Chequeo Móvil">
+            <i class="bi bi-phone-vibrate"></i>
+        </a>
+    </div>
+    
+    <style>
+        .mobile-fab {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 1000;
+        }
+        
+        .fab-button {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, #2196F3, #1976D2);
+            color: white;
+            border-radius: 50%;
+            text-decoration: none;
+            box-shadow: 0 4px 16px rgba(33, 150, 243, 0.4);
+            transition: all 0.3s ease;
+            font-size: 24px;
+            animation: pulse 2s infinite;
+        }
+        
+        .fab-button:hover {
+            background: linear-gradient(135deg, #1976D2, #1565C0);
+            color: white;
+            transform: scale(1.1);
+            box-shadow: 0 6px 20px rgba(33, 150, 243, 0.6);
+        }
+        
+        @keyframes pulse {
+            0% {
+                transform: scale(1);
+                box-shadow: 0 4px 16px rgba(33, 150, 243, 0.4);
+            }
+            50% {
+                transform: scale(1.05);
+                box-shadow: 0 6px 20px rgba(33, 150, 243, 0.6);
+            }
+            100% {
+                transform: scale(1);
+                box-shadow: 0 4px 16px rgba(33, 150, 243, 0.4);
+            }
+        }
+        
+        /* Efecto para dispositivos táctiles */
+        .fab-button:active {
+            transform: scale(0.95);
+        }
+    </style>
+    {% endif %}
 
     <script src="{% static 'js/bootstrap.bundle.min.js' %}"></script>
     <script src="{% load static %}{% static 'js/techo_dashboard.js' %}"></script>

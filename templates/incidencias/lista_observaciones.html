@@ -80,9 +80,11 @@ body.dark-mode .modal-content-techo .btn-techo-primary {
             </a>
             {% endif %}
             {% if not es_familia %}
-            <button class="btn btn-outline-primary d-none d-sm-inline">
-                Chequeo Móvil
-            </button>
+            <a href="{% url 'incidencias:observaciones_movil' %}" class="btn btn-outline-primary">
+                <i class="bi bi-phone"></i> 
+                <span class="d-none d-md-inline">Chequeo Móvil</span>
+                <span class="d-md-none">Móvil</span>
+            </a>
             {% endif %}
     </div>
     <!-- Métricas para familias -->

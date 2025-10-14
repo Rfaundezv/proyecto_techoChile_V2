@@ -1,0 +1,329 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Editar {{ acta.numero_acta }}{% endblock %}
+
+{% block extra_css %}
+<style>
+    .form-section {
+        background: #f8f9fa;
+        border-radius: 8px;
+        padding: 20px;
+        margin-bottom: 20px;
+    }
+    .section-title {
+        color: #d4002a;
+        border-bottom: 2px solid #d4002a;
+        padding-bottom: 10px;
+        margin-bottom: 20px;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="chart-container">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h2><i class="fas fa-edit"></i> Editar Acta: {{ acta.numero_acta }}</h2>
+                    <div>
+                        <a href="{% url 'reportes:acta_detail' acta.pk %}" class="btn btn-secondary">
+                            <i class="fas fa-arrow-left"></i> Volver
+                        </a>
+                        <a href="{% url 'reportes:acta_list' %}" class="btn btn-outline-secondary">
+                            Lista de Actas
+                        </a>
+                    </div>
+                </div>
+
+                <form method="post">
+                    {% csrf_token %}
+                    
+                    <!-- Errores del formulario -->
+                    {% if form.non_field_errors %}
+                        <div class="alert alert-danger">
+                            <h6><i class="fas fa-exclamation-triangle"></i> Errores del formulario:</h6>
+                            {% for error in form.non_field_errors %}
+                                <p class="mb-1">{{ error }}</p>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                    
+                    <!-- Información Básica -->
+                    <div class="form-section">
+                        <h4 class="section-title">Información Básica</h4>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="{{ form.numero_acta.id_for_label }}" class="form-label">{{ form.numero_acta.label }}</label>
+                                    {{ form.numero_acta }}
+                                    {% if form.numero_acta.errors %}
+                                        <div class="text-danger">{{ form.numero_acta.errors }}</div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="{{ form.fecha_entrega.id_for_label }}" class="form-label">{{ form.fecha_entrega.label }}</label>
+                                    {{ form.fecha_entrega }}
+                                    {% if form.fecha_entrega.errors %}
+                                        <div class="text-danger">{{ form.fecha_entrega.errors }}</div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-12">
+                                <div class="mb-3">
+                                    <label for="{{ form.lugar_entrega.id_for_label }}" class="form-label">{{ form.lugar_entrega.label }}</label>
+                                    {{ form.lugar_entrega }}
+                                    {% if form.lugar_entrega.errors %}
+                                        <div class="text-danger">{{ form.lugar_entrega.errors }}</div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Información de la Vivienda -->
+                    <div class="form-section">
+                        <h4 class="section-title">Información del Proyecto</h4>
+                        <div class="row">
+                            <div class="col-md-4">
+                                <div class="mb-3">
+                                    <label for="{{ form.vivienda.id_for_label }}" class="form-label">{{ form.vivienda.label }}</label>
+                                    {{ form.vivienda }}
+                                    {% if form.vivienda.errors %}
+                                        <div class="text-danger">{{ form.vivienda.errors }}</div>
+                                    {% endif %}
+                                    <div class="form-text">Vivienda asociada al acta de recepción</div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="mb-3">
+                                    <label for="{{ form.proyecto.id_for_label }}" class="form-label">{{ form.proyecto.label }}</label>
+                                    {{ form.proyecto }}
+                                    {% if form.proyecto.errors %}
+                                        <div class="text-danger">{{ form.proyecto.errors }}</div>
+                                    {% endif %}
+                                    <div class="form-text">Proyecto al que pertenece la vivienda</div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="mb-3">
+                                    <label for="{{ form.beneficiario.id_for_label }}" class="form-label">{{ form.beneficiario.label }}</label>
+                                    {{ form.beneficiario }}
+                                    {% if form.beneficiario.errors %}
+                                        <div class="text-danger">{{ form.beneficiario.errors }}</div>
+                                    {% endif %}
+                                    <div class="form-text">Selecciona el beneficiario de la vivienda</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Representante TECHO -->
+                    <div class="form-section">
+                        <h4 class="section-title">Representante TECHO</h4>
+                        <div class="row">
+                            <div class="col-md-4">
+                                <div class="mb-3">
+                                    <label for="{{ form.representante_techo.id_for_label }}" class="form-label">{{ form.representante_techo.label }}</label>
+                                    {{ form.representante_techo }}
+                                    {% if form.representante_techo.errors %}
+                                        <div class="text-danger">{{ form.representante_techo.errors }}</div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="mb-3">
+                                    <label for="{{ form.cargo_representante.id_for_label }}" class="form-label">{{ form.cargo_representante.label }}</label>
+                                    {{ form.cargo_representante }}
+                                    {% if form.cargo_representante.errors %}
+                                        <div class="text-danger">{{ form.cargo_representante.errors }}</div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="mb-3">
+                                    <label for="{{ form.rut_representante.id_for_label }}" class="form-label">{{ form.rut_representante.label }}</label>
+                                    {{ form.rut_representante }}
+                                    {% if form.rut_representante.errors %}
+                                        <div class="text-danger">{{ form.rut_representante.errors }}</div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="{{ form.telefono_representante.id_for_label }}" class="form-label">{{ form.telefono_representante.label }}</label>
+                                    {{ form.telefono_representante }}
+                                    {% if form.telefono_representante.errors %}
+                                        <div class="text-danger">{{ form.telefono_representante.errors }}</div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="{{ form.jefe_construccion.id_for_label }}" class="form-label">{{ form.jefe_construccion.label }}</label>
+                                    {{ form.jefe_construccion }}
+                                    {% if form.jefe_construccion.errors %}
+                                        <div class="text-danger">{{ form.jefe_construccion.errors }}</div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Información de la Vivienda -->
+                    <div class="form-section">
+                        <h4 class="section-title">Detalles de la Vivienda</h4>
+                        <div class="row">
+                            <div class="col-md-3">
+                                <div class="mb-3">
+                                    <label for="{{ form.superficie_construida.id_for_label }}" class="form-label">{{ form.superficie_construida.label }}</label>
+                                    {{ form.superficie_construida }}
+                                    {% if form.superficie_construida.errors %}
+                                        <div class="text-danger">{{ form.superficie_construida.errors }}</div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="mb-3">
+                                    <label for="{{ form.numero_ambientes.id_for_label }}" class="form-label">{{ form.numero_ambientes.label }}</label>
+                                    {{ form.numero_ambientes }}
+                                    {% if form.numero_ambientes.errors %}
+                                        <div class="text-danger">{{ form.numero_ambientes.errors }}</div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="mb-3">
+                                    <label for="{{ form.tipo_estructura.id_for_label }}" class="form-label">{{ form.tipo_estructura.label }}</label>
+                                    {{ form.tipo_estructura }}
+                                    {% if form.tipo_estructura.errors %}
+                                        <div class="text-danger">{{ form.tipo_estructura.errors }}</div>
+                                    {% endif %}
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+
+                    <!-- Estados y Servicios -->
+                    <div class="form-section">
+                        <h4 class="section-title">Estado y Servicios</h4>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <div class="form-check">
+                                        {{ form.estado_estructura }}
+                                        <label class="form-check-label" for="{{ form.estado_estructura.id_for_label }}">
+                                            {{ form.estado_estructura.label }}
+                                        </label>
+                                    </div>
+                                </div>
+                                <div class="mb-3">
+                                    <div class="form-check">
+                                        {{ form.estado_instalaciones }}
+                                        <label class="form-check-label" for="{{ form.estado_instalaciones.id_for_label }}">
+                                            {{ form.estado_instalaciones.label }}
+                                        </label>
+                                    </div>
+                                </div>
+
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <div class="form-check">
+                                        {{ form.tiene_electricidad }}
+                                        <label class="form-check-label" for="{{ form.tiene_electricidad.id_for_label }}">
+                                            Electricidad
+                                        </label>
+                                    </div>
+                                </div>
+                                <div class="mb-3">
+                                    <div class="form-check">
+                                        {{ form.tiene_agua_potable }}
+                                        <label class="form-check-label" for="{{ form.tiene_agua_potable.id_for_label }}">
+                                            Agua Potable
+                                        </label>
+                                    </div>
+                                </div>
+                                <div class="mb-3">
+                                    <div class="form-check">
+                                        {{ form.tiene_alcantarillado }}
+                                        <label class="form-check-label" for="{{ form.tiene_alcantarillado.id_for_label }}">
+                                            Alcantarillado
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Observaciones -->
+                    <div class="form-section">
+                        <h4 class="section-title">Observaciones</h4>
+                        <div class="row">
+                            <div class="col-md-8">
+                                <div class="mb-3">
+                                    <label for="{{ form.observaciones.id_for_label }}" class="form-label">{{ form.observaciones.label }}</label>
+                                    {{ form.observaciones }}
+                                    {% if form.observaciones.errors %}
+                                        <div class="text-danger">{{ form.observaciones.errors }}</div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="mb-3">
+                                    <label for="{{ form.plazo_correcciones.id_for_label }}" class="form-label">{{ form.plazo_correcciones.label }}</label>
+                                    {{ form.plazo_correcciones }}
+                                    {% if form.plazo_correcciones.errors %}
+                                        <div class="text-danger">{{ form.plazo_correcciones.errors }}</div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="d-flex justify-content-end gap-2">
+                        <a href="{% url 'reportes:acta_detail' acta.pk %}" class="btn btn-secondary">Cancelar</a>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-save"></i> Guardar Cambios
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Agregar clases de Bootstrap a los campos del formulario
+    const formInputs = document.querySelectorAll('input, select, textarea');
+    formInputs.forEach(input => {
+        if (input.type === 'checkbox') {
+            input.classList.add('form-check-input');
+        } else {
+            input.classList.add('form-control');
+        }
+    });
+
+    // Formato de fecha y hora para datetime-local
+    const fechaEntrega = document.querySelector('input[name="fecha_entrega"]');
+    if (fechaEntrega && fechaEntrega.type !== 'datetime-local') {
+        fechaEntrega.type = 'datetime-local';
+        
+        // Convertir formato de fecha si es necesario
+        if (fechaEntrega.value && !fechaEntrega.value.includes('T')) {
+            const fecha = new Date(fechaEntrega.value);
+            fechaEntrega.value = fecha.toISOString().slice(0, 16);
+        }
+    }
+});
+</script>
+{% endblock %}

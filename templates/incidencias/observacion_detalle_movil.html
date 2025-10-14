@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Detalle Observación - Móvil</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #f5f5f5;
+            font-size: 14px;
+            line-height: 1.4;
+        }
+        
+        .header-movil {
+            background: #2c3e50;
+            color: white;
+            padding: 10px 15px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            display: flex;
+            align-items: center;
+        }
+        
+        .btn-volver {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 18px;
+            margin-right: 10px;
+            cursor: pointer;
+        }
+        
+        .header-title {
+            font-size: 16px;
+            font-weight: 600;
+        }
+        
+        .detalle-container {
+            background: white;
+            margin: 10px;
+            border-radius: 8px;
+            padding: 15px;
+        }
+        
+        .obs-elemento {
+            font-size: 18px;
+            font-weight: 600;
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+        
+        .obs-meta {
+            background: #f8f9fa;
+            padding: 10px;
+            border-radius: 6px;
+            margin-bottom: 15px;
+        }
+        
+        .meta-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 5px;
+            font-size: 13px;
+        }
+        
+        .meta-label {
+            color: #666;
+            font-weight: 500;
+        }
+        
+        .meta-value {
+            color: #333;
+        }
+        
+        .obs-detalle {
+            margin-bottom: 20px;
+        }
+        
+        .detalle-titulo {
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #2c3e50;
+        }
+        
+        .detalle-texto {
+            color: #444;
+            line-height: 1.5;
+        }
+        
+        .estado-actual {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 15px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+        
+        .estado-pendiente { background: #ffeaa7; color: #2d3436; }
+        .estado-proceso { background: #74b9ff; color: white; }
+        .estado-resuelto { background: #00b894; color: white; }
+        .estado-cerrado { background: #636e72; color: white; }
+        
+        .prioridad-alta { color: #e74c3c; }
+        .prioridad-media { color: #f39c12; }
+        .prioridad-baja { color: #95a5a6; }
+        
+        .cambio-estado-section {
+            background: white;
+            margin: 0 10px 10px 10px;
+            border-radius: 8px;
+            padding: 15px;
+            display: none;
+        }
+        
+        .cambio-estado-section.show {
+            display: block;
+        }
+        
+        .section-titulo {
+            font-weight: 600;
+            margin-bottom: 15px;
+            color: #2c3e50;
+        }
+        
+        .form-group {
+            margin-bottom: 15px;
+        }
+        
+        .form-label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 500;
+            color: #555;
+        }
+        
+        .form-select,
+        .form-textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 14px;
+        }
+        
+        .form-textarea {
+            height: 80px;
+            resize: vertical;
+        }
+        
+        .btn-group {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .btn {
+            flex: 1;
+            padding: 12px;
+            border: none;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+        }
+        
+        .btn-primary {
+            background: #27ae60;
+            color: white;
+        }
+        
+        .btn-secondary {
+            background: #95a5a6;
+            color: white;
+        }
+        
+        .seguimientos-section {
+            background: white;
+            margin: 0 10px;
+            border-radius: 8px;
+            padding: 15px;
+        }
+        
+        .seguimiento-item {
+            border-left: 3px solid #3498db;
+            padding-left: 12px;
+            margin-bottom: 15px;
+        }
+        
+        .seguimiento-header {
+            font-size: 12px;
+            color: #666;
+            margin-bottom: 5px;
+        }
+        
+        .seguimiento-accion {
+            font-weight: 500;
+            color: #2c3e50;
+            margin-bottom: 3px;
+        }
+        
+        .seguimiento-comentario {
+            color: #555;
+            font-style: italic;
+        }
+        
+        .fab-cambiar-estado {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            width: 56px;
+            height: 56px;
+            border-radius: 50%;
+            background: #3498db;
+            color: white;
+            border: none;
+            font-size: 16px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            z-index: 1000;
+            cursor: pointer;
+        }
+        
+        .urgente {
+            color: #e74c3c;
+        }
+        
+        .urgente::before {
+            content: "🔥 ";
+        }
+    </style>
+</head>
+<body>
+    <div class="header-movil">
+        <button class="btn-volver" onclick="history.back()">←</button>
+        <div class="header-title">Detalle Observación</div>
+    </div>
+    
+    <div class="detalle-container">
+        <div class="obs-elemento {{ observacion.es_urgente|yesno:'urgente,' }}">
+            {{ observacion.elemento }}
+        </div>
+        
+        <div class="obs-meta">
+            <div class="meta-row">
+                <span class="meta-label">Vivienda:</span>
+                <span class="meta-value">{{ observacion.vivienda.codigo }}</span>
+            </div>
+            <div class="meta-row">
+                <span class="meta-label">Proyecto:</span>
+                <span class="meta-value">{{ observacion.vivienda.proyecto.codigo }}</span>
+            </div>
+            <div class="meta-row">
+                <span class="meta-label">Recinto:</span>
+                <span class="meta-value">{{ observacion.recinto.nombre|default:"No especificado" }}</span>
+            </div>
+            <div class="meta-row">
+                <span class="meta-label">Estado:</span>
+                <span class="meta-value">
+                    <span class="estado-actual estado-{{ observacion.estado.codigo|lower }}">
+                        {{ observacion.estado.nombre }}
+                    </span>
+                </span>
+            </div>
+            <div class="meta-row">
+                <span class="meta-label">Prioridad:</span>
+                <span class="meta-value prioridad-{{ observacion.prioridad }}">
+                    {{ observacion.get_prioridad_display }}
+                </span>
+            </div>
+            <div class="meta-row">
+                <span class="meta-label">Creada:</span>
+                <span class="meta-value">{{ observacion.fecha_creacion|date:"d/m/Y H:i" }}</span>
+            </div>
+            <div class="meta-row">
+                <span class="meta-label">Por:</span>
+                <span class="meta-value">{{ observacion.creado_por.nombre|default:"Sistema" }}</span>
+            </div>
+        </div>
+        
+        <div class="obs-detalle">
+            <div class="detalle-titulo">Descripción:</div>
+            <div class="detalle-texto">{{ observacion.detalle }}</div>
+        </div>
+    </div>
+    
+    {% if puede_editar %}
+    <div class="cambio-estado-section" id="cambio-estado-section">
+        <div class="section-titulo">Cambiar Estado</div>
+        
+        <div class="form-group">
+            <label class="form-label">Nuevo Estado:</label>
+            <select class="form-select" id="nuevo-estado">
+                {% for estado in estados %}
+                <option value="{{ estado.id }}" {% if estado.id == observacion.estado.id %}selected{% endif %}>
+                    {{ estado.nombre }}
+                </option>
+                {% endfor %}
+            </select>
+        </div>
+        
+        <div class="form-group">
+            <label class="form-label">Comentario:</label>
+            <textarea class="form-textarea" id="comentario-cambio" placeholder="Describe el cambio realizado..."></textarea>
+        </div>
+        
+        <div class="btn-group">
+            <button class="btn btn-primary" onclick="guardarCambioEstado()">
+                Guardar Cambio
+            </button>
+            <button class="btn btn-secondary" onclick="cancelarCambio()">
+                Cancelar
+            </button>
+        </div>
+    </div>
+    
+    <button class="fab-cambiar-estado" onclick="toggleCambioEstado()">
+        ✎
+    </button>
+    {% endif %}
+    
+    <div class="seguimientos-section">
+        <div class="section-titulo">Historial Reciente</div>
+        
+        {% for seguimiento in seguimientos %}
+        <div class="seguimiento-item">
+            <div class="seguimiento-header">
+                {{ seguimiento.fecha|date:"d/m/Y H:i" }} - {{ seguimiento.usuario.nombre }}
+            </div>
+            <div class="seguimiento-accion">{{ seguimiento.accion }}</div>
+            {% if seguimiento.comentario %}
+            <div class="seguimiento-comentario">{{ seguimiento.comentario }}</div>
+            {% endif %}
+        </div>
+        {% empty %}
+        <p style="color: #666; font-style: italic;">No hay seguimientos registrados</p>
+        {% endfor %}
+    </div>
+    
+    <script>
+        function toggleCambioEstado() {
+            const section = document.getElementById('cambio-estado-section');
+            section.classList.toggle('show');
+        }
+        
+        function cancelarCambio() {
+            const section = document.getElementById('cambio-estado-section');
+            section.classList.remove('show');
+            
+            // Limpiar campos
+            document.getElementById('comentario-cambio').value = '';
+        }
+        
+        function guardarCambioEstado() {
+            const nuevoEstadoId = document.getElementById('nuevo-estado').value;
+            const comentario = document.getElementById('comentario-cambio').value;
+            
+            if (!nuevoEstadoId) {
+                alert('Selecciona un estado');
+                return;
+            }
+            
+            // Mostrar loading
+            const btnGuardar = document.querySelector('.btn-primary');
+            const textoOriginal = btnGuardar.textContent;
+            btnGuardar.textContent = 'Guardando...';
+            btnGuardar.disabled = true;
+            
+            fetch(`/incidencias/movil/cambiar-estado/{{ observacion.id }}/`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': getCookie('csrftoken')
+                },
+                body: JSON.stringify({
+                    estado_id: nuevoEstadoId,
+                    comentario: comentario
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Recargar la página para mostrar cambios
+                    location.reload();
+                } else {
+                    alert('Error: ' + (data.error || 'No se pudo cambiar el estado'));
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Error al cambiar estado');
+            })
+            .finally(() => {
+                btnGuardar.textContent = textoOriginal;
+                btnGuardar.disabled = false;
+            });
+        }
+        
+        function getCookie(name) {
+            let cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+                const cookies = document.cookie.split(';');
+                for (let i = 0; i < cookies.length; i++) {
+                    const cookie = cookies[i].trim();
+                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
+        }
+    </script>
+</body>
+</html>

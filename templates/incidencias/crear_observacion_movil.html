@@ -1,0 +1,561 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}{% if es_familia %}Nueva Observación - Móvil{% else %}Nueva Observación - Móvil{% endif %} - TECHO CHILE{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/forms.css' %}">
+<style>
+/* Estilos optimizados para móvil */
+.mobile-form-container {
+    padding: 10px;
+    margin: 0;
+}
+
+.mobile-header {
+    background: linear-gradient(135deg, #2196F3, #1976D2);
+    color: white;
+    padding: 20px 15px;
+    margin: -15px -15px 20px -15px;
+    border-radius: 0 0 20px 20px;
+    text-align: center;
+}
+
+.mobile-header h1 {
+    font-size: 22px;
+    margin: 0;
+    font-weight: 600;
+}
+
+.mobile-header .subtitle {
+    font-size: 14px;
+    opacity: 0.9;
+    margin-top: 5px;
+}
+
+.mobile-card {
+    background: white;
+    border-radius: 15px;
+    padding: 20px;
+    margin-bottom: 15px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    border: none;
+}
+
+.mobile-field-group {
+    margin-bottom: 20px;
+}
+
+.mobile-field-group label {
+    font-weight: 600;
+    color: #333;
+    font-size: 16px;
+    margin-bottom: 8px;
+    display: block;
+}
+
+.mobile-field-group .form-control,
+.mobile-field-group .form-select,
+.mobile-field-group textarea {
+    font-size: 16px;
+    padding: 12px 15px;
+    border: 2px solid #e0e0e0;
+    border-radius: 12px;
+    transition: all 0.3s ease;
+    -webkit-appearance: none;
+}
+
+.mobile-field-group .form-control:focus,
+.mobile-field-group .form-select:focus,
+.mobile-field-group textarea:focus {
+    border-color: #2196F3;
+    box-shadow: 0 0 0 3px rgba(33, 150, 243, 0.1);
+    outline: none;
+}
+
+.mobile-field-group textarea {
+    min-height: 120px;
+    resize: vertical;
+}
+
+.vivienda-info-mobile {
+    background: linear-gradient(135deg, #4CAF50, #45a049);
+    color: white;
+    padding: 15px;
+    border-radius: 12px;
+    margin-bottom: 20px;
+}
+
+.vivienda-info-mobile h5 {
+    margin: 0 0 10px 0;
+    font-size: 16px;
+    font-weight: 600;
+}
+
+.vivienda-info-mobile .info-row {
+    display: flex;
+    justify-content: space-between;
+    margin: 5px 0;
+    font-size: 14px;
+}
+
+.urgente-section {
+    background: #fff3cd;
+    border: 2px solid #ffc107;
+    border-radius: 12px;
+    padding: 15px;
+    margin: 20px 0;
+}
+
+.urgente-section .form-check {
+    margin: 0;
+}
+
+.urgente-section .form-check-input {
+    width: 20px;
+    height: 20px;
+    margin-right: 10px;
+}
+
+.urgente-section .form-check-label {
+    font-size: 16px;
+    font-weight: 600;
+    color: #856404;
+}
+
+.file-upload-mobile {
+    border: 2px dashed #2196F3;
+    border-radius: 12px;
+    padding: 20px;
+    text-align: center;
+    background: #f8f9fa;
+    margin: 15px 0;
+}
+
+.file-upload-mobile input[type="file"] {
+    display: none;
+}
+
+.file-upload-mobile .upload-label {
+    background: #2196F3;
+    color: white;
+    padding: 12px 20px;
+    border-radius: 8px;
+    cursor: pointer;
+    display: inline-block;
+    font-weight: 600;
+    transition: all 0.3s ease;
+}
+
+.file-upload-mobile .upload-label:hover {
+    background: #1976D2;
+}
+
+.mobile-buttons {
+    position: sticky;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: white;
+    padding: 15px;
+    border-top: 1px solid #e0e0e0;
+    margin: 20px -20px -20px -20px;
+    border-radius: 15px 15px 0 0;
+}
+
+.btn-mobile {
+    width: 100%;
+    padding: 15px;
+    font-size: 18px;
+    font-weight: 600;
+    border-radius: 12px;
+    border: none;
+    margin-bottom: 10px;
+    transition: all 0.3s ease;
+}
+
+.btn-mobile-primary {
+    background: linear-gradient(135deg, #2196F3, #1976D2);
+    color: white;
+    box-shadow: 0 4px 15px rgba(33, 150, 243, 0.3);
+}
+
+.btn-mobile-primary:hover {
+    background: linear-gradient(135deg, #1976D2, #1565C0);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(33, 150, 243, 0.4);
+}
+
+.btn-mobile-secondary {
+    background: #6c757d;
+    color: white;
+}
+
+.btn-mobile-secondary:hover {
+    background: #545b62;
+}
+
+.loading-spinner {
+    display: none;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: rgba(0,0,0,0.8);
+    color: white;
+    padding: 20px;
+    border-radius: 10px;
+    z-index: 9999;
+}
+
+.error-message {
+    background: #f8d7da;
+    color: #721c24;
+    border: 1px solid #f5c6cb;
+    padding: 12px;
+    border-radius: 8px;
+    margin: 10px 0;
+    font-size: 14px;
+}
+
+.success-message {
+    background: #d4edda;
+    color: #155724;
+    border: 1px solid #c3e6cb;
+    padding: 12px;
+    border-radius: 8px;
+    margin: 10px 0;
+    font-size: 14px;
+}
+
+/* Responsive mejoras */
+@media (max-width: 576px) {
+    .mobile-form-container {
+        padding: 5px;
+    }
+    
+    .mobile-card {
+        padding: 15px;
+        border-radius: 12px;
+    }
+    
+    .mobile-header {
+        margin: -10px -10px 15px -10px;
+        padding: 15px 10px;
+    }
+    
+    .mobile-buttons {
+        margin: 15px -15px -15px -15px;
+    }
+}
+
+/* Fix para iOS Safari */
+input[type="file"] {
+    -webkit-appearance: none;
+}
+
+select {
+    -webkit-appearance: none;
+    background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6,9 12,15 18,9'%3e%3c/polyline%3e%3c/svg%3e");
+    background-repeat: no-repeat;
+    background-position: right 12px center;
+    background-size: 16px;
+    padding-right: 40px;
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="mobile-form-container">
+    <!-- Header móvil -->
+    <div class="mobile-header">
+        <h1>📋 Nueva Observación</h1>
+        <div class="subtitle">
+            {% if es_familia %}Tu Vivienda{% else %}Sistema Móvil{% endif %}
+        </div>
+    </div>
+
+    <!-- Información de vivienda para familias -->
+    {% if es_familia and mi_vivienda %}
+    <div class="vivienda-info-mobile">
+        <h5>🏠 Tu Vivienda</h5>
+        <div class="info-row">
+            <span>Proyecto:</span>
+            <strong>{{ mi_vivienda.proyecto.nombre }}</strong>
+        </div>
+        <div class="info-row">
+            <span>Código:</span>
+            <strong>{{ mi_vivienda.codigo }}</strong>
+        </div>
+        <div class="info-row">
+            <span>Dirección:</span>
+            <strong>{{ mi_vivienda.direccion|default:"No especificada" }}</strong>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Formulario -->
+    <form id="observacionMovilForm" enctype="multipart/form-data">
+        {% csrf_token %}
+        
+        <!-- Campos principales -->
+        <div class="mobile-card">
+            <h5 style="margin-bottom: 20px; color: #333;">📝 Detalles de la Observación</h5>
+            
+            {% if not es_familia %}
+            <!-- Solo para administradores: selección de proyecto y vivienda -->
+            <div class="mobile-field-group">
+                <label for="id_proyecto">📋 Proyecto</label>
+                <select name="proyecto" id="id_proyecto" class="form-select" required>
+                    <option value="">Seleccionar proyecto...</option>
+                    {% for proyecto in proyectos %}
+                    <option value="{{ proyecto.id }}">{{ proyecto.codigo }} - {{ proyecto.nombre }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            
+            <div class="mobile-field-group">
+                <label for="id_vivienda">🏠 Vivienda</label>
+                <select name="vivienda" id="id_vivienda" class="form-select" required>
+                    <option value="">Primero selecciona un proyecto...</option>
+                </select>
+            </div>
+            {% endif %}
+            
+            <div class="mobile-field-group">
+                <label for="id_recinto">🏠 Recinto</label>
+                <select name="recinto" id="id_recinto" class="form-select" required>
+                    <option value="">Seleccionar recinto...</option>
+                    {% for recinto in recintos %}
+                    <option value="{{ recinto.id }}">{{ recinto.nombre }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            
+            <div class="mobile-field-group">
+                <label for="id_elemento">🔧 Elemento</label>
+                <input type="text" name="elemento" id="id_elemento" 
+                       class="form-control" placeholder="Ej: Puerta, ventana, pared..." required>
+            </div>
+            
+            <div class="mobile-field-group">
+                <label for="id_detalle">📄 Descripción del Problema</label>
+                <textarea name="detalle" id="id_detalle" class="form-control" 
+                          placeholder="Describe detalladamente el problema que encontraste..." required></textarea>
+            </div>
+
+            <div class="mobile-field-group">
+                <label for="id_tipo">📂 Tipo de Observación</label>
+                <select name="tipo" id="id_tipo" class="form-select" required>
+                    <option value="">Seleccionar tipo...</option>
+                    {% for tipo in tipos %}
+                    <option value="{{ tipo.id }}">{{ tipo.nombre }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="mobile-field-group">
+                <label for="id_prioridad">⚖️ Prioridad</label>
+                <select name="prioridad" id="id_prioridad" class="form-select" required>
+                    <option value="">Seleccionar prioridad...</option>
+                    {% for value,label in prioridades %}
+                    <option value="{{ value }}">{{ label }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+        </div>
+
+        <!-- Sección de urgencia -->
+        <div class="urgente-section">
+            <div class="form-check">
+                <input type="checkbox" name="es_urgente" id="id_es_urgente" class="form-check-input">
+                <label class="form-check-label" for="id_es_urgente">
+                    🚨 Marcar como URGENTE
+                </label>
+            </div>
+            <small class="text-muted d-block mt-2">
+                Solo marca como urgente si requiere atención inmediata (riesgo de seguridad, daños mayores, etc.)
+            </small>
+        </div>
+
+        <!-- Subida de archivos -->
+        <div class="mobile-card">
+            <h5 style="margin-bottom: 15px; color: #333;">📎 Archivos Adjuntos</h5>
+            <div class="file-upload-mobile">
+                <label for="id_archivos_adjuntos" class="upload-label">
+                    📷 Seleccionar Fotos/Archivos
+                </label>
+                <input type="file" name="archivos_adjuntos" id="id_archivos_adjuntos" 
+                       multiple accept="image/*,.pdf,.doc,.docx">
+                <div class="mt-2">
+                    <small class="text-muted">
+                        Máximo 10MB total. Formatos: JPG, PNG, PDF, DOC, DOCX
+                    </small>
+                </div>
+                <div id="files-preview" class="mt-3"></div>
+            </div>
+        </div>
+
+        <!-- Botones de acción -->
+        <div class="mobile-buttons">
+            <button type="submit" class="btn btn-mobile btn-mobile-primary">
+                💾 Crear Observación
+            </button>
+            <a href="{% url 'incidencias:observaciones_movil' %}" class="btn btn-mobile btn-mobile-secondary">
+                ❌ Cancelar
+            </a>
+        </div>
+    </form>
+
+    <!-- Loading spinner -->
+    <div class="loading-spinner" id="loadingSpinner">
+        <div class="text-center">
+            <div class="spinner-border" role="status">
+                <span class="visually-hidden">Cargando...</span>
+            </div>
+            <div class="mt-2">Creando observación...</div>
+        </div>
+    </div>
+</div>
+
+<!-- Messages container -->
+<div id="messagesContainer" style="position: fixed; top: 10px; right: 10px; z-index: 9998; width: 300px;"></div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.getElementById('observacionMovilForm');
+    const loadingSpinner = document.getElementById('loadingSpinner');
+    const messagesContainer = document.getElementById('messagesContainer');
+    const proyectoSelect = document.getElementById('id_proyecto');
+    const viviendaSelect = document.getElementById('id_vivienda');
+    const fileInput = document.getElementById('id_archivos_adjuntos');
+    const filesPreview = document.getElementById('files-preview');
+    
+    // Función para mostrar mensajes
+    function showMessage(message, type = 'success') {
+        const messageDiv = document.createElement('div');
+        messageDiv.className = `alert alert-${type === 'success' ? 'success' : 'danger'} alert-dismissible fade show`;
+        messageDiv.innerHTML = `
+            ${message}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        `;
+        messagesContainer.appendChild(messageDiv);
+        
+        // Auto-remove después de 5 segundos
+        setTimeout(() => {
+            if (messageDiv.parentNode) {
+                messageDiv.remove();
+            }
+        }, 5000);
+    }
+    
+    // Preview de archivos seleccionados
+    if (fileInput) {
+        fileInput.addEventListener('change', function() {
+            filesPreview.innerHTML = '';
+            const files = Array.from(this.files);
+            
+            if (files.length > 0) {
+                files.forEach((file, index) => {
+                    const fileDiv = document.createElement('div');
+                    fileDiv.className = 'file-preview-item d-flex justify-content-between align-items-center p-2 mb-2 bg-light rounded';
+                    fileDiv.innerHTML = `
+                        <span class="file-name">${file.name}</span>
+                        <small class="file-size text-muted">${(file.size / 1024 / 1024).toFixed(2)} MB</small>
+                    `;
+                    filesPreview.appendChild(fileDiv);
+                });
+                
+                const totalSize = files.reduce((total, file) => total + file.size, 0);
+                const totalMB = totalSize / 1024 / 1024;
+                
+                if (totalMB > 10) {
+                    showMessage('⚠️ El tamaño total de los archivos excede los 10MB permitidos', 'error');
+                }
+            }
+        });
+    }
+    
+    // Cargar viviendas cuando se selecciona proyecto (solo para no-familia)
+    if (proyectoSelect && viviendaSelect) {
+        proyectoSelect.addEventListener('change', function() {
+            const proyectoId = this.value;
+            viviendaSelect.innerHTML = '<option value="">Cargando viviendas...</option>';
+            
+            if (proyectoId) {
+                // AJAX para cargar viviendas (usar URL con namespace para evitar 404 en móvil)
+                fetch(`{% url 'incidencias:ajax_viviendas' %}?proyecto_id=${proyectoId}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        viviendaSelect.innerHTML = '<option value="">Seleccionar vivienda...</option>';
+                        data.viviendas.forEach(vivienda => {
+                            viviendaSelect.innerHTML += `<option value="${vivienda.id}">${vivienda.codigo}</option>`;
+                        });
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        viviendaSelect.innerHTML = '<option value="">Error al cargar viviendas</option>';
+                        showMessage('Error al cargar las viviendas', 'error');
+                    });
+            } else {
+                viviendaSelect.innerHTML = '<option value="">Primero selecciona un proyecto...</option>';
+            }
+        });
+    }
+    
+    // Submit del formulario
+    form.addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        // Mostrar loading
+        loadingSpinner.style.display = 'block';
+        
+        // Preparar datos del formulario
+        const formData = new FormData(form);
+        
+        // Enviar datos
+        fetch('{% url "incidencias:crear_observacion_movil" %}', {
+            method: 'POST',
+            body: formData,
+            headers: {
+                'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            loadingSpinner.style.display = 'none';
+            
+            if (data.success) {
+                showMessage('✅ ' + data.message, 'success');
+                
+                // Redirigir después de 2 segundos
+                setTimeout(() => {
+                    if (data.redirect_url) {
+                        window.location.href = data.redirect_url;
+                    } else {
+                        window.location.href = '{% url "incidencias:observaciones_movil" %}';
+                    }
+                }, 2000);
+            } else {
+                if (data.errors) {
+                    // Mostrar errores específicos del formulario
+                    Object.keys(data.errors).forEach(field => {
+                        data.errors[field].forEach(error => {
+                            showMessage(`❌ ${field}: ${error}`, 'error');
+                        });
+                    });
+                } else {
+                    showMessage('❌ ' + (data.error || 'Error al crear la observación'), 'error');
+                }
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            loadingSpinner.style.display = 'none';
+            showMessage('❌ Error de conexión. Inténtalo de nuevo.', 'error');
+        });
+    });
+});
+</script>
+{% endblock %}

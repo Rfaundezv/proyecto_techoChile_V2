@@ -1,0 +1,607 @@
+<!-- templates/reportes/acta_template.html -->
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Acta de Recepción - {{ acta.numero_acta }}</title>
+    <style>
+        @page {
+            size: A4;
+            margin: 2cm;
+        }
+        
+        body {
+            font-family: 'Arial', sans-serif;
+            font-size: 11px;
+            line-height: 1.4;
+            color: #333;
+            max-width: 17cm;
+            margin: 0 auto;
+        }
+        
+        /* Estilos para impresión */
+        @media print {
+            .no-print {
+                display: none !important;
+            }
+            body {
+                font-size: 10px;
+            }
+            .section {
+                page-break-inside: avoid;
+            }
+        }
+        
+        /* Botones flotantes */
+        .print-controls {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+            display: flex;
+            gap: 10px;
+        }
+        
+        .btn {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+        }
+        
+        .btn-primary { background: #007bff; color: white; }
+        .btn-success { background: #28a745; color: white; }
+        .btn-secondary { background: #6c757d; color: white; }
+        
+        .btn:hover {
+            opacity: 0.9;
+            transform: translateY(-1px);
+        }
+        
+        .header {
+            text-align: center;
+            border-bottom: 2px solid #e74c3c;
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+        }
+        
+        .header h1 {
+            color: #e74c3c;
+            font-size: 18px;
+            margin-bottom: 5px;
+        }
+        
+        .header h2 {
+            color: #2c3e50;
+            font-size: 14px;
+            margin-top: 0;
+        }
+        
+        .section {
+            margin-bottom: 15px;
+            page-break-inside: avoid;
+        }
+        
+        .section-title {
+            background-color: #34495e;
+            color: white;
+            padding: 5px 10px;
+            font-weight: bold;
+            font-size: 12px;
+            margin-bottom: 10px;
+        }
+        
+        .field-row {
+            display: flex;
+            margin-bottom: 8px;
+            align-items: flex-start;
+            width: 100%;
+        }
+        
+        .field-label {
+            font-weight: bold;
+            min-width: 120px;
+            max-width: 180px;
+            margin-right: 8px;
+            flex-shrink: 0;
+        }
+        
+        .field-value {
+            flex: 1;
+            border-bottom: 1px solid #bdc3c7;
+            padding-bottom: 2px;
+            min-width: 0;
+        }
+        
+        .checkbox-group {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 8px;
+        }
+        
+        .checkbox-item {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        
+        .table-responsive {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 10px 0;
+            font-size: 10px;
+            table-layout: fixed;
+        }
+        
+        .table-responsive th,
+        .table-responsive td {
+            border: 1px solid #bdc3c7;
+            padding: 6px;
+            text-align: left;
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+        }
+        
+        .table-responsive th {
+            background-color: #ecf0f1;
+            font-weight: bold;
+        }
+        
+        .signature-section {
+            margin-top: 30px;
+            page-break-inside: avoid;
+        }
+        
+        .signatures {
+            display: flex;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 20px;
+            margin-top: 20px;
+        }
+        
+        .signature-box {
+            flex: 1;
+            min-width: 150px;
+            max-width: 200px;
+            text-align: center;
+            border: 1px solid #bdc3c7;
+            padding: 10px;
+            margin-bottom: 20px;
+        }
+        
+        .signature-line {
+            border-bottom: 1px solid #333;
+            margin-bottom: 10px;
+            height: 40px;
+        }
+        
+        .observations-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 10px 0;
+        }
+        
+        .observations-table th,
+        .observations-table td {
+            border: 1px solid #bdc3c7;
+            padding: 8px;
+            text-align: left;
+            vertical-align: top;
+        }
+        
+        .observations-table th {
+            background-color: #ecf0f1;
+            font-weight: bold;
+            font-size: 10px;
+        }
+        
+        .page-break {
+            page-break-before: always;
+        }
+        
+        .footer-note {
+            font-size: 9px;
+            color: #7f8c8d;
+            text-align: center;
+            margin-top: 20px;
+            border-top: 1px solid #bdc3c7;
+            padding-top: 10px;
+        }
+        
+        .yes-no {
+            color: #e74c3c;
+            font-weight: bold;
+        }
+        
+        .yes-no.yes {
+            color: #27ae60;
+        }
+    </style>
+</head>
+<body>
+    <!-- Controles de impresión (no se muestran al imprimir) -->
+    {% if not es_descarga %}
+    <div class="print-controls no-print">
+        <button onclick="window.print()" class="btn btn-primary">
+            🖨️ Imprimir
+        </button>
+        <a href="?download=1" class="btn btn-success">
+            💾 Descargar
+        </a>
+        <button onclick="window.close()" class="btn btn-secondary">
+            ❌ Cerrar
+        </button>
+    </div>
+    {% endif %}
+    
+    <div class="header">
+        <h1>ACTA DE RECEPCIÓN DE VIVIENDA</h1>
+        <h2>TECHO CHILE</h2>
+        <p><strong>Acta N°:</strong> {{ acta.numero_acta }} | <strong>Generada:</strong> {{ fecha_generacion|date:"d/m/Y H:i" }}</p>
+    </div>
+
+    <!-- INFORMACIÓN GENERAL -->
+    <div class="section">
+        <div class="section-title">I. INFORMACIÓN GENERAL</div>
+        <div class="field-row">
+            <div class="field-label">Fecha de Entrega:</div>
+            <div class="field-value">{{ acta.fecha_entrega|date:"d/m/Y" }}</div>
+            <div class="field-label" style="margin-left: 30px;">Hora:</div>
+            <div class="field-value">{{ acta.fecha_entrega|date:"H:i" }}</div>
+        </div>
+        <div class="field-row">
+            <div class="field-label">Lugar de Entrega:</div>
+            <div class="field-value">{{ acta.lugar_entrega }}</div>
+        </div>
+    </div>
+
+    <!-- IDENTIFICACIÓN DEL PROYECTO -->
+    <div class="section">
+        <div class="section-title">II. IDENTIFICACIÓN DEL PROYECTO</div>
+        <div class="field-row">
+            <div class="field-label">Nombre del Proyecto:</div>
+            <div class="field-value">{{ proyecto.nombre }}</div>
+        </div>
+        <div class="field-row">
+            <div class="field-label">Código del Proyecto:</div>
+            <div class="field-value">{{ proyecto.codigo }}</div>
+        </div>
+        <div class="field-row">
+            <div class="field-label">Comuna:</div>
+            <div class="field-value">{{ proyecto.comuna.nombre }}</div>
+            <div class="field-label" style="margin-left: 30px;">Región:</div>
+            <div class="field-value">{{ proyecto.region.nombre }}</div>
+        </div>
+        <div class="field-row">
+            <div class="field-label">Constructora:</div>
+            <div class="field-value">{{ proyecto.constructora.nombre }}</div>
+        </div>
+    </div>
+
+    <!-- IDENTIFICACIÓN DEL BENEFICIARIO -->
+    <div class="section">
+        <div class="section-title">III. IDENTIFICACIÓN DEL BENEFICIARIO</div>
+        <div class="field-row">
+            <div class="field-label">Nombre Completo:</div>
+            <div class="field-value">{{ beneficiario.nombre_completo }}</div>
+        </div>
+        <div class="field-row">
+            <div class="field-label">RUT:</div>
+            <div class="field-value">{{ beneficiario.rut|default:"-" }}</div>
+            <div class="field-label" style="margin-left: 30px;">Email:</div>
+            <div class="field-value">{{ beneficiario.email|default:"-" }}</div>
+        </div>
+        {% if beneficiario.telefonos.exists %}
+        <div class="field-row">
+            <div class="field-label">Teléfono:</div>
+            <div class="field-value">{{ beneficiario.telefonos.first.numero }}</div>
+        </div>
+        {% endif %}
+        
+        {% if familiares %}
+        <p style="font-weight: bold; margin-top: 15px; margin-bottom: 8px;">Núcleo Familiar:</p>
+        <table class="table-responsive">
+            <thead>
+                <tr>
+                    <th>Nombre Completo</th>
+                    <th>Parentesco</th>
+                    <th>RUT</th>
+                    <th>Edad</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for familiar in familiares %}
+                <tr>
+                    <td>{{ familiar.nombre_completo }}</td>
+                    <td>{{ familiar.parentesco }}</td>
+                    <td>{{ familiar.rut|default:"-" }}</td>
+                    <td>{{ familiar.edad|default:"-" }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% endif %}
+    </div>
+
+    <!-- DESCRIPCIÓN DE LA VIVIENDA -->
+    <div class="section">
+        <div class="section-title">IV. DESCRIPCIÓN DE LA VIVIENDA</div>
+        <div class="field-row">
+            <div class="field-label">Código de la Vivienda:</div>
+            <div class="field-value">{{ vivienda.codigo }}</div>
+        </div>
+        <div class="field-row">
+            <div class="field-label">Ubicación:</div>
+            <div class="field-value">{{ acta.lugar_entrega }}</div>
+        </div>
+        <div class="field-row">
+            <div class="field-label">Superficie Construida:</div>
+            <div class="field-value">{{ acta.superficie_construida }} m²</div>
+            <div class="field-label" style="margin-left: 30px;">N° Ambientes:</div>
+            <div class="field-value">{{ acta.numero_ambientes }}</div>
+        </div>
+        <div class="field-row">
+            <div class="field-label">Tipo de Estructura:</div>
+            <div class="field-value">{{ acta.get_tipo_estructura_display }}</div>
+        </div>
+        
+        <p style="font-weight: bold; margin-top: 15px; margin-bottom: 8px;">Servicios Básicos:</p>
+        <div class="checkbox-group">
+            <div class="checkbox-item">
+                <span>{% if acta.tiene_electricidad %}☑{% else %}☐{% endif %}</span> <strong>Electricidad:</strong>
+                <span class="yes-no {% if acta.tiene_electricidad %}yes{% endif %}">
+                    {% if acta.tiene_electricidad %}Sí{% else %}No{% endif %}
+                </span>
+            </div>
+            <div class="checkbox-item">
+                <span>{% if acta.tiene_agua_potable %}☑{% else %}☐{% endif %}</span> <strong>Agua Potable:</strong>
+                <span class="yes-no {% if acta.tiene_agua_potable %}yes{% endif %}">
+                    {% if acta.tiene_agua_potable %}Sí{% else %}No{% endif %}
+                </span>
+            </div>
+        </div>
+        <div class="checkbox-group">
+            <div class="checkbox-item">
+                <span>{% if acta.tiene_alcantarillado %}☑{% else %}☐{% endif %}</span> <strong>Alcantarillado:</strong>
+                <span class="yes-no {% if acta.tiene_alcantarillado %}yes{% endif %}">
+                    {% if acta.tiene_alcantarillado %}Sí{% else %}No{% endif %}
+                </span>
+            </div>
+            <!-- Nota: Campo gas removido temporalmente por inconsistencias de esquema -->
+        </div>
+    </div>
+
+    <!-- ENTIDADES PARTICIPANTES -->
+    <div class="section">
+        <div class="section-title">V. ENTIDADES PARTICIPANTES</div>
+        
+        <p style="font-weight: bold; margin-bottom: 8px;">TECHO CHILE</p>
+        <div class="field-row">
+            <div class="field-label">Representante:</div>
+            <div class="field-value">{{ acta.representante_techo }}</div>
+        </div>
+        <div class="field-row">
+            <div class="field-label">Cargo:</div>
+            <div class="field-value">{{ acta.cargo_representante }}</div>
+            <div class="field-label" style="margin-left: 30px;">RUT:</div>
+            <div class="field-value">{{ acta.rut_representante }}</div>
+        </div>
+        <div class="field-row">
+            <div class="field-label">Teléfono:</div>
+            <div class="field-value">{{ acta.telefono_representante }}</div>
+        </div>
+        
+        {% if constructor %}
+        <p style="font-weight: bold; margin-top: 15px; margin-bottom: 8px;">CONSTRUCTOR/CONTRATISTA</p>
+        <div class="field-row">
+            <div class="field-label">Empresa:</div>
+            <div class="field-value">{{ constructor.nombre_empresa }}</div>
+        </div>
+        <div class="field-row">
+            <div class="field-label">Representante:</div>
+            <div class="field-value">{{ constructor.representante }}</div>
+            <div class="field-label" style="margin-left: 30px;">RUT:</div>
+            <div class="field-value">{{ constructor.rut }}</div>
+        </div>
+        <div class="field-row">
+            <div class="field-label">Teléfono:</div>
+            <div class="field-value">{{ constructor.telefono }}</div>
+        </div>
+        {% endif %}
+        
+        <p style="font-weight: bold; margin-top: 15px; margin-bottom: 8px;">VOLUNTARIOS PARTICIPANTES</p>
+        {% if acta.jefe_construccion %}
+        <div class="field-row">
+            <div class="field-label">Jefe de Construcción:</div>
+            <div class="field-value">{{ acta.jefe_construccion }}</div>
+        </div>
+        {% endif %}
+    </div>
+
+    <!-- VERIFICACIÓN Y RECEPCIÓN -->
+    <div class="section">
+        <div class="section-title">VI. VERIFICACIÓN Y RECEPCIÓN</div>
+        <p style="font-weight: bold; margin-bottom: 8px;">Estado de la Vivienda al momento de la entrega:</p>
+        
+        <div class="checkbox-group">
+            <div class="checkbox-item">
+                <span>{% if acta.estado_estructura %}☑{% else %}☐{% endif %}</span>
+                <strong>Estructura General:</strong>
+                <span class="yes-no {% if acta.estado_estructura %}yes{% endif %}">
+                    {% if acta.estado_estructura %}Conforme{% else %}Con observaciones{% endif %}
+                </span>
+            </div>
+        </div>
+        <div class="checkbox-group">
+            <div class="checkbox-item">
+                <span>{% if acta.estado_instalaciones %}☑{% else %}☐{% endif %}</span>
+                <strong>Instalaciones:</strong>
+                <span class="yes-no {% if acta.estado_instalaciones %}yes{% endif %}">
+                    {% if acta.estado_instalaciones %}Conforme{% else %}Con observaciones{% endif %}
+                </span>
+            </div>
+        </div>
+    </div>
+
+    <!-- OBSERVACIONES -->
+    {% if acta.observaciones %}
+    <div class="section">
+        <div class="section-title">VII. OBSERVACIONES Y COMPROMISOS</div>
+        <div class="field-row">
+            <div class="field-label">La vivienda se recibe:</div>
+            <div class="field-value">
+                {% if acta.observaciones %}Con las siguientes observaciones{% else %}Sin observaciones{% endif %}
+            </div>
+        </div>
+        
+        {% if acta.observaciones %}
+        <p style="font-weight: bold; margin-top: 15px; margin-bottom: 8px;">Observaciones Detectadas:</p>
+        <div style="border: 1px solid #bdc3c7; padding: 10px; background-color: #f9f9f9; white-space: pre-line;">{{ acta.observaciones }}</div>
+        <div class="field-row" style="margin-top: 10px;">
+            <div class="field-label">Plazo General de Corrección:</div>
+            <div class="field-value">120 días calendario</div>
+        </div>
+        <div class="field-row">
+            <div class="field-label">Observaciones Urgentes:</div>
+            <div class="field-value">48 horas</div>
+        </div>
+        <p style="font-size: 10px; color: #666; margin-top: 8px;">
+            <strong>Nota:</strong> Las observaciones marcadas como urgentes deben ser corregidas en un plazo máximo de 48 horas. 
+            Las demás observaciones tienen un plazo de 120 días calendario para su corrección.
+        </p>
+        {% endif %}
+    </div>
+    {% endif %}
+
+    <div class="page-break"></div>
+
+    <!-- DECLARACIONES DEL BENEFICIARIO -->
+    <div class="section">
+        <div class="section-title">VIII. DECLARACIONES DEL BENEFICIARIO</div>
+        <p>Yo, <strong>{{ beneficiario.nombre_completo }}</strong>, RUT <strong>{{ beneficiario.rut|default:"" }}</strong>, por el presente documento:</p>
+        
+        <ol style="line-height: 1.6; margin-left: 20px;">
+            <li><strong>DECLARO</strong> haber recibido de parte de <strong>TECHO CHILE</strong>, la vivienda antes descrita, que me ha sido asignada según el proceso de selección y evaluación social correspondiente.</li>
+            
+            <li><strong>ACEPTO</strong> expresamente que esta vivienda ha sido construida con fines sociales y de ayuda humanitaria, y me comprometo a:
+                <ul style="margin-top: 5px;">
+                    <li>Habitar la vivienda junto con mi núcleo familiar</li>
+                    <li>Dar buen uso y mantención a la estructura</li>
+                    <li>No arrendar ni vender la vivienda por un período mínimo de <strong>2 años</strong></li>
+                    <li>Cumplir con los compromisos establecidos en el programa</li>
+                </ul>
+            </li>
+            
+            <li><strong>RECONOZCO</strong> que a partir de esta fecha será de mi cargo:
+                <ul style="margin-top: 5px;">
+                    <li>El pago de los servicios básicos (luz, agua, gas)</li>
+                    <li>El cuidado y mantención regular de la vivienda</li>
+                    <li>El cumplimiento de las normativas municipales</li>
+                </ul>
+            </li>
+            
+            <li><strong>DECLARO</strong> conocer que para problemas de post-venta el canal de comunicación será:
+                <ul style="margin-top: 5px;">
+                    <li><strong>Representante TECHO:</strong> {{ acta.representante_techo }}</li>
+                    <li><strong>Teléfono:</strong> {{ acta.telefono_representante }}</li>
+                    <li><strong>Plazo para reportar observaciones:</strong> 30 días</li>
+                </ul>
+            </li>
+        </ol>
+    </div>
+
+    <!-- GARANTÍAS -->
+    <div class="section">
+        <div class="section-title">IX. GARANTÍAS Y POST-VENTA</div>
+        <div class="field-row">
+            <div class="field-label">Período de Garantía:</div>
+            <div class="field-value">12 meses desde la fecha de entrega</div>
+        </div>
+        
+        <p style="font-weight: bold; margin-top: 10px; margin-bottom: 5px;">Cobertura de Garantía:</p>
+        <ul style="margin-left: 20px; line-height: 1.6;">
+            <li>Defectos estructurales</li>
+            <li>Defectos en instalaciones básicas</li>
+            <li>Filtración de agua de lluvia</li>
+            <li>Problemas en puertas y ventanas</li>
+        </ul>
+        
+        <p style="font-weight: bold; margin-top: 10px; margin-bottom: 5px;">Exclusiones de Garantía:</p>
+        <ul style="margin-left: 20px; line-height: 1.6;">
+            <li>Daños por mal uso o falta de mantención</li>
+            <li>Desgaste natural de materiales</li>
+            <li>Daños por fenómenos naturales extraordinarios</li>
+            <li>Modificaciones no autorizadas</li>
+        </ul>
+    </div>
+
+    <!-- FIRMAS -->
+    <div class="signature-section">
+        <div class="section-title">X. FIRMAS</div>
+        <p style="text-align: center; margin-bottom: 20px;">
+            El presente documento se firma en <strong>CUATRO (4)</strong> ejemplares originales
+        </p>
+        
+        <div class="signatures">
+            <div class="signature-box">
+                <div class="signature-line"></div>
+                <p><strong>BENEFICIARIO</strong></p>
+                <p>{{ beneficiario.nombre_completo }}</p>
+                <p>RUT: {{ beneficiario.rut|default:"" }}</p>
+                <p>Fecha: {{ acta.fecha_entrega|date:"d/m/Y" }}</p>
+            </div>
+            
+            <div class="signature-box">
+                <div class="signature-line"></div>
+                <p><strong>REPRESENTANTE TECHO</strong></p>
+                <p>{{ acta.representante_techo }}</p>
+                <p>{{ acta.cargo_representante }}</p>
+                <p>RUT: {{ acta.rut_representante }}</p>
+                <p>Fecha: {{ acta.fecha_entrega|date:"d/m/Y" }}</p>
+            </div>
+            
+            {% if constructor %}
+            <div class="signature-box">
+                <div class="signature-line"></div>
+                <p><strong>CONSTRUCTOR</strong></p>
+                <p>{{ constructor.representante }}</p>
+                <p>{{ constructor.nombre_empresa }}</p>
+                <p>RUT: {{ constructor.rut }}</p>
+                <p>Fecha: {{ acta.fecha_entrega|date:"d/m/Y" }}</p>
+            </div>
+            {% endif %}
+            
+            {% if acta.jefe_construccion %}
+            <div class="signature-box">
+                <div class="signature-line"></div>
+                <p><strong>TESTIGO</strong></p>
+                <p>{{ acta.jefe_construccion }}</p>
+                <p>Jefe de Construcción</p>
+                <p>Fecha: {{ acta.fecha_entrega|date:"d/m/Y" }}</p>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="footer-note">
+        <p>
+            <strong>NOTA IMPORTANTE:</strong> Este documento constituye la constancia oficial de la entrega y recepción de la vivienda. 
+            Consérvelo como documento de respaldo para cualquier gestión posterior relacionada con la vivienda.
+        </p>
+        <p style="margin-top: 10px;">
+            Este documento ha sido elaborado conforme a las normativas chilenas vigentes y adaptado a los 
+            procedimientos específicos de TECHO Chile para la entrega de viviendas sociales y de emergencia.
+        </p>
+        <p style="margin-top: 10px; font-weight: bold;">
+            Documento generado automáticamente - Acta N° {{ acta.numero_acta }} - {{ fecha_generacion|date:"d/m/Y H:i" }}
+        </p>
+    </div>
+</body>
+</html>

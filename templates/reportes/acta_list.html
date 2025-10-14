@@ -1,0 +1,127 @@
+{% extends "base.html" %}
+
+{% block title %}Actas de Recepción - {{ block.super }}{% endblock %}
+
+{% block content %}
+<div class="container-fluid mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
+        <h2 class="dashboard-title dashboard-h2 dynamic-title mb-1">
+            <i class="bi bi-file-earmark-text"></i> Actas de Recepción
+        </h2>
+        <a href="{% url 'reportes:acta_create' %}" class="btn btn-primary fw-semibold px-3">
+            <i class="bi bi-plus-circle me-1"></i> Nueva Acta
+        </a>
+    </div>
+
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        {% endfor %}
+    {% endif %}
+
+    <!-- Filtros -->
+    <div class="chart-container mb-4">
+        <form method="get" class="row g-2 align-items-end justify-content-start">
+            <div class="col-auto">
+                <label for="proyecto" class="form-label mb-1 fw-semibold">Proyecto</label>
+                <select id="proyecto" name="proyecto" class="form-select form-select-sm" style="min-width: 200px;">
+                    <option value="">Todos los proyectos</option>
+                    {% for proyecto in proyectos %}
+                        <option value="{{ proyecto.id }}" {% if request.GET.proyecto == proyecto.id|stringformat:"s" %}selected{% endif %}>
+                            {{ proyecto.nombre }}
+                        </option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-auto">
+                <button type="submit" class="btn btn-sm btn-primary fw-semibold px-3">Filtrar</button>
+                <a href="{% url 'reportes:acta_list' %}" class="btn btn-sm btn-outline-primary fw-semibold px-3 ms-2">Limpiar</a>
+            </div>
+        </form>
+    </div>
+
+    <!-- Tabla de actas -->
+    <div class="card">
+        <div class="card-body p-0 p-md-3">
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>Acta N°</th>
+                            <th>Proyecto</th>
+                            <th>Vivienda</th>
+                            <th>Beneficiario</th>
+                            <th>Fecha Entrega</th>
+                            <th>Representante</th>
+                            <th>Estado</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for acta in actas %}
+                        <tr>
+                            <td>
+                                <strong>{{ acta.numero_acta }}</strong>
+                            </td>
+                            <td>
+                                <span class="text-muted small d-block">{{ acta.proyecto.codigo }}</span>
+                                {{ acta.proyecto.nombre }}
+                            </td>
+                            <td>{{ acta.vivienda.codigo }}</td>
+                            <td>
+                                {{ acta.beneficiario.nombre_completo }}
+                                {% if acta.beneficiario.rut %}
+                                    <br><small class="text-muted">{{ acta.beneficiario.rut }}</small>
+                                {% endif %}
+                            </td>
+                            <td>
+                                {{ acta.fecha_entrega|date:"d/m/Y" }}
+                                <br><small class="text-muted">{{ acta.fecha_entrega|date:"H:i" }}</small>
+                            </td>
+                            <td>
+                                {{ acta.representante_techo }}
+                                <br><small class="text-muted">{{ acta.cargo_representante }}</small>
+                            </td>
+                            <td>
+                                {% if acta.observaciones %}
+                                    <span class="badge bg-warning">Con observaciones</span>
+                                {% else %}
+                                    <span class="badge bg-success">Conforme</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <div class="d-flex gap-1 flex-column flex-md-row">
+                                    <a href="{% url 'reportes:acta_detail' acta.pk %}" class="btn btn-sm btn-info" title="Ver detalle">
+                                        <i class="bi bi-eye"></i>
+                                        <span class="d-none d-lg-inline ms-1">Ver</span>
+                                    </a>
+                                    <a href="{% url 'reportes:acta_pdf' acta.pk %}" class="btn btn-sm btn-danger" title="Descargar PDF" target="_blank">
+                                        <i class="bi bi-file-earmark-pdf"></i>
+                                        <span class="d-none d-lg-inline ms-1">PDF</span>
+                                    </a>
+                                </div>
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="8" class="text-center py-4">
+                                <div class="text-muted">
+                                    <i class="bi bi-inbox display-4"></i>
+                                    <p class="mt-3">No hay actas de recepción registradas.</p>
+                                    <a href="{% url 'reportes:acta_create' %}" class="btn btn-primary">
+                                        <i class="bi bi-plus-circle me-1"></i> Crear primera acta
+                                    </a>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

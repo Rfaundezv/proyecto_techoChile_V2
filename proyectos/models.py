@@ -13,6 +13,9 @@ class TipologiaVivienda(models.Model):
     nombre = models.CharField(max_length=100)
     descripcion = models.TextField(blank=True)
     activa = models.BooleanField(default=True)
+    metros_cuadrados = models.DecimalField(max_digits=6, decimal_places=2, blank=True, null=True, help_text="Metros cuadrados de la vivienda")
+    numero_ambientes = models.PositiveIntegerField(blank=True, null=True, help_text="Número de ambientes")
+    tipo_estructura = models.CharField(max_length=100, blank=True, null=True, help_text="Tipo de estructura de la vivienda")
 
     def __str__(self):
         return f"{self.codigo} - {self.nombre}"
@@ -28,7 +31,8 @@ class Proyecto(models.Model):
     siglas = models.CharField(max_length=10, help_text="Siglas del proyecto")
     nombre = models.CharField(max_length=200, verbose_name="Nombre del proyecto")
 
-    constructora = models.ForeignKey('core.Constructora', on_delete=models.PROTECT, verbose_name="Constructora")
+    constructora = models.ForeignKey('core.Constructora', on_delete=models.PROTECT, 
+                                     verbose_name="Constructora", blank=True, null=True)
     constructora_legacy = models.CharField(max_length=100, blank=True, help_text="Campo legacy para compatibilidad")
     comuna = models.ForeignKey(Comuna, on_delete=models.PROTECT)
     region = models.ForeignKey(Region, on_delete=models.PROTECT)
@@ -50,6 +54,10 @@ class Proyecto(models.Model):
 
     def save(self, *args, **kwargs):
         if self.fecha_entrega and not self.fecha_termino_postventa:
+            # Convertir fecha_entrega a datetime.date si es string
+            if isinstance(self.fecha_entrega, str):
+                from django.utils.dateparse import parse_date
+                self.fecha_entrega = parse_date(self.fecha_entrega)
             self.fecha_termino_postventa = self.fecha_entrega + timedelta(days=120)
         super().save(*args, **kwargs)
 

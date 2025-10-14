@@ -1,0 +1,357 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ acta.numero_acta }} - Detalle Acta{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="chart-container">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h2><i class="fas fa-file-contract"></i> Detalle Acta: {{ acta.numero_acta }}</h2>
+                    <div class="btn-group" role="group">
+                        <a href="{% url 'reportes:acta_list' %}" class="btn btn-secondary">
+                            <i class="fas fa-arrow-left"></i> Volver
+                        </a>
+                        
+                        <!-- Dropdown para opciones de PDF -->
+                        <div class="btn-group" role="group">
+                            <button type="button" class="btn btn-danger dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+                                <i class="fas fa-file-pdf"></i> PDF
+                            </button>
+                            <ul class="dropdown-menu">
+                                <li><a class="dropdown-item" href="{% url 'reportes:acta_pdf' acta.pk %}" target="_blank">
+                                    <i class="fas fa-eye"></i> Ver PDF
+                                </a></li>
+                                <li><a class="dropdown-item" href="{% url 'reportes:acta_pdf' acta.pk %}?download=1">
+                                    <i class="fas fa-download"></i> Descargar PDF
+                                </a></li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li><a class="dropdown-item" href="#" onclick="imprimirPDF()">
+                                    <i class="fas fa-print"></i> Imprimir PDF
+                                </a></li>
+                            </ul>
+                        </div>
+                        
+                        <a href="{% url 'reportes:acta_edit' acta.pk %}" class="btn btn-warning">
+                            <i class="fas fa-edit"></i> Editar
+                        </a>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <!-- Información Principal -->
+                    <div class="col-md-6">
+                        <div class="card mb-4">
+                            <div class="card-header bg-primary text-white">
+                                <h5><i class="fas fa-info-circle"></i> Información General</h5>
+                            </div>
+                            <div class="card-body">
+                                <table class="table table-sm">
+                                    <tr>
+                                        <th width="40%">Número de Acta:</th>
+                                        <td><strong>{{ acta.numero_acta }}</strong></td>
+                                    </tr>
+                                    <tr>
+                                        <th>Fecha de Entrega:</th>
+                                        <td>{{ acta.fecha_entrega|date:"d/m/Y H:i" }}</td>
+                                    </tr>
+                                    <tr>
+                                        <th>Lugar de Entrega:</th>
+                                        <td>{{ acta.lugar_entrega }}</td>
+                                    </tr>
+                                    <tr>
+                                        <th>Proyecto:</th>
+                                        <td>
+                                            <span class="badge bg-secondary">{{ acta.proyecto.codigo }}</span>
+                                            {{ acta.proyecto.nombre }}
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <th>Vivienda:</th>
+                                        <td>{{ acta.vivienda.direccion|default:"ID: "|add:acta.vivienda.id }}</td>
+                                    </tr>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Información del Beneficiario -->
+                    <div class="col-md-6">
+                        <div class="card mb-4">
+                            <div class="card-header bg-info text-white">
+                                <h5><i class="fas fa-user"></i> Beneficiario</h5>
+                            </div>
+                            <div class="card-body">
+                                <table class="table table-sm">
+                                    <tr>
+                                        <th width="40%">Nombre:</th>
+                                        <td>{{ acta.beneficiario.nombre_completo|default:"N/A" }}</td>
+                                    </tr>
+                                    <tr>
+                                        <th>RUT:</th>
+                                        <td>{{ acta.beneficiario.rut|default:"N/A" }}</td>
+                                    </tr>
+                                    <tr>
+                                        <th>Estado:</th>
+                                        <td>
+                                            {% if acta.entregado_beneficiario %}
+                                                <span class="badge bg-success">Entregada</span>
+                                            {% else %}
+                                                <span class="badge bg-warning">Pendiente</span>
+                                            {% endif %}
+                                        </td>
+                                    </tr>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <!-- Representante TECHO -->
+                    <div class="col-md-6">
+                        <div class="card mb-4">
+                            <div class="card-header bg-success text-white">
+                                <h5><i class="fas fa-user-tie"></i> Representante TECHO</h5>
+                            </div>
+                            <div class="card-body">
+                                <table class="table table-sm">
+                                    <tr>
+                                        <th width="40%">Nombre:</th>
+                                        <td>{{ acta.representante_techo }}</td>
+                                    </tr>
+                                    <tr>
+                                        <th>Cargo:</th>
+                                        <td>{{ acta.cargo_representante }}</td>
+                                    </tr>
+                                    <tr>
+                                        <th>RUT:</th>
+                                        <td>{{ acta.rut_representante }}</td>
+                                    </tr>
+                                    <tr>
+                                        <th>Teléfono:</th>
+                                        <td>{{ acta.telefono_representante }}</td>
+                                    </tr>
+                                    {% if acta.jefe_construccion %}
+                                    <tr>
+                                        <th>Jefe Construcción:</th>
+                                        <td>{{ acta.jefe_construccion }}</td>
+                                    </tr>
+                                    {% endif %}
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Información de la Vivienda -->
+                    <div class="col-md-6">
+                        <div class="card mb-4">
+                            <div class="card-header bg-warning text-dark">
+                                <h5><i class="fas fa-home"></i> Detalles de la Vivienda</h5>
+                            </div>
+                            <div class="card-body">
+                                <table class="table table-sm">
+                                    {% if acta.vivienda %}
+                                    <tr>
+                                        <th width="40%">Código:</th>
+                                        <td>{{ acta.vivienda.codigo }}</td>
+                                    </tr>
+                                    <tr>
+                                        <th>Tipología:</th>
+                                        <td>{{ acta.vivienda.tipologia.nombre|default:"N/A" }}</td>
+                                    </tr>
+                                    <tr>
+                                        <th>Estado:</th>
+                                        <td>{{ acta.vivienda.get_estado_display }}</td>
+                                    </tr>
+                                    {% endif %}
+                                    <tr>
+                                        <th>Superficie:</th>
+                                        <td>{{ acta.superficie_construida|default:"N/A" }} m²</td>
+                                    </tr>
+                                    <tr>
+                                        <th>Ambientes:</th>
+                                        <td>{{ acta.numero_ambientes|default:"N/A" }}</td>
+                                    </tr>
+                                    <tr>
+                                        <th>Tipo Estructura:</th>
+                                        <td>{{ acta.get_tipo_estructura_display }}</td>
+                                    </tr>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Estado y Servicios -->
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="card mb-4">
+                            <div class="card-header bg-secondary text-white">
+                                <h5><i class="fas fa-check-circle"></i> Estado de la Vivienda</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-12">
+                                        <div class="d-flex justify-content-between align-items-center mb-2">
+                                            <span>Estructura:</span>
+                                            {% if acta.estado_estructura %}
+                                                <span class="badge bg-success">Conforme</span>
+                                            {% else %}
+                                                <span class="badge bg-danger">Con Observaciones</span>
+                                            {% endif %}
+                                        </div>
+                                        <div class="d-flex justify-content-between align-items-center">
+                                            <span>Instalaciones:</span>
+                                            {% if acta.estado_instalaciones %}
+                                                <span class="badge bg-success">Conforme</span>
+                                            {% else %}
+                                                <span class="badge bg-danger">Con Observaciones</span>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="card mb-4">
+                            <div class="card-header bg-secondary text-white">
+                                <h5><i class="fas fa-wrench"></i> Servicios Básicos</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-12">
+                                        <div class="d-flex justify-content-between align-items-center mb-2">
+                                            <span><i class="fas fa-bolt"></i> Electricidad:</span>
+                                            {% if acta.tiene_electricidad %}
+                                                <span class="badge bg-success">Sí</span>
+                                            {% else %}
+                                                <span class="badge bg-danger">No</span>
+                                            {% endif %}
+                                        </div>
+                                        <div class="d-flex justify-content-between align-items-center mb-2">
+                                            <span><i class="fas fa-tint"></i> Agua Potable:</span>
+                                            {% if acta.tiene_agua_potable %}
+                                                <span class="badge bg-success">Sí</span>
+                                            {% else %}
+                                                <span class="badge bg-danger">No</span>
+                                            {% endif %}
+                                        </div>
+                                        <div class="d-flex justify-content-between align-items-center">
+                                            <span><i class="fas fa-water"></i> Alcantarillado:</span>
+                                            {% if acta.tiene_alcantarillado %}
+                                                <span class="badge bg-success">Sí</span>
+                                            {% else %}
+                                                <span class="badge bg-danger">No</span>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Observaciones -->
+                {% if acta.observaciones %}
+                <div class="row">
+                    <div class="col-12">
+                        <div class="card">
+                            <div class="card-header bg-danger text-white">
+                                <h5><i class="fas fa-exclamation-triangle"></i> Observaciones</h5>
+                            </div>
+                            <div class="card-body">
+                                <p>{{ acta.observaciones }}</p>
+                                <hr>
+                                <div class="d-flex justify-content-between">
+                                    <span><strong>Plazo para Correcciones:</strong></span>
+                                    <span class="badge bg-warning">{{ acta.plazo_correcciones }} días</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+
+                <!-- Familiares (si existen) -->
+                {% if acta.familiares.exists %}
+                <div class="row mt-4">
+                    <div class="col-12">
+                        <div class="card">
+                            <div class="card-header bg-info text-white">
+                                <h5><i class="fas fa-users"></i> Familiares del Beneficiario</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="table-responsive">
+                                    <table class="table table-sm">
+                                        <thead>
+                                            <tr>
+                                                <th>Nombre</th>
+                                                <th>RUT</th>
+                                                <th>Parentesco</th>
+                                                <th>Edad</th>
+                                                <th>Teléfono</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {% for familiar in acta.familiares.all %}
+                                            <tr>
+                                                <td>{{ familiar.nombre_completo }}</td>
+                                                <td>{{ familiar.rut }}</td>
+                                                <td>{{ familiar.get_parentesco_display }}</td>
+                                                <td>{{ familiar.edad }}</td>
+                                                <td>{{ familiar.telefono|default:"-" }}</td>
+                                            </tr>
+                                            {% endfor %}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+
+                <!-- Información de creación -->
+                <div class="row mt-4">
+                    <div class="col-12">
+                        <small class="text-muted">
+                            <i class="fas fa-clock"></i> Creada: {{ acta.fecha_creacion|date:"d/m/Y H:i" }}
+                            {% if acta.fecha_actualizacion != acta.fecha_creacion %}
+                                | Actualizada: {{ acta.fecha_actualizacion|date:"d/m/Y H:i" }}
+                            {% endif %}
+                        </small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function imprimirPDF() {
+    // Abrir el PDF en una nueva ventana y activar la impresión automática
+    const pdfUrl = "{% url 'reportes:acta_pdf' acta.pk %}";
+    const ventanaImpresion = window.open(pdfUrl, '_blank');
+    
+    // Esperar a que se cargue y luego imprimir
+    ventanaImpresion.onload = function() {
+        setTimeout(function() {
+            ventanaImpresion.print();
+        }, 1000);
+    };
+}
+
+// También agregar shortcut de teclado para imprimir (Ctrl+P)
+document.addEventListener('keydown', function(e) {
+    if (e.ctrlKey && e.key === 'p') {
+        e.preventDefault();
+        imprimirPDF();
+    }
+});
+</script>
+{% endblock %}

@@ -1,0 +1,77 @@
+{% extends "base.html" %}
+
+{% block title %}{{ titulo }} - {{ block.super }}{% endblock %}
+
+{% block content %}
+<div class="container-fluid mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
+        <h2 class="dashboard-title dashboard-h2 dynamic-title mb-1">
+            <i class="bi bi-file-earmark-text"></i> {{ titulo }}
+        </h2>
+    </div>
+
+    <div class="row g-4 mb-4">
+        <!-- Métricas principales -->
+        <div class="col-md-3">
+            <div class="metric-card">
+                <div class="metric-icon">
+                    <i class="bi bi-file-earmark-check"></i>
+                </div>
+                <div class="metric-content">
+                    <div class="metric-number">{{ total_actas }}</div>
+                    <div class="metric-label">Total Actas</div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-3">
+            <div class="metric-card">
+                <div class="metric-icon">
+                    <i class="bi bi-calendar-event"></i>
+                </div>
+                <div class="metric-content">
+                    <div class="metric-number">{{ actas_mes }}</div>
+                    <div class="metric-label">Este Mes</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Acciones principales -->
+    <div class="row g-4">
+        <div class="col-lg-6">
+            <div class="chart-container">
+                <h5><i class="bi bi-file-earmark-plus"></i> Generar Documentos</h5>
+                <div class="d-grid gap-3">
+                    <a href="{% url 'reportes:acta_create' %}" class="btn btn-primary btn-lg">
+                        <i class="bi bi-file-earmark-text me-2"></i>
+                        Nueva Acta de Recepción
+                    </a>
+                    <a href="{% url 'reportes:acta_list' %}" class="btn btn-outline-primary btn-lg">
+                        <i class="bi bi-list-ul me-2"></i>
+                        Ver Todas las Actas
+                    </a>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-lg-6">
+            <div class="chart-container">
+                <h5><i class="bi bi-graph-up"></i> Reportes Estadísticos</h5>
+                <div class="d-grid gap-3">
+                    <button class="btn btn-info btn-lg" disabled>
+                        <i class="bi bi-bar-chart me-2"></i>
+                        Reporte de Entregas (Próximamente)
+                    </button>
+                    <button class="btn btn-outline-info btn-lg" disabled>
+                        <i class="bi bi-pie-chart me-2"></i>
+                        Estadísticas por Región (Próximamente)
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    
+</div>
+{% endblock %}

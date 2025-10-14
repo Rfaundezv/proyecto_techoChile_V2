@@ -1,0 +1,1256 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="theme-color" content="#2c3e50">
+    <link rel="manifest" href="/static/manifest.json">
+    <title>Observaciones - Móvil</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #f5f5f5;
+            font-size: 14px;
+            line-height: 1.4;
+            overflow-x: hidden;
+        }
+        
+        .header-movil {
+            background: #2c3e50;
+            color: white;
+            padding: 10px 15px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        
+        .header-title {
+            font-size: 16px;
+            font-weight: 600;
+        }
+        
+        .filtros-movil {
+            background: white;
+            padding: 10px 15px;
+            border-bottom: 1px solid #ddd;
+            display: none;
+        }
+        
+        .filtros-movil.show {
+            display: block;
+        }
+        
+        .filtro-group {
+            margin-bottom: 10px;
+        }
+        
+        .filtro-group label {
+            display: block;
+            font-size: 12px;
+            color: #666;
+            margin-bottom: 3px;
+        }
+        
+        .filtro-group select,
+        .filtro-group input {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+        
+        .btn-filtros {
+            background: #3498db;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 4px;
+            font-size: 12px;
+            margin-left: 5px;
+        }
+        
+        .btn-nueva {
+            background: #27ae60;
+            color: white;
+            text-decoration: none;
+            padding: 8px 12px;
+            border-radius: 50%;
+            font-size: 16px;
+            margin-left: 5px;
+            display: inline-block;
+            line-height: 1;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-nueva:hover {
+            background: #229954;
+            color: white;
+            text-decoration: none;
+            transform: scale(1.1);
+        }
+        
+        .btn-aplicar {
+            background: #27ae60;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 4px;
+            font-size: 12px;
+            width: 100%;
+            margin-top: 10px;
+        }
+        
+        .loading {
+            text-align: center;
+            padding: 20px;
+            color: #666;
+        }
+        
+        .observaciones-container {
+            padding: 0;
+        }
+        
+        .observacion-card {
+            background: white;
+            border-bottom: 1px solid #eee;
+            padding: 12px 15px;
+            position: relative;
+        }
+        
+        .observacion-card:last-child {
+            border-bottom: none;
+        }
+        
+        .obs-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 8px;
+        }
+        
+        .obs-elemento {
+            font-weight: 600;
+            color: #2c3e50;
+            font-size: 15px;
+            flex: 1;
+        }
+        
+        .obs-prioridad {
+            font-size: 11px;
+            padding: 2px 6px;
+            border-radius: 10px;
+            margin-left: 8px;
+        }
+        
+        .prioridad-alta { background: #e74c3c; color: white; }
+        .prioridad-media { background: #f39c12; color: white; }
+        .prioridad-baja { background: #95a5a6; color: white; }
+        
+        .obs-info {
+            font-size: 12px;
+            color: #666;
+            margin-bottom: 8px;
+        }
+        
+        .obs-detalle {
+            color: #444;
+            margin-bottom: 8px;
+            font-size: 13px;
+        }
+        
+        .obs-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .obs-estado {
+            padding: 3px 8px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 500;
+        }
+        
+        .estado-pendiente { background: #ffeaa7; color: #2d3436; }
+        .estado-proceso { background: #74b9ff; color: white; }
+        .estado-resuelto { background: #00b894; color: white; }
+        .estado-cerrado { background: #636e72; color: white; }
+        
+        .obs-fecha {
+            font-size: 11px;
+            color: #999;
+        }
+        
+        .cambio-estado-rapido {
+            margin-top: 10px;
+            padding-top: 10px;
+            border-top: 1px solid #eee;
+            display: none;
+        }
+        
+        .cambio-estado-rapido.show {
+            display: block;
+        }
+        
+        .estado-select {
+            width: 100%;
+            padding: 6px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            margin-bottom: 8px;
+        }
+        
+        .comentario-input {
+            width: 100%;
+            padding: 6px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            margin-bottom: 8px;
+            resize: none;
+            height: 60px;
+        }
+        
+        .btn-guardar-estado {
+            background: #27ae60;
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 4px;
+            font-size: 12px;
+            margin-right: 8px;
+        }
+        
+        .btn-cancelar-estado {
+            background: #95a5a6;
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 4px;
+            font-size: 12px;
+        }
+        
+        .pagination-movil {
+            text-align: center;
+            padding: 15px;
+            background: white;
+            border-top: 1px solid #eee;
+        }
+        
+        .btn-cargar-mas {
+            background: #3498db;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+        
+        .btn-cargar-mas:disabled {
+            background: #bdc3c7;
+            cursor: not-allowed;
+        }
+        
+        .fab {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            width: 56px;
+            height: 56px;
+            border-radius: 50%;
+            background: #e74c3c;
+            color: white;
+            border: none;
+            font-size: 18px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            z-index: 1000;
+        }
+        
+        .sin-resultados {
+            text-align: center;
+            padding: 40px 20px;
+            color: #666;
+        }
+        
+        /* Animaciones mínimas */
+        .observacion-card {
+            transition: background-color 0.2s ease;
+        }
+        
+        .observacion-card:active {
+            background: #f8f9fa;
+        }
+        
+        /* Indicador de urgente */
+        .urgente {
+            background: linear-gradient(135deg, #ff6b6b, #ee5a24) !important;
+            color: white !important;
+            border-left: 4px solid #c0392b !important;
+            animation: pulse-urgent 2s infinite;
+        }
+        
+        .urgente::before {
+            content: "� URGENTE ";
+            font-weight: bold;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
+        }
+        
+        @keyframes pulse-urgent {
+            0% { box-shadow: 0 0 0 0 rgba(231, 76, 60, 0.4); }
+            50% { box-shadow: 0 0 0 10px rgba(231, 76, 60, 0.1); }
+            100% { box-shadow: 0 0 0 0 rgba(231, 76, 60, 0); }
+        }
+        
+        .urgente .obs-elemento {
+            color: white !important;
+            font-weight: bold;
+        }
+        
+        .urgente .obs-info,
+        .urgente .obs-detalle,
+        .urgente .obs-fecha {
+            color: rgba(255,255,255,0.9) !important;
+        }
+        
+        /* Estilos para descripción expandible */
+        .descripcion-expandible {
+            cursor: pointer;
+            position: relative;
+        }
+        
+        .descripcion-expandible:hover {
+            background-color: #f8f9fa;
+        }
+        
+        /* Checkbox para filtro urgente */
+        .filtro-group label {
+            display: flex;
+            align-items: center;
+            font-size: 13px;
+        }
+        
+        .filtro-group input[type="checkbox"] {
+            width: auto;
+            margin-right: 8px;
+        }
+        
+        /* Botones inline */
+        .btn-inline {
+            background: #3498db;
+            color: white;
+            border: none;
+            padding: 4px 8px;
+            border-radius: 3px;
+            font-size: 11px;
+            margin-left: 8px;
+            cursor: pointer;
+        }
+        
+        .btn-inline:hover {
+            background: #2980b9;
+        }
+        
+        /* Textarea para edición de descripción */
+        .descripcion-textarea {
+            width: 100%;
+            min-height: 80px;
+            border: 1px solid #ddd;
+            padding: 8px;
+            margin: 8px 0;
+            border-radius: 4px;
+            font-family: inherit;
+            font-size: 13px;
+            resize: vertical;
+        }
+        
+        /* Botones de acción en descripción */
+        .descripcion-actions {
+            margin-top: 8px;
+        }
+        
+        .descripcion-actions button {
+            margin-right: 8px;
+        }
+        
+        /* Archivos adjuntos */
+        .archivos-section {
+            margin-top: 10px;
+            padding-top: 8px;
+            border-top: 1px solid #eee;
+        }
+        
+        .archivo-item {
+            display: inline-block;
+            background: #f8f9fa;
+            padding: 3px 8px;
+            margin: 2px;
+            border-radius: 12px;
+            font-size: 11px;
+            color: #495057;
+            text-decoration: none;
+            border: 1px solid #dee2e6;
+        }
+        
+        .archivo-item:hover {
+            background: #e9ecef;
+            text-decoration: none;
+            color: #495057;
+        }
+        
+        .archivo-contador {
+            background: #3498db;
+            color: white;
+            padding: 2px 6px;
+            border-radius: 10px;
+            font-size: 10px;
+            margin-left: 5px;
+        }
+        
+        /* Input de archivo móvil */
+        .archivo-input-container {
+            margin-top: 10px;
+            display: none;
+        }
+        
+        .archivo-input-container.show {
+            display: block;
+        }
+        
+        .archivo-input {
+            width: 100%;
+            padding: 8px;
+            border: 2px dashed #ddd;
+            border-radius: 6px;
+            text-align: center;
+            margin-bottom: 8px;
+            cursor: pointer;
+            background: #f9f9f9;
+        }
+        
+        .archivo-input:hover {
+            border-color: #3498db;
+            background: #f0f8ff;
+        }
+        
+        .archivo-descripcion {
+            width: 100%;
+            padding: 6px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            margin-bottom: 8px;
+            font-size: 12px;
+        }
+        
+        /* Estilos para comentarios */
+        .comentarios-section {
+            margin-top: 10px;
+            padding: 8px;
+            background: #f8f9fa;
+            border-radius: 6px;
+            border-left: 3px solid #17a2b8;
+        }
+        
+        .comentario-item {
+            background: white;
+            padding: 6px 8px;
+            margin-bottom: 4px;
+            border-radius: 4px;
+            font-size: 11px;
+        }
+        
+        .comentario-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 3px;
+        }
+        
+        .comentario-usuario {
+            font-weight: bold;
+            color: #495057;
+            font-size: 10px;
+        }
+        
+        .comentario-fecha {
+            color: #6c757d;
+            font-size: 9px;
+        }
+        
+        .comentario-accion {
+            color: #17a2b8;
+            font-weight: bold;
+            font-size: 9px;
+            margin-bottom: 2px;
+        }
+        
+        .comentario-texto {
+            color: #495057;
+            line-height: 1.3;
+        }
+        
+        .ver-mas-comentarios {
+            color: #3498db;
+            font-size: 10px;
+            text-decoration: underline;
+            cursor: pointer;
+            text-align: center;
+            margin-top: 5px;
+        }
+        
+        .agregar-comentario-container {
+            margin-top: 10px;
+            display: none;
+        }
+        
+        .agregar-comentario-container.show {
+            display: block;
+        }
+        
+        .comentario-textarea {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            margin-bottom: 8px;
+            font-size: 12px;
+            min-height: 60px;
+            resize: vertical;
+        }
+    </style>
+</head>
+<body>
+    <div class="header-movil">
+        <div class="header-title">
+            Observaciones
+            <div style="float: right;">
+                <a href="{% url 'incidencias:crear_observacion_movil' %}" class="btn-nueva" title="Nueva Observación">
+                    ➕
+                </a>
+                <button class="btn-filtros" onclick="toggleFiltros()">Filtros</button>
+            </div>
+        </div>
+    </div>
+    
+    <div class="filtros-movil" id="filtros">
+        <div class="filtro-group">
+            <label>Proyecto:</label>
+            <select id="filtro-proyecto">
+                <option value="">Todos los proyectos</option>
+                {% for proyecto in proyectos %}
+                <option value="{{ proyecto.id }}" {% if proyecto.id|stringformat:"s" == proyecto_seleccionado %}selected{% endif %}>
+                    {{ proyecto.codigo }} - {{ proyecto.nombre|truncatechars:30 }}
+                </option>
+                {% endfor %}
+            </select>
+        </div>
+        
+        <div class="filtro-group">
+            <label>Estado:</label>
+            <select id="filtro-estado">
+                <option value="">Todos los estados</option>
+                {% for estado in estados %}
+                <option value="{{ estado.id }}" {% if estado.id|stringformat:"s" == estado_seleccionado %}selected{% endif %}>
+                    {{ estado.nombre }}
+                </option>
+                {% endfor %}
+            </select>
+        </div>
+        
+        <div class="filtro-group">
+            <label>Buscar:</label>
+            <input type="text" id="filtro-buscar" placeholder="Elemento, detalle, código...">
+        </div>
+        
+        <div class="filtro-group">
+            <label>
+                <input type="checkbox" id="filtro-urgente" style="margin-right: 5px;">
+                Solo observaciones urgentes
+            </label>
+        </div>
+        
+        <button class="btn-aplicar" onclick="aplicarFiltros()">Aplicar Filtros</button>
+    </div>
+    
+    <div class="observaciones-container">
+        <div id="loading" class="loading">Cargando observaciones...</div>
+        <div id="observaciones-lista"></div>
+        <div id="sin-resultados" class="sin-resultados" style="display: none;">
+            No se encontraron observaciones
+        </div>
+    </div>
+    
+    <div class="pagination-movil" id="pagination" style="display: none;">
+        <button id="btn-cargar-mas" class="btn-cargar-mas" onclick="cargarMasPagina()">
+            Cargar más
+        </button>
+    </div>
+    
+    <!-- FAB para nueva observación -->
+    <button class="fab" onclick="window.location.href='/incidencias/crear/'">+</button>
+    
+    <script>
+        let currentPage = 1;
+        let hasMorePages = false;
+        let isLoading = false;
+        let estadosDisponibles = {{ estados|safe }};
+        
+        // Configuración inicial
+        document.addEventListener('DOMContentLoaded', function() {
+            cargarObservaciones();
+        });
+        
+        function crearFormularioCambioEstado(obsId) {
+            let opcionesEstados = estadosDisponibles.map(estado => 
+                `<option value="${estado.id}">${estado.nombre}</option>`
+            ).join('');
+            
+            return `
+                <div class="cambio-estado-rapido" id="cambio-${obsId}">
+                    <select class="estado-select" id="nuevo-estado-${obsId}">
+                        ${opcionesEstados}
+                    </select>
+                    <textarea class="comentario-input" id="comentario-${obsId}" placeholder="Comentario (opcional)"></textarea>
+                    <button class="btn-guardar-estado" onclick="guardarCambioEstado(${obsId}, event)">
+                        Guardar
+                    </button>
+                    <button class="btn-cancelar-estado" onclick="cancelarCambioEstado(${obsId}, event)">
+                        Cancelar
+                    </button>
+                </div>
+            `;
+        }
+        
+        function crearFormularioArchivo(obsId) {
+            return `
+                <div class="archivo-input-container" id="archivo-${obsId}">
+                    <input type="file" id="file-input-${obsId}" class="archivo-input" accept=".jpg,.jpeg,.png,.pdf,.doc,.docx,.txt" />
+                    <input type="text" id="file-desc-${obsId}" class="archivo-descripcion" placeholder="Descripción del archivo (opcional)" />
+                    <button class="btn-guardar-estado" onclick="subirArchivo(${obsId}, event)">
+                        Subir Archivo
+                    </button>
+                    <button class="btn-cancelar-estado" onclick="cancelarArchivo(${obsId}, event)">
+                        Cancelar
+                    </button>
+                </div>
+            `;
+        }
+        
+        function crearFormularioComentario(obsId) {
+            return `
+                <div class="agregar-comentario-container" id="comentario-form-${obsId}">
+                    <textarea id="comentario-textarea-${obsId}" class="comentario-textarea" placeholder="Escribe un comentario..."></textarea>
+                    <button class="btn-guardar-estado" onclick="guardarComentario(${obsId}, event)">
+                        Agregar Comentario
+                    </button>
+                    <button class="btn-cancelar-estado" onclick="cancelarComentario(${obsId}, event)">
+                        Cancelar
+                    </button>
+                </div>
+            `;
+        }
+        
+        function getIconoArchivo(tipo) {
+            const iconos = {
+                'jpg': '🖼️', 'jpeg': '🖼️', 'png': '🖼️',
+                'pdf': '📄', 'doc': '📝', 'docx': '📝', 
+                'txt': '📋', 'unknown': '📎'
+            };
+            return iconos[tipo] || '📎';
+        }
+        
+        function toggleFiltros() {
+            const filtros = document.getElementById('filtros');
+            filtros.classList.toggle('show');
+        }
+        
+        function aplicarFiltros() {
+            currentPage = 1;
+            cargarObservaciones(true);
+            toggleFiltros();
+        }
+        
+        function cargarObservaciones(reset = false) {
+            if (isLoading) return;
+            isLoading = true;
+            
+            const loading = document.getElementById('loading');
+            const lista = document.getElementById('observaciones-lista');
+            const sinResultados = document.getElementById('sin-resultados');
+            const pagination = document.getElementById('pagination');
+            
+            if (reset) {
+                lista.innerHTML = '';
+                currentPage = 1;
+            }
+            
+            loading.style.display = 'block';
+            sinResultados.style.display = 'none';
+            
+            // Preparar parámetros
+            const params = new URLSearchParams({
+                page: currentPage,
+                per_page: 20
+            });
+            
+            const proyecto = document.getElementById('filtro-proyecto').value;
+            const estado = document.getElementById('filtro-estado').value;
+            const buscar = document.getElementById('filtro-buscar').value;
+            const urgente = document.getElementById('filtro-urgente').checked;
+            
+            if (proyecto) params.append('proyecto', proyecto);
+            if (estado) params.append('estado', estado);
+            if (buscar) params.append('q', buscar);
+            if (urgente) params.append('urgente', 'true');
+            
+            fetch(`/incidencias/movil/api/?${params}`)
+                .then(response => response.json())
+                .then(data => {
+                    loading.style.display = 'none';
+                    
+                    if (data.error) {
+                        alert('Error: ' + data.error);
+                        return;
+                    }
+                    
+                    const observaciones = data.observaciones;
+                    
+                    if (observaciones.length === 0 && currentPage === 1) {
+                        sinResultados.style.display = 'block';
+                        pagination.style.display = 'none';
+                        return;
+                    }
+                    
+                    // Renderizar observaciones
+                    observaciones.forEach(obs => {
+                        const card = crearCardObservacion(obs);
+                        lista.appendChild(card);
+                    });
+                    
+                    // Configurar paginación
+                    hasMorePages = data.pagination.has_next;
+                    const btnCargarMas = document.getElementById('btn-cargar-mas');
+                    
+                    if (hasMorePages) {
+                        pagination.style.display = 'block';
+                        btnCargarMas.disabled = false;
+                        btnCargarMas.textContent = 'Cargar más';
+                    } else {
+                        if (currentPage > 1) {
+                            pagination.style.display = 'block';
+                            btnCargarMas.disabled = true;
+                            btnCargarMas.textContent = 'No hay más resultados';
+                        } else {
+                            pagination.style.display = 'none';
+                        }
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    loading.style.display = 'none';
+                    alert('Error al cargar observaciones');
+                })
+                .finally(() => {
+                    isLoading = false;
+                });
+        }
+        
+        function crearCardObservacion(obs) {
+            const card = document.createElement('div');
+            card.className = 'observacion-card' + (obs.es_urgente ? ' urgente' : '');
+            
+            const prioridadClass = {
+                'alta': 'prioridad-alta',
+                'media': 'prioridad-media',
+                'baja': 'prioridad-baja'
+            }[obs.prioridad] || 'prioridad-baja';
+            
+            const estadoClass = {
+                'PEN': 'estado-pendiente',
+                'PRO': 'estado-proceso', 
+                'RES': 'estado-resuelto',
+                'CER': 'estado-cerrado'
+            }[obs.estado.codigo] || 'estado-pendiente';
+            
+            // Crear HTML para archivos
+            let archivosHtml = '';
+            if (obs.total_archivos > 0) {
+                archivosHtml = '<div class="archivos-section">';
+                archivosHtml += '<small style="color: #666;">📎 Archivos: </small>';
+                
+                obs.archivos.forEach(archivo => {
+                    const icono = getIconoArchivo(archivo.tipo);
+                    archivosHtml += `<a href="${archivo.url}" target="_blank" class="archivo-item">
+                        ${icono} ${archivo.nombre}
+                    </a>`;
+                });
+                
+                if (obs.total_archivos > 3) {
+                    archivosHtml += `<span class="archivo-contador">+${obs.total_archivos - 3} más</span>`;
+                }
+                
+                archivosHtml += '</div>';
+            }
+            
+            // Crear HTML para comentarios
+            let comentariosHtml = '';
+            if (obs.total_comentarios > 0) {
+                comentariosHtml = '<div class="comentarios-section">';
+                comentariosHtml += '<small style="color: #666;">💬 Comentarios: </small>';
+                
+                obs.comentarios.forEach(comentario => {
+                    comentariosHtml += `
+                        <div class="comentario-item">
+                            <div class="comentario-header">
+                                <span class="comentario-usuario">${comentario.usuario}</span>
+                                <span class="comentario-fecha">${comentario.fecha}</span>
+                            </div>
+                            <div class="comentario-accion">${comentario.accion}</div>
+                            ${comentario.comentario ? `<div class="comentario-texto">${comentario.comentario}</div>` : ''}
+                        </div>
+                    `;
+                });
+                
+                if (obs.total_comentarios > 3) {
+                    comentariosHtml += `<div class="ver-mas-comentarios" onclick="verTodosComentarios(${obs.id}, event)">
+                        Ver todos los comentarios (${obs.total_comentarios})
+                    </div>`;
+                }
+                
+                comentariosHtml += '</div>';
+            }
+            
+            card.innerHTML = `
+                <div class="obs-header">
+                    <div class="obs-elemento">
+                        ${obs.elemento}
+                    </div>
+                    <span class="obs-prioridad ${prioridadClass}">
+                        ${obs.prioridad.toUpperCase()}
+                    </span>
+                </div>
+                
+                <div class="obs-info">
+                    ${obs.vivienda_codigo} - ${obs.proyecto_codigo}
+                </div>
+                
+                <div class="obs-detalle descripcion-expandible" onclick="toggleDescripcion(${obs.id})">
+                    <div id="detalle-corto-${obs.id}">
+                        ${obs.detalle}
+                        ${obs.detalle.endsWith('...') ? '<small style="color: #3498db;"> (toque para ver completo)</small>' : ''}
+                    </div>
+                    <div id="detalle-completo-${obs.id}" style="display: none;">
+                        <textarea id="textarea-detalle-${obs.id}" class="descripcion-textarea">${obs.detalle.replace('...', '')}</textarea>
+                        ${obs.puede_editar ? `
+                            <div class="descripcion-actions">
+                                <button onclick="guardarDescripcion(${obs.id}, event)" class="btn-guardar-estado">Guardar</button>
+                                <button onclick="cancelarDescripcion(${obs.id}, event)" class="btn-cancelar-estado">Cancelar</button>
+                            </div>
+                        ` : ''}
+                    </div>
+                </div>
+                
+                ${archivosHtml}
+                
+                ${comentariosHtml}
+                
+                <div class="obs-footer">
+                    <span class="obs-estado ${estadoClass}">
+                        ${obs.estado.nombre}
+                    </span>
+                    <span class="obs-fecha">
+                        ${obs.fecha_creacion}
+                    </span>
+                    ${obs.puede_editar ? `
+                        <button onclick="toggleCambioEstado(${obs.id}, event)" class="btn-inline">Estado</button>
+                        <button onclick="toggleAgregarArchivo(${obs.id}, event)" class="btn-inline" style="background: #27ae60;">📎</button>
+                        <button onclick="toggleAgregarComentario(${obs.id}, event)" class="btn-inline" style="background: #17a2b8;">💬</button>
+                    ` : ''}
+                </div>
+                
+                ${obs.puede_editar ? crearFormularioCambioEstado(obs.id) : ''}
+                ${obs.puede_editar ? crearFormularioArchivo(obs.id) : ''}
+                ${obs.puede_editar ? crearFormularioComentario(obs.id) : ''}
+            `;
+            
+            return card;
+        }
+        
+        function cargarMasPagina() {
+            if (hasMorePages && !isLoading) {
+                currentPage++;
+                cargarObservaciones();
+            }
+        }
+        
+        function toggleCambioEstado(obsId, event) {
+            if (event) event.stopPropagation();
+            const cambioDiv = document.getElementById(`cambio-${obsId}`);
+            if (cambioDiv) {
+                cambioDiv.classList.toggle('show');
+            }
+        }
+        
+        function toggleDescripcion(obsId) {
+            const detalleCorto = document.getElementById(`detalle-corto-${obsId}`);
+            const detalleCompleto = document.getElementById(`detalle-completo-${obsId}`);
+            
+            if (detalleCompleto.style.display === 'none') {
+                detalleCorto.style.display = 'none';
+                detalleCompleto.style.display = 'block';
+                // Cargar descripción completa
+                cargarDescripcionCompleta(obsId);
+            } else {
+                detalleCorto.style.display = 'block';
+                detalleCompleto.style.display = 'none';
+            }
+        }
+        
+        function cargarDescripcionCompleta(obsId) {
+            const textarea = document.getElementById(`textarea-detalle-${obsId}`);
+            if (textarea && textarea.value.trim().endsWith('...')) {
+                // Cargar la descripción completa desde el servidor
+                fetch(`/incidencias/movil/descripcion-completa/${obsId}/`)
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            textarea.value = data.descripcion_completa;
+                        }
+                    })
+                    .catch(error => console.error('Error cargando descripción completa:', error));
+            }
+        }
+        
+        function guardarDescripcion(obsId, event) {
+            event.stopPropagation();
+            
+            const textarea = document.getElementById(`textarea-detalle-${obsId}`);
+            const nuevaDescripcion = textarea.value.trim();
+            
+            if (!nuevaDescripcion) {
+                alert('La descripción no puede estar vacía');
+                return;
+            }
+            
+            fetch(`/incidencias/movil/actualizar-descripcion/${obsId}/`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': getCookie('csrftoken')
+                },
+                body: JSON.stringify({
+                    descripcion: nuevaDescripcion
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Actualizar la vista
+                    const detalleCorto = document.getElementById(`detalle-corto-${obsId}`);
+                    const detalleCompleto = document.getElementById(`detalle-completo-${obsId}`);
+                    
+                    const descripcionMostrar = nuevaDescripcion.length > 100 ? 
+                        nuevaDescripcion.substring(0, 100) + '...' : 
+                        nuevaDescripcion;
+                    
+                    detalleCorto.innerHTML = descripcionMostrar + 
+                        (nuevaDescripcion.length > 100 ? '<small style="color: #3498db;"> (toque para ver completo)</small>' : '');
+                    
+                    detalleCorto.style.display = 'block';
+                    detalleCompleto.style.display = 'none';
+                } else {
+                    alert('Error: ' + (data.error || 'No se pudo actualizar'));
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Error al actualizar descripción');
+            });
+        }
+        
+        function cancelarDescripcion(obsId, event) {
+            event.stopPropagation();
+            const detalleCorto = document.getElementById(`detalle-corto-${obsId}`);
+            const detalleCompleto = document.getElementById(`detalle-completo-${obsId}`);
+            
+            detalleCorto.style.display = 'block';
+            detalleCompleto.style.display = 'none';
+        }
+        
+        function guardarCambioEstado(obsId, event) {
+            event.stopPropagation();
+            
+            const nuevoEstadoId = document.getElementById(`nuevo-estado-${obsId}`).value;
+            const comentario = document.getElementById(`comentario-${obsId}`).value;
+            
+            if (!nuevoEstadoId) {
+                alert('Selecciona un estado');
+                return;
+            }
+            
+            fetch(`/incidencias/movil/cambiar-estado/${obsId}/`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': getCookie('csrftoken')
+                },
+                body: JSON.stringify({
+                    estado_id: nuevoEstadoId,
+                    comentario: comentario
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Recargar la lista
+                    aplicarFiltros();
+                } else {
+                    alert('Error: ' + (data.error || 'No se pudo cambiar el estado'));
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Error al cambiar estado');
+            });
+        }
+        
+        function cancelarCambioEstado(obsId, event) {
+            event.stopPropagation();
+            toggleCambioEstado(obsId);
+        }
+        
+        function getCookie(name) {
+            let cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+                const cookies = document.cookie.split(';');
+                for (let i = 0; i < cookies.length; i++) {
+                    const cookie = cookies[i].trim();
+                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
+        }
+        
+        function toggleAgregarArchivo(obsId, event) {
+            event.stopPropagation();
+            const archivoDiv = document.getElementById(`archivo-${obsId}`);
+            if (archivoDiv) {
+                archivoDiv.classList.toggle('show');
+            }
+        }
+        
+        function subirArchivo(obsId, event) {
+            event.stopPropagation();
+            
+            const fileInput = document.getElementById(`file-input-${obsId}`);
+            const descInput = document.getElementById(`file-desc-${obsId}`);
+            
+            if (!fileInput.files.length) {
+                alert('Selecciona un archivo');
+                return;
+            }
+            
+            const formData = new FormData();
+            formData.append('archivo', fileInput.files[0]);
+            formData.append('descripcion', descInput.value);
+            
+            const button = event.target;
+            button.textContent = 'Subiendo...';
+            button.disabled = true;
+            
+            fetch(`/incidencias/movil/subir-archivo/${obsId}/`, {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': getCookie('csrftoken')
+                },
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Recargar la lista para mostrar el nuevo archivo
+                    aplicarFiltros();
+                    alert('Archivo subido correctamente');
+                } else {
+                    alert('Error: ' + (data.error || 'No se pudo subir el archivo'));
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Error al subir archivo');
+            })
+            .finally(() => {
+                button.textContent = 'Subir Archivo';
+                button.disabled = false;
+            });
+        }
+        
+        function cancelarArchivo(obsId, event) {
+            event.stopPropagation();
+            const archivoDiv = document.getElementById(`archivo-${obsId}`);
+            if (archivoDiv) {
+                archivoDiv.classList.remove('show');
+                // Limpiar inputs
+                document.getElementById(`file-input-${obsId}`).value = '';
+                document.getElementById(`file-desc-${obsId}`).value = '';
+            }
+        }
+        
+        function toggleAgregarComentario(obsId, event) {
+            event.stopPropagation();
+            const comentarioDiv = document.getElementById(`comentario-form-${obsId}`);
+            if (comentarioDiv) {
+                comentarioDiv.classList.toggle('show');
+            }
+        }
+        
+        function guardarComentario(obsId, event) {
+            event.stopPropagation();
+            
+            const comentarioInput = document.getElementById(`comentario-textarea-${obsId}`);
+            const comentario = comentarioInput.value.trim();
+            
+            if (!comentario) {
+                alert('El comentario no puede estar vacío');
+                return;
+            }
+            
+            const button = event.target;
+            button.textContent = 'Guardando...';
+            button.disabled = true;
+            
+            fetch(`/incidencias/movil/agregar-comentario/${obsId}/`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': getCookie('csrftoken')
+                },
+                body: JSON.stringify({
+                    comentario: comentario
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Recargar la lista para mostrar el nuevo comentario
+                    aplicarFiltros();
+                    alert('Comentario agregado correctamente');
+                } else {
+                    alert('Error: ' + (data.error || 'No se pudo agregar el comentario'));
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Error al agregar comentario');
+            })
+            .finally(() => {
+                button.textContent = 'Agregar Comentario';
+                button.disabled = false;
+            });
+        }
+        
+        function cancelarComentario(obsId, event) {
+            event.stopPropagation();
+            const comentarioDiv = document.getElementById(`comentario-form-${obsId}`);
+            if (comentarioDiv) {
+                comentarioDiv.classList.remove('show');
+                // Limpiar textarea
+                document.getElementById(`comentario-textarea-${obsId}`).value = '';
+            }
+        }
+        
+        function verTodosComentarios(obsId, event) {
+            event.stopPropagation();
+            
+            fetch(`/incidencias/movil/comentarios/${obsId}/`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        mostrarModalComentarios(obsId, data.comentarios);
+                    } else {
+                        alert('Error: ' + (data.error || 'No se pudieron cargar los comentarios'));
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('Error al cargar comentarios');
+                });
+        }
+        
+        function mostrarModalComentarios(obsId, comentarios) {
+            // Crear un modal simple para mostrar todos los comentarios
+            let modalHtml = `
+                <div id="modal-comentarios" style="
+                    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+                    background: rgba(0,0,0,0.7); z-index: 1000;
+                    display: flex; align-items: center; justify-content: center;
+                ">
+                    <div style="
+                        background: white; padding: 20px; border-radius: 10px;
+                        max-width: 90%; max-height: 80%; overflow-y: auto;
+                    ">
+                        <h3>Todos los Comentarios</h3>
+                        <div style="max-height: 300px; overflow-y: auto;">
+            `;
+            
+            comentarios.forEach(comentario => {
+                modalHtml += `
+                    <div style="border-bottom: 1px solid #eee; padding: 10px 0;">
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
+                            <strong>${comentario.usuario}</strong>
+                            <small>${comentario.fecha}</small>
+                        </div>
+                        <div style="color: #17a2b8; font-weight: bold; font-size: 12px;">${comentario.accion}</div>
+                        ${comentario.comentario ? `<div style="margin-top: 5px;">${comentario.comentario}</div>` : ''}
+                        ${comentario.estado_anterior && comentario.estado_nuevo ? 
+                            `<div style="font-size: 11px; color: #666; margin-top: 5px;">
+                                Estado: ${comentario.estado_anterior} → ${comentario.estado_nuevo}
+                            </div>` : ''}
+                    </div>
+                `;
+            });
+            
+            modalHtml += `
+                        </div>
+                        <button onclick="cerrarModalComentarios()" style="
+                            margin-top: 15px; padding: 8px 16px; background: #dc3545;
+                            color: white; border: none; border-radius: 4px;
+                        ">Cerrar</button>
+                    </div>
+                </div>
+            `;
+            
+            document.body.insertAdjacentHTML('beforeend', modalHtml);
+        }
+        
+        function cerrarModalComentarios() {
+            const modal = document.getElementById('modal-comentarios');
+            if (modal) {
+                modal.remove();
+            }
+        }
+        
+        // Registrar Service Worker para PWA
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', function() {
+                navigator.serviceWorker.register('/static/sw.js')
+                    .then(function(registration) {
+                        console.log('SW registered: ', registration);
+                    }, function(registrationError) {
+                        console.log('SW registration failed: ', registrationError);
+                    });
+            });
+        }
+    </script>
+</body>
+</html>

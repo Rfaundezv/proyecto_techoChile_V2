@@ -44,6 +44,7 @@ urlpatterns = [
     path('maestro/viviendas/<int:pk>/editar/', core_views.ViviendaUpdate.as_view(), name='maestro_vivienda_edit'),
     path('maestro/viviendas/<int:pk>/eliminar/', core_views.ViviendaDelete.as_view(), name='maestro_vivienda_delete'),
     path('maestro/observaciones/', core_views.ObservacionList.as_view(), name='maestro_observacion_list'),
+    path('maestro/observaciones/crear/', core_views.ObservacionCreate.as_view(), name='maestro_observacion_create'),
     path('maestro/observaciones/<int:pk>/archivos/', core_views.ObservacionArchivosView.as_view(), name='maestro_observacion_archivos'),
     path('maestro/observaciones/<int:pk>/editar/', core_views.ObservacionUpdate.as_view(), name='maestro_observacion_edit'),
     path('maestro/observaciones/<int:pk>/eliminar/', core_views.ObservacionDelete.as_view(), name='maestro_observacion_delete'),
@@ -51,6 +52,7 @@ urlpatterns = [
     path('maestro/buscar-beneficiario/', core_views.buscar_beneficiario_por_rut, name='maestro_buscar_beneficiario_rut'),
     path('proyectos/', include('proyectos.urls', namespace='proyectos')),
     path('incidencias/', include('incidencias.urls', namespace='incidencias')),
+    path('reportes/', include('reportes.urls', namespace='reportes')),
     path('auth/', include('django.contrib.auth.urls')),
     path('ajax/comunas/', core_views.ajax_comunas_por_region, name='ajax_comunas'),
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
