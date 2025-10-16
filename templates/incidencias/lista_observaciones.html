@@ -195,7 +195,10 @@ body.dark-mode .modal-content-techo .btn-techo-primary {
                     </td>
                     <td>
                         <strong>Vivienda {{ obs.vivienda.codigo }}</strong><br>
-                        <small>{{ obs.vivienda.familia_beneficiaria|truncatechars:20 }}</small>
+                        <small> {{ obs.vivienda.beneficiario.nombre|truncatechars:20 }}
+                                {{ obs.vivienda.beneficiario.apellido_paterno }} 
+                                {{ obs.vivienda.beneficiario.apellido_materno|truncatechars:20 }}
+                        </small>
                     </td>
                     <td>{{ obs.recinto.nombre|default:"-" }}</td>
                     <td>{{ obs.elemento }}</td>
@@ -209,13 +212,13 @@ body.dark-mode .modal-content-techo .btn-techo-primary {
                         <span class="badge bg-secondary">{{ obs.tipo.nombre }}</span>
                     </td>
                     <td>
-                        {% if obs.prioridad == 'urgente' or obs.es_urgente %}
+                        {% if obs.prioridad == 'URGENTE' or obs.es_urgente %}
                             <span class="badge" style="background-color: #dc3545; color: white; font-weight: 600;">URGENTE</span>
-                        {% elif obs.prioridad == 'alta' %}
+                        {% elif obs.prioridad == 'ALTA' %}
                             <span class="badge" style="background-color: #ff6b6b; color: white; font-weight: 600;">ALTA</span>
-                        {% elif obs.prioridad == 'media' %}
+                        {% elif obs.prioridad == 'MEDIA' %}
                             <span class="badge" style="background-color: #ffa500; color: white;">MEDIA</span>
-                        {% elif obs.prioridad == 'baja' %}
+                        {% elif obs.prioridad == 'BAJA' %}
                             <span class="badge" style="background-color: #90EE90; color: #2d5016;">BAJA</span>
                         {% endif %}
                     </td>
@@ -277,26 +280,13 @@ body.dark-mode .modal-content-techo .btn-techo-primary {
                         <small>por {{ obs.creado_por.nombre|default:obs.creado_por.email }}</small>
                     </td>
                     <td class="text-center">
-                        {% if obs.archivo_adjunto or obs.total_archivos > 0 %}
-                            {% with total=obs.total_archivos %}
-                                {% if obs.archivo_adjunto %}
-                                    {% with total_final=total|add:1 %}
-                                        <a href="{% url 'incidencias:incidencias_observacion_archivos' obs.pk %}" class="text-decoration-none" title="Tiene {{ total_final }} archivo(s) adjunto(s)">
-                                            <i class="bi bi-paperclip fs-5" style="color: #00a7e1;"></i>
-                                            {% if total_final > 1 %}
-                                                <span class="badge bg-info ms-1">{{ total_final }}</span>
-                                            {% endif %}
-                                        </a>
-                                    {% endwith %}
-                                {% else %}
-                                    <a href="{% url 'incidencias:incidencias_observacion_archivos' obs.pk %}" class="text-decoration-none" title="Tiene {{ total }} archivo(s) adjunto(s)">
-                                        <i class="bi bi-paperclip fs-5" style="color: #00a7e1;"></i>
-                                        {% if total > 1 %}
-                                            <span class="badge bg-info ms-1">{{ total }}</span>
-                                        {% endif %}
-                                    </a>
+                        {% if obs.total_archivos and obs.total_archivos|default:0 > 0 %}
+                            <a href="{% url 'incidencias:incidencias_observacion_archivos' obs.pk %}" class="text-decoration-none" title="Tiene {{ obs.total_archivos }} archivo(s) adjunto(s)">
+                                <i class="bi bi-paperclip fs-5" style="color: #00a7e1;"></i>
+                                {% if obs.total_archivos > 1 %}
+                                    <span class="badge bg-info ms-1">{{ obs.total_archivos }}</span>
                                 {% endif %}
-                            {% endwith %}
+                            </a>
                         {% else %}
                             <span class="text-muted">-</span>
                         {% endif %}
@@ -373,13 +363,13 @@ body.dark-mode .modal-content-techo .btn-techo-primary {
 
             <!-- Prioridad y Tipo -->
             <div class="mb-2">
-                {% if obs.prioridad == 'urgente' or obs.es_urgente %}
+                {% if obs.prioridad == 'URGENTE' or obs.es_urgente %}
                     <span class="badge" style="background-color: #dc3545; color: white; font-weight: 600;">URGENTE</span>
-                {% elif obs.prioridad == 'alta' %}
+                {% elif obs.prioridad == 'ALTA' %}
                     <span class="badge" style="background-color: #ff6b6b; color: white; font-weight: 600;">ALTA</span>
-                {% elif obs.prioridad == 'media' %}
+                {% elif obs.prioridad == 'MEDIA' %}
                     <span class="badge" style="background-color: #ffa500; color: white;">MEDIA</span>
-                {% elif obs.prioridad == 'baja' %}
+                {% elif obs.prioridad == 'BAJA' %}
                     <span class="badge" style="background-color: #90EE90; color: #2d5016;">BAJA</span>
                 {% endif %}
                 <span class="badge bg-secondary ms-1">{{ obs.tipo.nombre }}</span>
@@ -400,26 +390,13 @@ body.dark-mode .modal-content-techo .btn-techo-primary {
                     </small>
                     {% endif %}
                 </div>
-                {% if obs.archivo_adjunto or obs.total_archivos > 0 %}
-                    {% with total=obs.total_archivos %}
-                        {% if obs.archivo_adjunto %}
-                            {% with total_final=total|add:1 %}
-                                <a href="{% url 'incidencias:incidencias_observacion_archivos' obs.pk %}" class="text-decoration-none" title="Tiene {{ total_final }} archivo(s) adjunto(s)">
-                                    <i class="bi bi-paperclip" style="color: #00a7e1;"></i>
-                                    {% if total_final > 1 %}
-                                        <span class="badge bg-info">{{ total_final }}</span>
-                                    {% endif %}
-                                </a>
-                            {% endwith %}
-                        {% else %}
-                            <a href="{% url 'incidencias:incidencias_observacion_archivos' obs.pk %}" class="text-decoration-none" title="Tiene {{ total }} archivo(s) adjunto(s)">
-                                <i class="bi bi-paperclip" style="color: #00a7e1;"></i>
-                                {% if total > 1 %}
-                                    <span class="badge bg-info">{{ total }}</span>
-                                {% endif %}
-                            </a>
+                {% if obs.total_archivos and obs.total_archivos|default:0 > 0 %}
+                    <a href="{% url 'incidencias:incidencias_observacion_archivos' obs.pk %}" class="text-decoration-none" title="Tiene {{ obs.total_archivos }} archivo(s) adjunto(s)">
+                        <i class="bi bi-paperclip" style="color: #00a7e1;"></i>
+                        {% if obs.total_archivos > 1 %}
+                            <span class="badge bg-info">{{ obs.total_archivos }}</span>
                         {% endif %}
-                    {% endwith %}
+                    </a>
                 {% endif %}
             </div>
 
@@ -429,10 +406,12 @@ body.dark-mode .modal-content-techo .btn-techo-primary {
                    style="background: linear-gradient(45deg, #2563eb, #1e40af) !important; color: white !important; border: none !important; box-shadow: 0 2px 8px rgba(37, 99, 235, 0.3) !important; font-weight: 600 !important; text-decoration: none !important; display: inline-flex !important; align-items: center !important; justify-content: center !important; gap: 0.5rem !important; transition: all 0.3s ease !important;">
                     Ver detalle
                 </a>
+              
                 <button class="btn btn-sm btn-outline-warning cambiar-estado-btn" 
                         data-obs-id="{{ obs.pk }}" data-bs-toggle="modal" data-bs-target="#modalCambioEstado">
                     Cambiar Estado
                 </button>
+               
             </div>
         </div>
         {% empty %}

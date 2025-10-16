@@ -1,0 +1,701 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load split_filter %}
+
+{% block title %}{{ titulo }}{% endblock %}
+
+{% block extra_css %}
+<style>
+    .form-section {
+        background: #f8f9fc;
+        border: 1px solid #e3e6f0;
+        border-radius: 10px;
+        margin-bottom: 1.5rem;
+        padding: 1.5rem;
+    }
+    
+    .section-title {
+        color: #0056b3;
+        font-weight: 600;
+        margin-bottom: 1rem;
+        border-bottom: 2px solid #e3e6f0;
+        padding-bottom: 0.5rem;
+    }
+    
+    .rating-group {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+    }
+    
+    .rating-option {
+        flex: 1;
+        min-width: 120px;
+    }
+    
+    .rating-option input[type="radio"] {
+        display: none;
+    }
+    
+    .rating-option label {
+        display: block;
+        padding: 10px;
+        border: 2px solid #e3e6f0;
+        border-radius: 8px;
+        text-align: center;
+        cursor: pointer;
+        transition: all 0.3s;
+        background: white;
+    }
+    
+    .rating-option input[type="radio"]:checked + label {
+        border-color: #0056b3;
+        background: #0056b3;
+        color: white;
+    }
+    
+    .rating-1 input:checked + label { background: #dc3545; border-color: #dc3545; }
+    .rating-2 input:checked + label { background: #fd7e14; border-color: #fd7e14; }
+    .rating-3 input:checked + label { background: #ffc107; border-color: #ffc107; color: #212529; }
+    .rating-4 input:checked + label { background: #198754; border-color: #198754; }
+    .rating-5 input:checked + label { background: #20c997; border-color: #20c997; }
+    
+    .form-check-custom {
+        background: white;
+        padding: 15px;
+        border: 1px solid #e3e6f0;
+        border-radius: 8px;
+        margin-bottom: 10px;
+    }
+    
+    .progress-form {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 4px;
+        background: #e3e6f0;
+        z-index: 1000;
+    }
+    
+    .progress-bar-form {
+        height: 100%;
+        background: #0056b3;
+        transition: width 0.3s;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="progress-form">
+    <div class="progress-bar-form" style="width: 0%" id="formProgress"></div>
+</div>
+
+<div class="container-fluid">
+    <!-- Header -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <h1 class="h3 mb-0 text-gray-800">
+                        <i class="fas fa-{% if ficha %}edit{% else %}plus{% endif %}"></i>
+                        {{ titulo }}
+                    </h1>
+                    {% if ficha %}
+                        <p class="mb-0 text-muted">{{ ficha.vivienda }} - {{ ficha.vivienda.proyecto }}</p>
+                    {% endif %}
+                </div>
+                <div>
+                    <a href="{% url 'ficha_postventa:listar' %}" class="btn btn-outline-secondary">
+                        <i class="fas fa-arrow-left"></i> Volver al Listado
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <form method="post" id="fichaForm">
+        {% csrf_token %}
+        
+        <!-- Sección 1: Información Básica -->
+        <div class="form-section">
+            <h4 class="section-title">
+                <i class="fas fa-info-circle"></i>
+                1. Información Básica
+            </h4>
+            
+            <!-- Búsqueda de Beneficiario por RUT -->
+            <div class="row mb-3">
+                <div class="col-md-2">
+                    <label class="form-label">RUT del Beneficiario</label>
+                    <div class="input-group">
+                        <input type="text" 
+                               id="rut_beneficiario" 
+                               class="form-control" 
+                               placeholder="Ej: 12345678-9"
+                               maxlength="12">
+                        <button type="button" 
+                                class="btn btn-primary" 
+                                id="buscar_beneficiario">
+                            <i class="bi bi-search"></i> Buscar
+                        </button>
+                    </div>
+                    <small class="text-muted">Ingrese el RUT para cargar datos del beneficiario</small>
+                </div>
+                <div class="col-md-6">
+                    <div id="beneficiario_info" class="alert alert-info" style="display: none;">
+                        <strong>Beneficiario:</strong> <span id="beneficiario_nombre"></span><br>
+                        <strong>Email:</strong> <span id="beneficiario_email"></span><br>
+                        <strong>Teléfono:</strong> <span id="beneficiario_telefono"></span>
+                    </div>
+                    <div id="beneficiario_error" class="alert alert-warning" style="display: none;"></div>
+                </div>
+            </div>
+            
+            <div class="row">
+                <div class="col-md-1">
+                    <label class="form-label">Vivienda *</label>
+                    {{ form.vivienda }}
+                    {% if form.vivienda.errors %}
+                        <div class="text-danger small">{{ form.vivienda.errors.0 }}</div>
+                    {% endif %}
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label">Fecha de Evaluación *</label>
+                    {{ form.fecha_evaluacion }}
+                    {% if form.fecha_evaluacion.errors %}
+                        <div class="text-danger small">{{ form.fecha_evaluacion.errors.0 }}</div>
+                    {% endif %}
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label">Evaluador *</label>
+                    {{ form.evaluador }}
+                    {% if form.evaluador.errors %}
+                        <div class="text-danger small">{{ form.evaluador.errors.0 }}</div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Sección 2: Datos de la Familia -->
+        <div class="form-section">
+            <h4 class="section-title">
+                <i class="fas fa-users"></i>
+                2. Datos de la Familia
+            </h4>
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-check-custom">
+                        {{ form.familia_presente }}
+                        <label class="form-check-label" for="id_familia_presente">
+                            {{ form.familia_presente.label }}
+                        </label>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-check-custom">
+                        {{ form.jefe_hogar_presente }}
+                        <label class="form-check-label" for="id_jefe_hogar_presente">
+                            {{ form.jefe_hogar_presente.label }}
+                        </label>
+                    </div>
+                </div>
+                <div class="col-12 mt-3">
+                    <label class="form-label">Observaciones sobre la Familia</label>
+                    {{ form.observaciones_familia }}
+                </div>
+            </div>
+        </div>
+
+        <!-- Sección 3: Servicios Básicos -->
+        <div class="form-section">
+            <h4 class="section-title">
+                <i class="fas fa-tools"></i>
+                3. Servicios Básicos
+            </h4>
+            <div class="row">
+                <div class="col-md-3">
+                    <div class="form-check-custom">
+                        {{ form.agua_potable_funciona }}
+                        <label class="form-check-label" for="id_agua_potable_funciona">
+                            Agua Potable
+                        </label>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="form-check-custom">
+                        {{ form.electricidad_funciona }}
+                        <label class="form-check-label" for="id_electricidad_funciona">
+                            Electricidad
+                        </label>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="form-check-custom">
+                        {{ form.alcantarillado_funciona }}
+                        <label class="form-check-label" for="id_alcantarillado_funciona">
+                            Alcantarillado
+                        </label>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="form-check-custom">
+                        {{ form.gas_funciona }}
+                        <label class="form-check-label" for="id_gas_funciona">
+                            Gas
+                        </label>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sección 4: Evaluación Técnica -->
+        <div class="form-section">
+            <h4 class="section-title">
+                <i class="fas fa-hammer"></i>
+                4. Evaluación Técnica de la Vivienda
+            </h4>
+            
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    {{ form.estado_general_vivienda.label_tag }}
+                    {{ form.estado_general_vivienda }}
+                    {% if form.estado_general_vivienda.errors %}
+                        <div class="invalid-feedback d-block">{{ form.estado_general_vivienda.errors }}</div>
+                    {% endif %}
+                </div>
+                
+                <div class="col-md-6 mb-3">
+                    {{ form.estado_techumbre.label_tag }}
+                    {{ form.estado_techumbre }}
+                    {% if form.estado_techumbre.errors %}
+                        <div class="invalid-feedback d-block">{{ form.estado_techumbre.errors }}</div>
+                    {% endif %}
+                </div>
+                
+                <div class="col-md-6 mb-3">
+                    {{ form.estado_muros.label_tag }}
+                    {{ form.estado_muros }}
+                    {% if form.estado_muros.errors %}
+                        <div class="invalid-feedback d-block">{{ form.estado_muros.errors }}</div>
+                    {% endif %}
+                </div>
+                
+                <div class="col-md-6 mb-3">
+                    {{ form.estado_pisos.label_tag }}
+                    {{ form.estado_pisos }}
+                    {% if form.estado_pisos.errors %}
+                        <div class="invalid-feedback d-block">{{ form.estado_pisos.errors }}</div>
+                    {% endif %}
+                </div>
+                
+                <div class="col-md-6 mb-3">
+                    {{ form.estado_puertas_ventanas.label_tag }}
+                    {{ form.estado_puertas_ventanas }}
+                    {% if form.estado_puertas_ventanas.errors %}
+                        <div class="invalid-feedback d-block">{{ form.estado_puertas_ventanas.errors }}</div>
+                    {% endif %}
+                </div>
+                
+                <div class="col-md-6 mb-3">
+                    {{ form.estado_instalacion_electrica.label_tag }}
+                    {{ form.estado_instalacion_electrica }}
+                    {% if form.estado_instalacion_electrica.errors %}
+                        <div class="invalid-feedback d-block">{{ form.estado_instalacion_electrica.errors }}</div>
+                    {% endif %}
+                </div>
+                
+                <div class="col-md-6 mb-3">
+                    {{ form.estado_instalacion_sanitaria.label_tag }}
+                    {{ form.estado_instalacion_sanitaria }}
+                    {% if form.estado_instalacion_sanitaria.errors %}
+                        <div class="invalid-feedback d-block">{{ form.estado_instalacion_sanitaria.errors }}</div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Sección 5: Evaluación de Satisfacción -->
+        <div class="form-section">
+            <h4 class="section-title">
+                <i class="fas fa-smile"></i>
+                5. Evaluación de Satisfacción
+            </h4>
+            
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    {{ form.satisfaccion_general.label_tag }}
+                    {{ form.satisfaccion_general }}
+                    {% if form.satisfaccion_general.errors %}
+                        <div class="invalid-feedback d-block">{{ form.satisfaccion_general.errors }}</div>
+                    {% endif %}
+                </div>
+                
+                <div class="col-md-6 mb-3">
+                    {{ form.satisfaccion_tamano.label_tag }}
+                    {{ form.satisfaccion_tamano }}
+                    {% if form.satisfaccion_tamano.errors %}
+                        <div class="invalid-feedback d-block">{{ form.satisfaccion_tamano.errors }}</div>
+                    {% endif %}
+                </div>
+                
+                <div class="col-md-6 mb-3">
+                    {{ form.satisfaccion_distribucion.label_tag }}
+                    {{ form.satisfaccion_distribucion }}
+                    {% if form.satisfaccion_distribucion.errors %}
+                        <div class="invalid-feedback d-block">{{ form.satisfaccion_distribucion.errors }}</div>
+                    {% endif %}
+                </div>
+                
+                <div class="col-md-6 mb-3">
+                    {{ form.satisfaccion_ubicacion.label_tag }}
+                    {{ form.satisfaccion_ubicacion }}
+                    {% if form.satisfaccion_ubicacion.errors %}
+                        <div class="invalid-feedback d-block">{{ form.satisfaccion_ubicacion.errors }}</div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Sección 6: Necesidades y Reparaciones -->
+        <div class="form-section">
+            <h4 class="section-title">
+                <i class="fas fa-wrench"></i>
+                6. Necesidades y Reparaciones
+            </h4>
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-check-custom">
+                        {{ form.requiere_reparaciones }}
+                        <label class="form-check-label" for="id_requiere_reparaciones">
+                            {{ form.requiere_reparaciones.label }}
+                        </label>
+                    </div>
+                    <div class="mt-3" id="detalle_reparaciones_group" style="display: none;">
+                        <label class="form-label">Detalle de Reparaciones</label>
+                        {{ form.detalle_reparaciones }}
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-check-custom">
+                        {{ form.requiere_mejoras }}
+                        <label class="form-check-label" for="id_requiere_mejoras">
+                            {{ form.requiere_mejoras.label }}
+                        </label>
+                    </div>
+                    <div class="mt-3" id="detalle_mejoras_group" style="display: none;">
+                        <label class="form-label">Detalle de Mejoras</label>
+                        {{ form.detalle_mejoras }}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sección 7: Seguimiento Social -->
+        <div class="form-section">
+            <h4 class="section-title">
+                <i class="fas fa-handshake"></i>
+                7. Seguimiento Social
+            </h4>
+            
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    {{ form.adaptacion_familiar.label_tag }}
+                    {{ form.adaptacion_familiar }}
+                    {% if form.adaptacion_familiar.errors %}
+                        <div class="invalid-feedback d-block">{{ form.adaptacion_familiar.errors }}</div>
+                    {% endif %}
+                </div>
+                
+                <div class="col-md-6 mb-3">
+                    {{ form.integracion_comunitaria.label_tag }}
+                    {{ form.integracion_comunitaria }}
+                    {% if form.integracion_comunitaria.errors %}
+                        <div class="invalid-feedback d-block">{{ form.integracion_comunitaria.errors }}</div>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-check-custom">
+                        {{ form.conoce_vecinos }}
+                        <label class="form-check-label" for="id_conoce_vecinos">
+                            {{ form.conoce_vecinos.label }}
+                        </label>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-check-custom">
+                        {{ form.participa_organizaciones }}
+                        <label class="form-check-label" for="id_participa_organizaciones">
+                            {{ form.participa_organizaciones.label }}
+                        </label>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sección 8: Acceso a Servicios -->
+        <div class="form-section">
+            <h4 class="section-title">
+                <i class="fas fa-map-marker-alt"></i>
+                8. Acceso a Servicios
+            </h4>
+            
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    {{ form.acceso_salud.label_tag }}
+                    {{ form.acceso_salud }}
+                    {% if form.acceso_salud.errors %}
+                        <div class="invalid-feedback d-block">{{ form.acceso_salud.errors }}</div>
+                    {% endif %}
+                </div>
+                
+                <div class="col-md-6 mb-3">
+                    {{ form.acceso_educacion.label_tag }}
+                    {{ form.acceso_educacion }}
+                    {% if form.acceso_educacion.errors %}
+                        <div class="invalid-feedback d-block">{{ form.acceso_educacion.errors }}</div>
+                    {% endif %}
+                </div>
+                
+                <div class="col-md-6 mb-3">
+                    {{ form.acceso_transporte.label_tag }}
+                    {{ form.acceso_transporte }}
+                    {% if form.acceso_transporte.errors %}
+                        <div class="invalid-feedback d-block">{{ form.acceso_transporte.errors }}</div>
+                    {% endif %}
+                </div>
+                
+                <div class="col-md-6 mb-3">
+                    {{ form.acceso_comercio.label_tag }}
+                    {{ form.acceso_comercio }}
+                    {% if form.acceso_comercio.errors %}
+                        <div class="invalid-feedback d-block">{{ form.acceso_comercio.errors }}</div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Sección 9: Observaciones -->
+        <div class="form-section">
+            <h4 class="section-title">
+                <i class="fas fa-sticky-note"></i>
+                9. Observaciones y Recomendaciones
+            </h4>
+            <div class="row">
+                <div class="col-md-4 mb-3">
+                    <label class="form-label">Observaciones Técnicas</label>
+                    {{ form.observaciones_tecnicas }}
+                </div>
+                <div class="col-md-4 mb-3">
+                    <label class="form-label">Observaciones Sociales</label>
+                    {{ form.observaciones_sociales }}
+                </div>
+                <div class="col-md-4 mb-3">
+                    <label class="form-label">Recomendaciones</label>
+                    {{ form.recomendaciones }}
+                </div>
+            </div>
+        </div>
+
+        <!-- Sección 10: Seguimiento -->
+        <div class="form-section">
+            <h4 class="section-title">
+                <i class="fas fa-calendar-check"></i>
+                10. Seguimiento Futuro
+            </h4>
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-check-custom">
+                        {{ form.requiere_seguimiento }}
+                        <label class="form-check-label" for="id_requiere_seguimiento">
+                            {{ form.requiere_seguimiento.label }}
+                        </label>
+                    </div>
+                </div>
+                <div class="col-md-6" id="fecha_seguimiento_group" style="display: none;">
+                    <label class="form-label">Fecha Próximo Seguimiento</label>
+                    {{ form.fecha_proximo_seguimiento }}
+                    {% if form.fecha_proximo_seguimiento.errors %}
+                        <div class="text-danger small">{{ form.fecha_proximo_seguimiento.errors.0 }}</div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Botones de Acción -->
+        <div class="row">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-body text-center">
+                        <button type="submit" class="btn btn-primary btn-lg me-3">
+                            <i class="fas fa-save"></i>
+                            {{ accion }} Ficha
+                        </button>
+                        
+                        <a href="{% url 'ficha_postventa:listar' %}" class="btn btn-outline-secondary btn-lg me-3">
+                            <i class="fas fa-times"></i>
+                            Cancelar
+                        </a>
+                        
+                        {% if ficha %}
+                        <a href="{% url 'ficha_postventa:detalle' ficha.pk %}" class="btn btn-outline-info btn-lg">
+                            <i class="fas fa-eye"></i>
+                            Ver Detalle
+                        </a>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Mostrar/ocultar campos condicionales
+    const requiereReparaciones = document.getElementById('id_requiere_reparaciones');
+    const detallReparaciones = document.getElementById('detalle_reparaciones_group');
+    
+    const requiereMejoras = document.getElementById('id_requiere_mejoras');
+    const detalleMejoras = document.getElementById('detalle_mejoras_group');
+    
+    const requiereSeguimiento = document.getElementById('id_requiere_seguimiento');
+    const fechaSeguimiento = document.getElementById('fecha_seguimiento_group');
+    
+    function toggleFields() {
+        if (requiereReparaciones && detallReparaciones) {
+            detallReparaciones.style.display = requiereReparaciones.checked ? 'block' : 'none';
+        }
+        
+        if (requiereMejoras && detalleMejoras) {
+            detalleMejoras.style.display = requiereMejoras.checked ? 'block' : 'none';
+        }
+        
+        if (requiereSeguimiento && fechaSeguimiento) {
+            fechaSeguimiento.style.display = requiereSeguimiento.checked ? 'block' : 'none';
+        }
+    }
+    
+    // Inicializar estado
+    toggleFields();
+    
+    // Eventos
+    if (requiereReparaciones) requiereReparaciones.addEventListener('change', toggleFields);
+    if (requiereMejoras) requiereMejoras.addEventListener('change', toggleFields);
+    if (requiereSeguimiento) requiereSeguimiento.addEventListener('change', toggleFields);
+    
+    // Progreso del formulario
+    const form = document.getElementById('fichaForm');
+    const progressBar = document.getElementById('formProgress');
+    
+    function updateProgress() {
+        const inputs = form.querySelectorAll('input[required], select[required]');
+        let completed = 0;
+        
+        inputs.forEach(input => {
+            if (input.type === 'radio') {
+                const radioGroup = form.querySelectorAll(`input[name="${input.name}"]`);
+                if (Array.from(radioGroup).some(radio => radio.checked)) {
+                    completed++;
+                }
+            } else if (input.value.trim() !== '') {
+                completed++;
+            }
+        });
+        
+        const percentage = Math.round((completed / inputs.length) * 100);
+        progressBar.style.width = percentage + '%';
+    }
+    
+    // Actualizar progreso en tiempo real
+    form.addEventListener('input', updateProgress);
+    form.addEventListener('change', updateProgress);
+    
+    // Inicializar progreso
+    updateProgress();
+    
+    // Búsqueda de beneficiario por RUT
+    const btnBuscarBeneficiario = document.getElementById('buscar_beneficiario');
+    const inputRut = document.getElementById('rut_beneficiario');
+    const beneficiarioInfo = document.getElementById('beneficiario_info');
+    const beneficiarioError = document.getElementById('beneficiario_error');
+    const selectVivienda = document.getElementById('id_vivienda');
+    
+    if (btnBuscarBeneficiario) {
+        btnBuscarBeneficiario.addEventListener('click', function() {
+            const rut = inputRut.value.trim();
+            
+            if (!rut) {
+                beneficiarioError.textContent = 'Por favor ingrese un RUT';
+                beneficiarioError.style.display = 'block';
+                beneficiarioInfo.style.display = 'none';
+                return;
+            }
+            
+            // Mostrar loading
+            btnBuscarBeneficiario.disabled = true;
+            btnBuscarBeneficiario.innerHTML = '<i class="bi bi-hourglass-split"></i> Buscando...';
+            
+            // Realizar búsqueda AJAX
+            fetch(`{% url 'ficha_postventa:ajax_buscar_beneficiario' %}?rut=${encodeURIComponent(rut)}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.found) {
+                        // Mostrar información del beneficiario
+                        document.getElementById('beneficiario_nombre').textContent = data.beneficiario.nombre_completo;
+                        document.getElementById('beneficiario_email').textContent = data.beneficiario.email || 'No registrado';
+                        document.getElementById('beneficiario_telefono').textContent = data.beneficiario.telefonos.join(', ') || 'No registrado';
+                        
+                        beneficiarioInfo.style.display = 'block';
+                        beneficiarioError.style.display = 'none';
+                        
+                        // Si tiene vivienda, seleccionarla automáticamente
+                        if (data.vivienda) {
+                            // Seleccionar la vivienda en el dropdown
+                            for (let i = 0; i < selectVivienda.options.length; i++) {
+                                if (selectVivienda.options[i].value == data.vivienda.id) {
+                                    selectVivienda.selectedIndex = i;
+                                    // Disparar evento change para que se actualice el formulario
+                                    selectVivienda.dispatchEvent(new Event('change'));
+                                    break;
+                                }
+                            }
+                        } else {
+                            beneficiarioError.textContent = 'Beneficiario encontrado, pero no tiene vivienda asignada';
+                            beneficiarioError.style.display = 'block';
+                        }
+                    } else {
+                        beneficiarioError.textContent = data.message || 'No se encontró el beneficiario';
+                        beneficiarioError.style.display = 'block';
+                        beneficiarioInfo.style.display = 'none';
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    beneficiarioError.textContent = 'Error al buscar beneficiario. Intente nuevamente.';
+                    beneficiarioError.style.display = 'block';
+                    beneficiarioInfo.style.display = 'none';
+                })
+                .finally(() => {
+                    // Restaurar botón
+                    btnBuscarBeneficiario.disabled = false;
+                    btnBuscarBeneficiario.innerHTML = '<i class="bi bi-search"></i> Buscar';
+                });
+        });
+        
+        // Permitir buscar con Enter
+        inputRut.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                btnBuscarBeneficiario.click();
+            }
+        });
+    }
+});
+</script>
+{% endblock %}

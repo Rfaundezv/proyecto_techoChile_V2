@@ -1,0 +1,309 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Fichas de Postventa{% endblock %}
+
+{% block extra_css %}
+<style>
+    .filter-card {
+        background: #f8f9fc;
+        border: 1px solid #e3e6f0;
+        border-radius: 10px;
+    }
+    
+    .badge-habitabilidad {
+        font-size: 0.8em;
+        padding: 0.4em 0.6em;
+    }
+    
+    .ficha-card {
+        transition: transform 0.2s, box-shadow 0.2s;
+        border: none;
+        border-left: 4px solid #0056b3;
+    }
+    
+    .ficha-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+    }
+    
+    .progress-mini {
+        height: 8px;
+        border-radius: 4px;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- Header -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <h1 class="h3 mb-0 text-gray-800">
+                        <i class="fas fa-clipboard-list"></i>
+                        Fichas de Postventa
+                    </h1>
+                    <p class="mb-0 text-muted">{{ total_fichas }} fichas encontradas</p>
+                </div>
+                <div>
+                    <a href="{% url 'ficha_postventa:crear' %}" class="btn btn-primary">
+                        <i class="fas fa-plus"></i> Nueva Ficha
+                    </a>
+                    <a href="{% url 'ficha_postventa:dashboard' %}" class="btn btn-outline-secondary">
+                        <i class="fas fa-tachometer-alt"></i> Dashboard
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Filtros -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card filter-card">
+                <div class="card-body">
+                    <h6 class="card-title mb-3">
+                        <i class="fas fa-filter"></i> Filtros y Búsqueda
+                    </h6>
+                    
+                    <form method="get" class="row g-3">
+                        <!-- Búsqueda por término -->
+                        <div class="col-md-2">
+                            <label class="form-label">Búsqueda General</label>
+                            {{ form_busqueda.termino }}
+                        </div>
+                        
+                        <!-- Filtro por proyecto -->
+                        <div class="col-md-2">
+                            <label class="form-label">Proyecto</label>
+                            {{ form_filtro.proyecto }}
+                        </div>
+                        
+                        <!-- Filtro por evaluador -->
+                        <div class="col-md-2">
+                            <label class="form-label">Evaluador</label>
+                            {{ form_filtro.evaluador }}
+                        </div>
+                        
+                        <!-- Rango de fechas -->
+                        <div class="col-md-1">
+                            <label class="form-label">Desde</label>
+                            {{ form_filtro.fecha_desde }}
+                        </div>
+                        
+                        <div class="col-md-1">
+                            <label class="form-label">Hasta</label>
+                            {{ form_filtro.fecha_hasta }}
+                        </div>
+                        
+                        <!-- Estado mínimo -->
+                        <div class="col-md-1">
+                            <label class="form-label">Estado Mínimo</label>
+                            {{ form_filtro.estado_minimo }}
+                        </div>
+                        
+                        <!-- Requiere seguimiento -->
+                        <div class="col-md-1">
+                            <div class="form-check mt-4">
+                                {{ form_filtro.requiere_seguimiento }}
+                                <label class="form-check-label" for="id_requiere_seguimiento">
+                                    Solo fichas con seguimiento
+                                </label>
+                            </div>
+                        </div>
+                        
+                        <!-- Botones -->
+                        <div class="col-md-2">
+                            <div class="mt-2">
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="fas fa-search"></i> Buscar
+                                </button>
+                                <a href="{% url 'ficha_postventa:listar' %}" class="btn btn-outline-secondary">
+                                    <i class="fas fa-times"></i> Limpiar
+                                </a>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Listado de Fichas -->
+    <div class="row">
+        {% if fichas %}
+            {% for ficha in fichas %}
+            <div class="col-lg-6 col-xl-4 mb-4">
+                <div class="card ficha-card h-100 shadow-sm">
+                    <div class="card-body">
+                        <!-- Header de la ficha -->
+                        <div class="d-flex justify-content-between align-items-start mb-3">
+                            <div>
+                                <h5 class="card-title mb-1">
+                                    <a href="{% url 'ficha_postventa:detalle' ficha.pk %}" class="text-decoration-none">
+                                        {{ ficha.vivienda.codigo }}
+                                    </a>
+                                </h5>
+                                <p class="text-muted small mb-0">{{ ficha.vivienda.proyecto.codigo }}</p>
+                                {% if ficha.vivienda.familia_beneficiaria %}
+                                    <p class="text-muted small">{{ ficha.vivienda.familia_beneficiaria }}</p>
+                                {% endif %}
+                            </div>
+                            
+                            <!-- Badges de estado -->
+                            <div class="text-end">
+                                {% if ficha.estado_general_vivienda >= 4 %}
+                                    <span class="badge bg-success badge-habitabilidad">Bueno</span>
+                                {% elif ficha.estado_general_vivienda == 3 %}
+                                    <span class="badge bg-warning badge-habitabilidad">Regular</span>
+                                {% else %}
+                                    <span class="badge bg-danger badge-habitabilidad">Atención</span>
+                                {% endif %}
+                                
+                                {% if ficha.requiere_seguimiento %}
+                                    <br><span class="badge bg-warning mt-1">Seguimiento</span>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <!-- Información de evaluación -->
+                        <div class="mb-3">
+                            <div class="row text-center">
+                                <div class="col-4">
+                                    <div class="small text-muted">Habitabilidad</div>
+                                    <div class="h6 mb-0">{{ ficha.puntaje_habitabilidad|floatformat:1 }}/5</div>
+                                    <div class="progress progress-mini">
+                                        <div class="progress-bar bg-info" style="width: {% widthratio ficha.puntaje_habitabilidad 5 100 %}%"></div>
+                                    </div>
+                                </div>
+                                <div class="col-4">
+                                    <div class="small text-muted">Satisfacción</div>
+                                    <div class="h6 mb-0">{{ ficha.puntaje_satisfaccion|floatformat:1 }}/5</div>
+                                    <div class="progress progress-mini">
+                                        <div class="progress-bar bg-success" style="width: {% widthratio ficha.puntaje_satisfaccion 5 100 %}%"></div>
+                                    </div>
+                                </div>
+                                <div class="col-4">
+                                    <div class="small text-muted">Servicios</div>
+                                    <div class="h6 mb-0">{{ ficha.servicios_funcionando }}/4</div>
+                                    <div class="progress progress-mini">
+                                        <div class="progress-bar bg-primary" style="width: {% widthratio ficha.servicios_funcionando 4 100 %}%"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Información adicional -->
+                        <div class="mb-3">
+                            <small class="text-muted">
+                                <i class="fas fa-user"></i> {{ ficha.evaluador.nombre }}
+                                <br>
+                                <i class="fas fa-calendar"></i> {{ ficha.fecha_evaluacion|date:"d/m/Y" }}
+                                {% if ficha.fecha_proximo_seguimiento %}
+                                    <br>
+                                    <i class="fas fa-clock text-warning"></i> 
+                                    Seg: {{ ficha.fecha_proximo_seguimiento|date:"d/m/Y" }}
+                                {% endif %}
+                            </small>
+                        </div>
+
+                        <!-- Acciones -->
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div class="btn-group btn-group-sm" role="group">
+                                <a href="{% url 'ficha_postventa:detalle' ficha.pk %}" 
+                                   class="btn btn-outline-primary" title="Ver detalle">
+                                    <i class="fas fa-eye"></i>
+                                </a>
+                                <a href="{% url 'ficha_postventa:generar_pdf' ficha.pk %}" 
+                                   class="btn btn-outline-danger" title="Ver PDF" target="_blank">
+                                    <i class="fas fa-file-pdf"></i>
+                                </a>
+                                <a href="{% url 'ficha_postventa:generar_pdf' ficha.pk %}?download=1" 
+                                   class="btn btn-outline-danger" title="Descargar PDF">
+                                    <i class="fas fa-download"></i>
+                                </a>
+                                {% if user.rol.nombre == 'TECHO' or user.rol.nombre == 'ADMINISTRADOR' %}
+                                <a href="{% url 'ficha_postventa:editar' ficha.pk %}" 
+                                   class="btn btn-outline-secondary" title="Editar">
+                                    <i class="fas fa-edit"></i>
+                                </a>
+                                {% endif %}
+                            </div>
+                            
+                            <small class="text-muted">
+                                ID: #{{ ficha.pk }}
+                            </small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        {% else %}
+            <!-- No hay fichas -->
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-body text-center py-5">
+                        <i class="fas fa-clipboard-list fa-5x text-muted mb-4"></i>
+                        <h4>No se encontraron fichas</h4>
+                        <p class="text-muted mb-4">
+                            {% if request.GET %}
+                                No hay fichas que coincidan con los criterios de búsqueda.
+                            {% else %}
+                                Aún no hay fichas de postventa registradas.
+                            {% endif %}
+                        </p>
+                        <a href="{% url 'ficha_postventa:crear' %}" class="btn btn-primary">
+                            <i class="fas fa-plus"></i> Crear Primera Ficha
+                        </a>
+                    </div>
+                </div>
+            </div>
+        {% endif %}
+    </div>
+
+    <!-- Paginación -->
+    {% if fichas.has_other_pages %}
+    <div class="row">
+        <div class="col-12">
+            <nav aria-label="Paginación de fichas">
+                <ul class="pagination justify-content-center">
+                    {% if fichas.has_previous %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page=1{% if request.GET.proyecto %}&proyecto={{ request.GET.proyecto }}{% endif %}{% if request.GET.evaluador %}&evaluador={{ request.GET.evaluador }}{% endif %}{% if request.GET.termino %}&termino={{ request.GET.termino }}{% endif %}">
+                                <i class="fas fa-angle-double-left"></i>
+                            </a>
+                        </li>
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ fichas.previous_page_number }}{% if request.GET.proyecto %}&proyecto={{ request.GET.proyecto }}{% endif %}{% if request.GET.evaluador %}&evaluador={{ request.GET.evaluador }}{% endif %}{% if request.GET.termino %}&termino={{ request.GET.termino }}{% endif %}">
+                                <i class="fas fa-angle-left"></i>
+                            </a>
+                        </li>
+                    {% endif %}
+
+                    <li class="page-item active">
+                        <span class="page-link">
+                            {{ fichas.number }} de {{ fichas.paginator.num_pages }}
+                        </span>
+                    </li>
+
+                    {% if fichas.has_next %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ fichas.next_page_number }}{% if request.GET.proyecto %}&proyecto={{ request.GET.proyecto }}{% endif %}{% if request.GET.evaluador %}&evaluador={{ request.GET.evaluador }}{% endif %}{% if request.GET.termino %}&termino={{ request.GET.termino }}{% endif %}">
+                                <i class="fas fa-angle-right"></i>
+                            </a>
+                        </li>
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ fichas.paginator.num_pages }}{% if request.GET.proyecto %}&proyecto={{ request.GET.proyecto }}{% endif %}{% if request.GET.evaluador %}&evaluador={{ request.GET.evaluador }}{% endif %}{% if request.GET.termino %}&termino={{ request.GET.termino }}{% endif %}">
+                                <i class="fas fa-angle-double-right"></i>
+                            </a>
+                        </li>
+                    {% endif %}
+                </ul>
+            </nav>
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

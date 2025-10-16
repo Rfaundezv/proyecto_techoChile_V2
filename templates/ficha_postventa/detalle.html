@@ -1,0 +1,555 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Ficha Postventa - {{ ficha.vivienda }}{% endblock %}
+
+{% block extra_css %}
+<style>
+    .info-section {
+        background: #ffffff;
+        border: 1px solid #e3e6f0;
+        border-radius: 8px;
+        padding: 1.5rem;
+        margin-bottom: 1.5rem;
+    }
+    
+    .section-header {
+        color: #0056b3;
+        font-weight: 600;
+        font-size: 1.2rem;
+        margin-bottom: 1rem;
+        padding-bottom: 0.5rem;
+        border-bottom: 2px solid #e3e6f0;
+    }
+    
+    .info-row {
+        display: flex;
+        padding: 0.75rem 0;
+        border-bottom: 1px solid #f0f0f0;
+    }
+    
+    .info-row:last-child {
+        border-bottom: none;
+    }
+    
+    .info-label {
+        font-weight: 600;
+        color: #495057;
+        width: 200px;
+        flex-shrink: 0;
+    }
+    
+    .info-value {
+        color: #212529;
+        flex: 1;
+    }
+    
+    .badge-estado {
+        padding: 0.5rem 1rem;
+        border-radius: 5px;
+        font-weight: 600;
+    }
+    
+    .rating-badge {
+        display: inline-block;
+        padding: 0.25rem 0.75rem;
+        border-radius: 4px;
+        font-weight: 600;
+        font-size: 0.9rem;
+    }
+    
+    .rating-excelente { background: #d4edda; color: #155724; }
+    .rating-bueno { background: #d1ecf1; color: #0c5460; }
+    .rating-regular { background: #fff3cd; color: #856404; }
+    .rating-malo { background: #f8d7da; color: #721c24; }
+    
+    .archivo-item {
+        background: #f8f9fc;
+        border: 1px solid #e3e6f0;
+        border-radius: 5px;
+        padding: 0.75rem;
+        margin-bottom: 0.5rem;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+    }
+    
+    .historial-item {
+        background: #f8f9fc;
+        border-left: 3px solid #0056b3;
+        padding: 1rem;
+        margin-bottom: 1rem;
+        border-radius: 4px;
+    }
+    
+    .historial-fecha {
+        font-size: 0.9rem;
+        color: #6c757d;
+        font-weight: 600;
+    }
+    
+    .action-buttons {
+        display: flex;
+        gap: 0.5rem;
+        flex-wrap: wrap;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid mt-4">
+    <!-- Encabezado -->
+    <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
+        <div>
+            <h2 class="dashboard-title mb-1">
+                <i class="bi bi-clipboard-check"></i> Ficha Postventa
+            </h2>
+            <p class="text-muted mb-0">{{ ficha.vivienda }} - {{ ficha.proyecto }}</p>
+        </div>
+        
+        <div class="action-buttons">
+            <a href="{% url 'ficha_postventa:listar' %}" class="btn btn-outline-secondary">
+                <i class="bi bi-arrow-left"></i> Volver
+            </a>
+            {% if permisos.puede_editar %}
+            <a href="{% url 'ficha_postventa:editar' ficha.pk %}" class="btn btn-warning">
+                <i class="bi bi-pencil"></i> Editar
+            </a>
+            {% endif %}
+            <div class="btn-group" role="group">
+                <button type="button" class="btn btn-danger dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+                    <i class="bi bi-file-pdf"></i> PDF
+                </button>
+                <ul class="dropdown-menu">
+                    <li>
+                        <a class="dropdown-item" href="{% url 'ficha_postventa:generar_pdf' ficha.pk %}" target="_blank">
+                            <i class="bi bi-eye"></i> Ver PDF
+                        </a>
+                    </li>
+                    <li>
+                        <a class="dropdown-item" href="{% url 'ficha_postventa:generar_pdf' ficha.pk %}?download=1">
+                            <i class="bi bi-download"></i> Descargar PDF
+                        </a>
+                    </li>
+                    <li><hr class="dropdown-divider"></li>
+                    <li>
+                        <a class="dropdown-item" href="#" onclick="imprimirPDF()">
+                            <i class="bi bi-printer"></i> Imprimir PDF
+                        </a>
+                    </li>
+                </ul>
+            </div>
+            {% if permisos.puede_eliminar %}
+            <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#eliminarModal">
+                <i class="bi bi-trash"></i> Eliminar
+            </button>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Información General -->
+    <div class="info-section">
+        <h4 class="section-header">
+            <i class="bi bi-info-circle"></i> Información General
+        </h4>
+        
+        <div class="info-row">
+            <div class="info-label">N° Ficha:</div>
+            <div class="info-value"><strong>{{ ficha.numero_ficha }}</strong></div>
+        </div>
+        
+        <div class="info-row">
+            <div class="info-label">Fecha de Visita:</div>
+            <div class="info-value">{{ ficha.fecha_visita|date:"d/m/Y" }}</div>
+        </div>
+        
+        <div class="info-row">
+            <div class="info-label">Proyecto:</div>
+            <div class="info-value">{{ ficha.proyecto }}</div>
+        </div>
+        
+        <div class="info-row">
+            <div class="info-label">Vivienda:</div>
+            <div class="info-value">{{ ficha.vivienda }}</div>
+        </div>
+        
+        <div class="info-row">
+            <div class="info-label">Responsable TECHO:</div>
+            <div class="info-value">{{ ficha.responsable_techo.get_full_name }}</div>
+        </div>
+        
+        <div class="info-row">
+            <div class="info-label">Estado:</div>
+            <div class="info-value">
+                <span class="badge {% if ficha.estado == 'completada' %}bg-success{% elif ficha.estado == 'en_proceso' %}bg-warning{% else %}bg-secondary{% endif %}">
+                    {{ ficha.get_estado_display }}
+                </span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Datos de la Familia -->
+    <div class="info-section">
+        <h4 class="section-header">
+            <i class="bi bi-people"></i> Datos de la Familia
+        </h4>
+        
+        <div class="info-row">
+            <div class="info-label">Jefe de Familia:</div>
+            <div class="info-value">{{ ficha.nombre_jefe_familia|default:"-" }}</div>
+        </div>
+        
+        <div class="info-row">
+            <div class="info-label">Teléfono:</div>
+            <div class="info-value">{{ ficha.telefono_contacto|default:"-" }}</div>
+        </div>
+        
+        <div class="info-row">
+            <div class="info-label">Correo:</div>
+            <div class="info-value">{{ ficha.correo_contacto|default:"-" }}</div>
+        </div>
+        
+        <div class="info-row">
+            <div class="info-label">Tiempo de Residencia:</div>
+            <div class="info-value">{{ ficha.tiempo_residencia }} meses</div>
+        </div>
+        
+        <div class="info-row">
+            <div class="info-label">N° Habitantes:</div>
+            <div class="info-value">{{ ficha.numero_habitantes }}</div>
+        </div>
+    </div>
+
+    <!-- Evaluación Técnica -->
+    <div class="info-section">
+        <h4 class="section-header">
+            <i class="bi bi-hammer"></i> Evaluación Técnica
+        </h4>
+        
+        <div class="row">
+            <div class="col-md-6">
+                <div class="info-row">
+                    <div class="info-label">Estado General:</div>
+                    <div class="info-value">
+                        <span class="rating-badge rating-{{ ficha.estado_general_vivienda|lower }}">
+                            {{ ficha.get_estado_general_vivienda_display }}
+                        </span>
+                    </div>
+                </div>
+                
+                <div class="info-row">
+                    <div class="info-label">Techumbre:</div>
+                    <div class="info-value">
+                        <span class="rating-badge rating-{{ ficha.estado_techumbre|lower }}">
+                            {{ ficha.get_estado_techumbre_display }}
+                        </span>
+                    </div>
+                </div>
+                
+                <div class="info-row">
+                    <div class="info-label">Muros:</div>
+                    <div class="info-value">
+                        <span class="rating-badge rating-{{ ficha.estado_muros|lower }}">
+                            {{ ficha.get_estado_muros_display }}
+                        </span>
+                    </div>
+                </div>
+                
+                <div class="info-row">
+                    <div class="info-label">Pisos:</div>
+                    <div class="info-value">
+                        <span class="rating-badge rating-{{ ficha.estado_pisos|lower }}">
+                            {{ ficha.get_estado_pisos_display }}
+                        </span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-6">
+                <div class="info-row">
+                    <div class="info-label">Puertas/Ventanas:</div>
+                    <div class="info-value">
+                        <span class="rating-badge rating-{{ ficha.estado_puertas_ventanas|lower }}">
+                            {{ ficha.get_estado_puertas_ventanas_display }}
+                        </span>
+                    </div>
+                </div>
+                
+                <div class="info-row">
+                    <div class="info-label">Instalación Eléctrica:</div>
+                    <div class="info-value">
+                        <span class="rating-badge rating-{{ ficha.estado_instalacion_electrica|lower }}">
+                            {{ ficha.get_estado_instalacion_electrica_display }}
+                        </span>
+                    </div>
+                </div>
+                
+                <div class="info-row">
+                    <div class="info-label">Instalación Sanitaria:</div>
+                    <div class="info-value">
+                        <span class="rating-badge rating-{{ ficha.estado_instalacion_sanitaria|lower }}">
+                            {{ ficha.get_estado_instalacion_sanitaria_display }}
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Evaluación de Satisfacción -->
+    <div class="info-section">
+        <h4 class="section-header">
+            <i class="bi bi-emoji-smile"></i> Evaluación de Satisfacción
+        </h4>
+        
+        <div class="row">
+            <div class="col-md-6">
+                <div class="info-row">
+                    <div class="info-label">Satisfacción General:</div>
+                    <div class="info-value">
+                        <span class="rating-badge rating-{{ ficha.satisfaccion_general|lower }}">
+                            {{ ficha.get_satisfaccion_general_display }}
+                        </span>
+                    </div>
+                </div>
+                
+                <div class="info-row">
+                    <div class="info-label">Tamaño:</div>
+                    <div class="info-value">
+                        <span class="rating-badge rating-{{ ficha.satisfaccion_tamano|lower }}">
+                            {{ ficha.get_satisfaccion_tamano_display }}
+                        </span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-6">
+                <div class="info-row">
+                    <div class="info-label">Distribución:</div>
+                    <div class="info-value">
+                        <span class="rating-badge rating-{{ ficha.satisfaccion_distribucion|lower }}">
+                            {{ ficha.get_satisfaccion_distribucion_display }}
+                        </span>
+                    </div>
+                </div>
+                
+                <div class="info-row">
+                    <div class="info-label">Ubicación:</div>
+                    <div class="info-value">
+                        <span class="rating-badge rating-{{ ficha.satisfaccion_ubicacion|lower }}">
+                            {{ ficha.get_satisfaccion_ubicacion_display }}
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Necesidades y Reparaciones -->
+    {% if ficha.necesita_reparaciones %}
+    <div class="info-section">
+        <h4 class="section-header">
+            <i class="bi bi-tools"></i> Necesidades y Reparaciones
+        </h4>
+        
+        <div class="info-row">
+            <div class="info-label">Requiere Reparaciones:</div>
+            <div class="info-value">
+                <span class="badge bg-warning">Sí</span>
+            </div>
+        </div>
+        
+        {% if ficha.descripcion_reparaciones %}
+        <div class="info-row">
+            <div class="info-label">Descripción:</div>
+            <div class="info-value">{{ ficha.descripcion_reparaciones|linebreaks }}</div>
+        </div>
+        {% endif %}
+        
+        {% if ficha.reparaciones_requeridas %}
+        <div class="info-row">
+            <div class="info-label">Reparaciones:</div>
+            <div class="info-value">{{ ficha.reparaciones_requeridas|linebreaks }}</div>
+        </div>
+        {% endif %}
+        
+        {% if ficha.costo_estimado_reparaciones %}
+        <div class="info-row">
+            <div class="info-label">Costo Estimado:</div>
+            <div class="info-value">${{ ficha.costo_estimado_reparaciones|floatformat:0 }}</div>
+        </div>
+        {% endif %}
+    </div>
+    {% endif %}
+
+    <!-- Seguimiento Social -->
+    <div class="info-section">
+        <h4 class="section-header">
+            <i class="bi bi-hand-thumbs-up"></i> Seguimiento Social
+        </h4>
+        
+        <div class="row">
+            <div class="col-md-6">
+                <div class="info-row">
+                    <div class="info-label">Adaptación Familiar:</div>
+                    <div class="info-value">
+                        <span class="rating-badge rating-{{ ficha.adaptacion_familiar|lower }}">
+                            {{ ficha.get_adaptacion_familiar_display }}
+                        </span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-6">
+                <div class="info-row">
+                    <div class="info-label">Integración Comunitaria:</div>
+                    <div class="info-value">
+                        <span class="rating-badge rating-{{ ficha.integracion_comunitaria|lower }}">
+                            {{ ficha.get_integracion_comunitaria_display }}
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Acceso a Servicios -->
+    <div class="info-section">
+        <h4 class="section-header">
+            <i class="bi bi-geo-alt"></i> Acceso a Servicios
+        </h4>
+        
+        <div class="row">
+            <div class="col-md-6">
+                <div class="info-row">
+                    <div class="info-label">Salud:</div>
+                    <div class="info-value">
+                        <span class="rating-badge rating-{{ ficha.acceso_salud|lower }}">
+                            {{ ficha.get_acceso_salud_display }}
+                        </span>
+                    </div>
+                </div>
+                
+                <div class="info-row">
+                    <div class="info-label">Educación:</div>
+                    <div class="info-value">
+                        <span class="rating-badge rating-{{ ficha.acceso_educacion|lower }}">
+                            {{ ficha.get_acceso_educacion_display }}
+                        </span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-6">
+                <div class="info-row">
+                    <div class="info-label">Transporte:</div>
+                    <div class="info-value">
+                        <span class="rating-badge rating-{{ ficha.acceso_transporte|lower }}">
+                            {{ ficha.get_acceso_transporte_display }}
+                        </span>
+                    </div>
+                </div>
+                
+                <div class="info-row">
+                    <div class="info-label">Comercio:</div>
+                    <div class="info-value">
+                        <span class="rating-badge rating-{{ ficha.acceso_comercio|lower }}">
+                            {{ ficha.get_acceso_comercio_display }}
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Observaciones -->
+    {% if ficha.observaciones_generales %}
+    <div class="info-section">
+        <h4 class="section-header">
+            <i class="bi bi-chat-left-text"></i> Observaciones
+        </h4>
+        <div class="info-value">{{ ficha.observaciones_generales|linebreaks }}</div>
+    </div>
+    {% endif %}
+
+    <!-- Archivos Adjuntos -->
+    {% if archivos %}
+    <div class="info-section">
+        <h4 class="section-header">
+            <i class="bi bi-paperclip"></i> Archivos Adjuntos
+        </h4>
+        
+        {% for archivo in archivos %}
+        <div class="archivo-item">
+            <div>
+                <i class="bi bi-file-earmark"></i>
+                <strong>{{ archivo.titulo }}</strong>
+                {% if archivo.descripcion %}
+                <br><small class="text-muted">{{ archivo.descripcion }}</small>
+                {% endif %}
+            </div>
+            <a href="{{ archivo.archivo.url }}" class="btn btn-sm btn-primary" download>
+                <i class="bi bi-download"></i> Descargar
+            </a>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <!-- Historial de Cambios -->
+    {% if historial %}
+    <div class="info-section">
+        <h4 class="section-header">
+            <i class="bi bi-clock-history"></i> Historial de Cambios
+        </h4>
+        
+        {% for cambio in historial %}
+        <div class="historial-item">
+            <div class="historial-fecha">
+                {{ cambio.fecha|date:"d/m/Y H:i" }} - {{ cambio.usuario.get_full_name }}
+            </div>
+            <div class="mt-2">
+                <strong>{{ cambio.get_tipo_cambio_display }}</strong>
+                {% if cambio.descripcion %}
+                <p class="mb-0 mt-1">{{ cambio.descripcion }}</p>
+                {% endif %}
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+</div>
+
+<script>
+function imprimirPDF() {
+    const pdfUrl = "{% url 'ficha_postventa:generar_pdf' ficha.pk %}";
+    const win = window.open(pdfUrl, '_blank');
+    if (!win) return; // Popup bloqueado
+    win.onload = function() {
+        setTimeout(function() { try { win.print(); } catch (e) {} }, 700);
+    };
+}
+</script>
+
+<!-- Modal de Confirmación de Eliminación -->
+<div class="modal fade" id="eliminarModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Confirmar Eliminación</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                ¿Está seguro que desea eliminar esta ficha postventa? Esta acción no se puede deshacer.
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <form method="post" action="{% url 'ficha_postventa:eliminar' ficha.pk %}" style="display: inline;">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-danger">Eliminar</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

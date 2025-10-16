@@ -15,7 +15,7 @@ DEBUG = os.getenv('DEBUG', 'True').lower() == 'true'
 ALLOWED_HOSTS = [
     "127.0.0.1",
     "localhost",
-    "marco-suspended-markers-owen.trycloudflare.com"
+    "officially-single-compute-myth.trycloudflare.com"
 ]
 
 CSRF_TRUSTED_ORIGINS = [
@@ -34,6 +34,7 @@ INSTALLED_APPS = [
     'proyectos',
     'incidencias',
     'reportes',
+    'ficha_postventa',
     "django_extensions",
 ]
 

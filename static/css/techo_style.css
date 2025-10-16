@@ -781,6 +781,48 @@ a .metric-card.info:hover .metric-label { color: rgba(255,255,255,0.9); }
 .badge-vencida { background: linear-gradient(45deg, var(--techo-danger), #dc2626) !important; }
 .badge-proceso { background: linear-gradient(45deg, var(--techo-orange), #ea580c) !important; }
 
+
+/* === Prioridades === */
+.badge-prioridad-urgente {
+    background: linear-gradient(45deg, #ef4444, #b91c1c) !important; /* rojo intenso */
+    color: #fff !important;
+    font-weight: bold;
+    border-radius: 8px;
+    padding: 0.35em 1em;
+    box-shadow: 0 2px 8px rgba(239,68,68,0.25);
+    letter-spacing: 0.5px;
+}
+
+.badge-prioridad-alta {
+    background: linear-gradient(45deg, #f97316, #ea580c) !important; /* naranja */
+    color: #fff !important;
+    font-weight: bold;
+    border-radius: 8px;
+    padding: 0.35em 1em;
+    box-shadow: 0 2px 8px rgba(249,115,22,0.25);
+    letter-spacing: 0.5px;
+}
+
+.badge-prioridad-media {
+    background: linear-gradient(45deg, #facc15, #eab308) !important; /* amarillo */
+    color: #1f2937 !important; /* texto oscuro */
+    font-weight: 600;
+    border-radius: 8px;
+    padding: 0.35em 1em;
+    box-shadow: 0 2px 8px rgba(250,204,21,0.25);
+    letter-spacing: 0.5px;
+}
+
+.badge-prioridad-baja {
+    background: linear-gradient(45deg, #22c55e, #16a34a) !important; /* verde */
+    color: #fff !important;
+    font-weight: 600;
+    border-radius: 8px;
+    padding: 0.35em 1em;
+    box-shadow: 0 2px 8px rgba(34,197,94,0.25);
+    letter-spacing: 0.5px;
+}
+
 /* Forms */
 .form-techo {
     background: var(--techo-white);

@@ -50,6 +50,8 @@
                             <th>Vivienda</th>
                             <th class="d-none d-md-table-cell">Beneficiario</th>
                             <th class="d-none d-lg-table-cell">Tipología</th>
+                            <th class="d-none d-lg-table-cell">Metros cuadrados</th>
+                            <th class="d-none d-lg-table-cell">Habitaciones</th>
                             <th class="d-none d-sm-table-cell">Estado</th>
                             <th class="d-none d-lg-table-cell">F. Entrega</th>
                             <th class="d-none d-sm-table-cell">Activo</th>
@@ -65,6 +67,8 @@
                                     <span class="text-muted">{{ vivienda.codigo }}</span>
                                     <small class="text-muted d-md-none">{{ vivienda.beneficiario|default:"Sin beneficiario" }}</small>
                                     <small class="text-muted d-lg-none">{{ vivienda.tipologia.nombre }}</small>
+                                    <small class="text-muted d-lg-none">{{ vivienda.tipologia.metros_cuadrados|default:"-" }}</small>
+                                    <small class="text-muted d-lg-none">{{ vivienda.tipologia.numero_ambientes|default:"-" }}</small>
                                     <div class="d-sm-none mt-1">
                                         <span class="badge
                                             {% if vivienda.prioridad == 'alta' %}badge-urgente
@@ -93,6 +97,8 @@
                             </td>
                             <td class="d-none d-md-table-cell">{{ vivienda.beneficiario|default:"-" }}</td>
                             <td class="d-none d-lg-table-cell">{{ vivienda.tipologia.nombre }}</td>
+                            <td class="d-none d-lg-table-cell">{{ vivienda.tipologia.metros_cuadrados|default:"-" }}</td>
+                            <td class="d-none d-lg-table-cell">{{ vivienda.tipologia.numero_ambientes|default:"-" }}</td>
                             <td class="d-none d-sm-table-cell">
                                 <span class="badge
                                     {% if vivienda.prioridad == 'alta' %}badge-urgente

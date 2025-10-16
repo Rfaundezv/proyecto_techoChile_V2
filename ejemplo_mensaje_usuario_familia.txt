@@ -1,0 +1,15 @@
+# Ejemplo de mensaje en consola al crear un beneficiario:
+
+✓ Usuario FAMILIA creado automáticamente: juan.perez@email.com (RUT: 12345678-9)
+  Contraseña temporal: 56789
+
+# Explicación:
+- El correo es el mismo que el beneficiario.
+- La contraseña son los 6 últimos dígitos del RUT (sin puntos ni guion).
+- El usuario puede ingresar al sistema con ese correo y contraseña.
+
+# Recomendación:
+- Puedes copiar este mensaje y entregárselo al beneficiario para que acceda por primera vez.
+- El usuario puede cambiar su contraseña después de ingresar.
+
+# Si quieres que se envíe automáticamente por email, avísame y lo implemento.

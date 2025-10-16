@@ -43,11 +43,6 @@ def lista_observaciones(request):
     observaciones = Observacion.objects.select_related(
         'vivienda__proyecto', 'recinto', 'creado_por'
     ).prefetch_related('archivos_adjuntos').order_by('-fecha_creacion')
-
-    # Agregar atributo total_archivos a cada observación
-    for obs in observaciones:
-        total_adjuntos = obs.archivos_adjuntos.count()
-        obs.total_archivos = total_adjuntos + (1 if obs.archivo_adjunto else 0)
     
     # Filtrar observaciones según el rol del usuario (incluye rol antiguo)
     observaciones = filtrar_observaciones_por_rol(request.user, observaciones)
@@ -106,7 +101,19 @@ def lista_observaciones(request):
     page_number = request.GET.get('page')
     observaciones_pagina = paginator.get_page(page_number)
 
-    # es_familia ya determinado arriba
+    # Agregar atributos calculados por elemento SOLO en la página actual (evitar iterar todo el queryset)
+    from datetime import timedelta
+    for obs in observaciones_pagina:
+        # Total de archivos adjuntos (archivos adicionales + archivo principal si existe)
+        total_adjuntos = obs.archivos_adjuntos.count()
+        obs.total_archivos = total_adjuntos + (1 if obs.archivo_adjunto else 0)
+        # Fallback de fecha de vencimiento si no existiera (para visualización)
+        if not obs.fecha_vencimiento and obs.fecha_creacion:
+            base_date = obs.fecha_creacion.date()
+            if obs.es_urgente or obs.prioridad == 'URGENTE':
+                obs.fecha_vencimiento = base_date + timedelta(days=2)  # 48 horas ≈ 2 días
+            else:
+                obs.fecha_vencimiento = base_date + timedelta(days=120)
 
     # Permiso para cambiar estado (solo no familias pueden cambiar)
     puede_cambiar = not es_familia
@@ -218,7 +225,7 @@ def crear_observacion(request):
             
             # Sincronizar es_urgente con prioridad
             if observacion.es_urgente:
-                observacion.prioridad = 'urgente'
+                observacion.prioridad = Observacion.Prioridad.URGENTE
             try:
                 estado_abierta = EstadoObservacion.objects.get(codigo=1)
             except EstadoObservacion.DoesNotExist:
@@ -338,8 +345,8 @@ def crear_observacion(request):
             
             # Sincronizar es_urgente con prioridad
             if observacion.es_urgente:
-                observacion.prioridad = 'urgente'
-            elif observacion.prioridad == 'urgente':
+                observacion.prioridad = Observacion.Prioridad.URGENTE
+            elif observacion.prioridad == Observacion.Prioridad.URGENTE:
                 observacion.es_urgente = True
             
             # Asignar estado inicial
@@ -460,8 +467,8 @@ def crear_observacion(request):
             
             # Sincronizar es_urgente con prioridad
             if observacion.es_urgente:
-                observacion.prioridad = 'urgente'
-            elif observacion.prioridad == 'urgente':
+                observacion.prioridad = Observacion.Prioridad.URGENTE
+            elif observacion.prioridad == Observacion.Prioridad.URGENTE:
                 observacion.es_urgente = True
             
             # Asignar estado inicial

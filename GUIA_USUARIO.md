@@ -87,7 +87,8 @@ El Sistema de Seguimiento de Incidentes de TECHO CHILE es una plataforma web des
 - **Contraseña:** familia123
 - **Nombre:** Juan Pérez Familia
 - **RUT:** 12345678-9
-
+test@creacionusuario.cl
+047762
 ---
 
 ## 🚀 Funcionalidades Principales

@@ -1,0 +1,589 @@
+<!-- templates/ficha_postventa/pdf_template.html -->
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ficha de Postventa - {{ ficha.pk }}</title>
+    <style>
+        @page {
+            size: A4;
+            margin: 1.5cm;
+        }
+        
+        body {
+            font-family: 'Arial', sans-serif;
+            font-size: 10px;
+            line-height: 1.3;
+            color: #333;
+        }
+        
+        .header {
+            text-align: center;
+            border-bottom: 3px solid #e74c3c;
+            padding-bottom: 10px;
+            margin-bottom: 15px;
+        }
+        
+        .header h1 {
+            color: #e74c3c;
+            font-size: 16px;
+            margin-bottom: 3px;
+        }
+        
+        .header h2 {
+            color: #2c3e50;
+            font-size: 12px;
+            margin: 0;
+        }
+        
+        .section {
+            margin-bottom: 12px;
+            page-break-inside: avoid;
+        }
+        
+        .section-title {
+            background-color: #34495e;
+            color: white;
+            padding: 4px 8px;
+            font-weight: bold;
+            font-size: 11px;
+            margin-bottom: 8px;
+        }
+        
+        .info-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-bottom: 8px;
+        }
+        
+        .info-item {
+            display: flex;
+            margin-bottom: 5px;
+        }
+        
+        .info-label {
+            font-weight: bold;
+            min-width: 120px;
+            margin-right: 8px;
+        }
+        
+        .info-value {
+            flex: 1;
+            border-bottom: 1px solid #bdc3c7;
+            padding-bottom: 1px;
+        }
+        
+        .evaluation-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 8px 0;
+            font-size: 9px;
+        }
+        
+        .evaluation-table th,
+        .evaluation-table td {
+            border: 1px solid #bdc3c7;
+            padding: 4px;
+            text-align: left;
+        }
+        
+        .evaluation-table th {
+            background-color: #ecf0f1;
+            font-weight: bold;
+            text-align: center;
+        }
+        
+        .status-excellent { background-color: #d5f4e6; }
+        .status-good { background-color: #ffeaa7; }
+        .status-regular { background-color: #fab1a0; }
+        .status-deficient { background-color: #ff7675; }
+        
+        .checkbox-group {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            margin: 5px 0;
+        }
+        
+        .checkbox-item {
+            display: flex;
+            align-items: center;
+            gap: 3px;
+        }
+        
+        .problems-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 8px 0;
+            font-size: 9px;
+        }
+        
+        .problems-table th,
+        .problems-table td {
+            border: 1px solid #bdc3c7;
+            padding: 4px;
+            vertical-align: top;
+        }
+        
+        .problems-table th {
+            background-color: #e74c3c;
+            color: white;
+            font-weight: bold;
+            text-align: center;
+        }
+        
+        .actions-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 8px 0;
+            font-size: 9px;
+        }
+        
+        .actions-table th,
+        .actions-table td {
+            border: 1px solid #bdc3c7;
+            padding: 4px;
+            vertical-align: top;
+        }
+        
+        .actions-table th {
+            background-color: #3498db;
+            color: white;
+            font-weight: bold;
+            text-align: center;
+        }
+        
+        .signature-section {
+            margin-top: 20px;
+            page-break-inside: avoid;
+        }
+        
+        .signatures {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-top: 15px;
+        }
+        
+        .signature-box {
+            border: 1px solid #bdc3c7;
+            padding: 10px;
+            text-align: center;
+        }
+        
+        .signature-line {
+            border-bottom: 1px solid #333;
+            margin-bottom: 8px;
+            height: 30px;
+        }
+        
+        .page-break {
+            page-break-before: always;
+        }
+        
+        .footer-note {
+            font-size: 8px;
+            color: #7f8c8d;
+            text-align: center;
+            margin-top: 15px;
+            border-top: 1px solid #bdc3c7;
+            padding-top: 8px;
+        }
+        
+        .highlight-box {
+            background-color: #f8f9fa;
+            border-left: 4px solid #e74c3c;
+            padding: 8px;
+            margin: 8px 0;
+        }
+        
+        .recommendation-box {
+            background-color: #e8f5e8;
+            border: 1px solid #27ae60;
+            padding: 8px;
+            margin: 5px 0;
+        }
+        
+        .alert-box {
+            background-color: #fff3cd;
+            border: 1px solid #ffc107;
+            padding: 8px;
+            margin: 5px 0;
+        }
+        
+        .critical-box {
+            background-color: #f8d7da;
+            border: 1px solid #dc3545;
+            padding: 8px;
+            margin: 5px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>FICHA DE POSTVENTA - SEGUIMIENTO INDIVIDUAL</h1>
+        <h2>TECHO CHILE</h2>
+        <p><strong>Ficha N°:</strong> {{ ficha.pk }} | <strong>Generada:</strong> {% now "d/m/Y H:i" %}</p>
+    </div>
+
+    <!-- I. INFORMACIÓN DE LA VISITA -->
+    <div class="section">
+        <div class="section-title">I. INFORMACIÓN DE LA EVALUACIÓN</div>
+        <div class="info-grid">
+            <div>
+                <div class="info-item">
+                    <div class="info-label">Fecha de Creación:</div>
+                    <div class="info-value">{{ ficha.fecha_creacion|date:"d/m/Y" }}</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Fecha de Evaluación:</div>
+                    <div class="info-value">{{ ficha.fecha_evaluacion|date:"d/m/Y" }}</div>
+                </div>
+            </div>
+            <div>
+                <div class="info-item">
+                    <div class="info-label">Evaluador:</div>
+                    <div class="info-value">{{ ficha.evaluador.nombre }} {{ ficha.evaluador.apellido_paterno|default:"" }}</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Cargo:</div>
+                    <div class="info-value">{{ ficha.evaluador.rol.nombre|default:"Evaluador" }}</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- II. IDENTIFICACIÓN DEL BENEFICIARIO Y PROYECTO -->
+    <div class="section">
+        <div class="section-title">II. IDENTIFICACIÓN DEL BENEFICIARIO Y PROYECTO</div>
+        <div class="info-grid">
+            <div>
+                <div class="info-item">
+                    <div class="info-label">Beneficiario:</div>
+                    <div class="info-value">{{ ficha.vivienda.familia_beneficiaria|default:"N/A" }}</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Proyecto:</div>
+                    <div class="info-value">{{ ficha.vivienda.proyecto.nombre }}</div>
+                </div>
+            </div>
+            <div>
+                <div class="info-item">
+                    <div class="info-label">Código Proyecto:</div>
+                    <div class="info-value">{{ ficha.vivienda.proyecto.codigo }}</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Código Vivienda:</div>
+                    <div class="info-value">{{ ficha.vivienda.codigo }}</div>
+                </div>
+            </div>
+        </div>
+        <div class="info-item">
+            <div class="info-label">Dirección:</div>
+            <div class="info-value">{{ ficha.vivienda.direccion|default:"No especificada" }}</div>
+        </div>
+    </div>
+
+    <!-- III. DATOS DE LA FAMILIA -->
+    <div class="section">
+        <div class="section-title">III. DATOS DE LA FAMILIA</div>
+        <div class="info-grid">
+            <div>
+                <div class="info-item">
+                    <div class="info-label">Familia Presente:</div>
+                    <div class="info-value">{{ ficha.familia_presente|yesno:"Sí,No" }}</div>
+                </div>
+            </div>
+            <div>
+                <div class="info-item">
+                    <div class="info-label">Jefe de Hogar Presente:</div>
+                    <div class="info-value">{{ ficha.jefe_hogar_presente|yesno:"Sí,No" }}</div>
+                </div>
+            </div>
+        </div>
+        {% if ficha.observaciones_familia %}
+        <div class="highlight-box">
+            <p><strong>Observaciones sobre la familia:</strong></p>
+            <p>{{ ficha.observaciones_familia|linebreaks }}</p>
+        </div>
+        {% endif %}
+    </div>
+
+    <!-- IV. EVALUACIÓN DEL ESTADO DE LA VIVIENDA -->
+    <div class="section">
+        <div class="section-title">IV. EVALUACIÓN DE HABITABILIDAD</div>
+        
+        <p style="font-weight: bold; margin-bottom: 5px;">A. Servicios Básicos</p>
+        <table class="evaluation-table">
+            <thead>
+                <tr>
+                    <th>Servicio</th>
+                    <th>Estado</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Agua Potable</td>
+                    <td>{{ ficha.agua_potable_funciona|yesno:"Funciona,No funciona" }}</td>
+                </tr>
+                <tr>
+                    <td>Electricidad</td>
+                    <td>{{ ficha.electricidad_funciona|yesno:"Funciona,No funciona" }}</td>
+                </tr>
+                <tr>
+                    <td>Alcantarillado</td>
+                    <td>{{ ficha.alcantarillado_funciona|yesno:"Funciona,No funciona" }}</td>
+                </tr>
+                <tr>
+                    <td>Gas</td>
+                    <td>{{ ficha.gas_funciona|yesno:"Funciona,No funciona" }}</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <p style="font-weight: bold; margin: 10px 0 5px 0;">B. Estado de Elementos Constructivos</p>
+        <table class="evaluation-table">
+            <thead>
+                <tr>
+                    <th>Elemento</th>
+                    <th>Estado</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Estado General de la Vivienda</td>
+                    <td>{{ ficha.get_estado_general_vivienda_display }}</td>
+                </tr>
+                <tr>
+                    <td>Techumbre</td>
+                    <td>{{ ficha.get_estado_techumbre_display }}</td>
+                </tr>
+                <tr>
+                    <td>Muros</td>
+                    <td>{{ ficha.get_estado_muros_display }}</td>
+                </tr>
+                <tr>
+                    <td>Pisos</td>
+                    <td>{{ ficha.get_estado_pisos_display }}</td>
+                </tr>
+                <tr>
+                    <td>Puertas y Ventanas</td>
+                    <td>{{ ficha.get_estado_puertas_ventanas_display }}</td>
+                </tr>
+                <tr>
+                    <td>Instalación Eléctrica</td>
+                    <td>{{ ficha.get_estado_instalacion_electrica_display }}</td>
+                </tr>
+                <tr>
+                    <td>Instalación Sanitaria</td>
+                    <td>{{ ficha.get_estado_instalacion_sanitaria_display }}</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- V. EVALUACIÓN DE SATISFACCIÓN -->
+    <div class="section">
+        <div class="section-title">V. EVALUACIÓN DE SATISFACCIÓN</div>
+        
+        <table class="evaluation-table">
+            <thead>
+                <tr>
+                    <th>Aspecto</th>
+                    <th>Nivel de Satisfacción</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Satisfacción General</td>
+                    <td>{{ ficha.get_satisfaccion_general_display }}</td>
+                </tr>
+                <tr>
+                    <td>Tamaño de la Vivienda</td>
+                    <td>{{ ficha.get_satisfaccion_tamano_display }}</td>
+                </tr>
+                <tr>
+                    <td>Distribución de Espacios</td>
+                    <td>{{ ficha.get_satisfaccion_distribucion_display }}</td>
+                </tr>
+                <tr>
+                    <td>Ubicación</td>
+                    <td>{{ ficha.get_satisfaccion_ubicacion_display }}</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- VI. NECESIDADES Y REPARACIONES -->
+    {% if ficha.requiere_reparaciones or ficha.requiere_mejoras %}
+    <div class="section">
+        <div class="section-title">VI. NECESIDADES IDENTIFICADAS</div>
+        
+        {% if ficha.requiere_reparaciones %}
+        <div class="alert-box">
+            <p><strong>⚠️ Requiere Reparaciones</strong></p>
+            {% if ficha.detalle_reparaciones %}
+            <p>{{ ficha.detalle_reparaciones|linebreaks }}</p>
+            {% endif %}
+        </div>
+        {% endif %}
+
+        {% if ficha.requiere_mejoras %}
+        <div class="recommendation-box">
+            <p><strong>💡 Mejoras Sugeridas</strong></p>
+            {% if ficha.detalle_mejoras %}
+            <p>{{ ficha.detalle_mejoras|linebreaks }}</p>
+            {% endif %}
+        </div>
+        {% endif %}
+    </div>
+    {% endif %}
+
+    <!-- VII. SEGUIMIENTO SOCIAL -->
+    <div class="section">
+        <div class="section-title">VII. SEGUIMIENTO SOCIAL Y ACCESO A SERVICIOS</div>
+        
+        <div class="info-grid">
+            <div>
+                <div class="info-item">
+                    <div class="info-label">Adaptación Familiar:</div>
+                    <div class="info-value">{{ ficha.get_adaptacion_familiar_display|default:"N/A" }}</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Acceso a Salud:</div>
+                    <div class="info-value">{{ ficha.get_acceso_salud_display|default:"N/A" }}</div>
+                </div>
+            </div>
+            <div>
+                <div class="info-item">
+                    <div class="info-label">Integración Comunitaria:</div>
+                    <div class="info-value">{{ ficha.get_integracion_comunitaria_display|default:"N/A" }}</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Acceso a Educación:</div>
+                    <div class="info-value">{{ ficha.get_acceso_educacion_display|default:"N/A" }}</div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="info-grid">
+            <div>
+                <div class="info-item">
+                    <div class="info-label">Acceso a Transporte:</div>
+                    <div class="info-value">{{ ficha.get_acceso_transporte_display|default:"N/A" }}</div>
+                </div>
+            </div>
+            <div>
+                <div class="info-item">
+                    <div class="info-label">Acceso a Comercio:</div>
+                    <div class="info-value">{{ ficha.get_acceso_comercio_display|default:"N/A" }}</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- VIII. OBSERVACIONES -->
+    {% if ficha.observaciones_generales or ficha.observaciones_tecnicas or ficha.observaciones_sociales %}
+    <div class="section">
+        <div class="section-title">VIII. OBSERVACIONES</div>
+        
+        {% if ficha.observaciones_tecnicas %}
+        <div class="highlight-box">
+            <p><strong>Observaciones Técnicas:</strong></p>
+            <p>{{ ficha.observaciones_tecnicas|linebreaks }}</p>
+        </div>
+        {% endif %}
+
+        {% if ficha.observaciones_sociales %}
+        <div class="highlight-box">
+            <p><strong>Observaciones Sociales:</strong></p>
+            <p>{{ ficha.observaciones_sociales|linebreaks }}</p>
+        </div>
+        {% endif %}
+
+        {% if ficha.observaciones_generales %}
+        <div class="highlight-box">
+            <p><strong>Observaciones Generales:</strong></p>
+            <p>{{ ficha.observaciones_generales|linebreaks }}</p>
+        </div>
+        {% endif %}
+    </div>
+    {% endif %}
+
+    <!-- IX. RECOMENDACIONES -->
+    {% if ficha.recomendaciones %}
+    <div class="section">
+        <div class="section-title">IX. RECOMENDACIONES</div>
+        <div class="recommendation-box">
+            <p>{{ ficha.recomendaciones|linebreaks }}</p>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- X. SEGUIMIENTO -->
+    <div class="section">
+        <div class="section-title">X. PLAN DE SEGUIMIENTO</div>
+        
+        <div class="info-grid">
+            <div>
+                <div class="info-item">
+                    <div class="info-label">Requiere Seguimiento:</div>
+                    <div class="info-value">{{ ficha.requiere_seguimiento|yesno:"Sí,No" }}</div>
+                </div>
+            </div>
+            <div>
+                {% if ficha.fecha_proximo_seguimiento %}
+                <div class="info-item">
+                    <div class="info-label">Próximo Seguimiento:</div>
+                    <div class="info-value">{{ ficha.fecha_proximo_seguimiento|date:"d/m/Y" }}</div>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+        {% if ficha.requiere_seguimiento %}
+        <div class="alert-box">
+            <p><strong>⚠️ Este caso requiere seguimiento continuo</strong></p>
+        </div>
+        {% endif %}
+    </div>
+
+    <!-- FIRMAS -->
+    <div class="signature-section">
+        <div class="section-title">XI. FIRMAS Y VALIDACIÓN</div>
+        
+        <div class="signatures">
+            <div class="signature-box">
+                <div class="signature-line"></div>
+                <p><strong>BENEFICIARIO</strong></p>
+                <p>{{ ficha.vivienda.familia_beneficiaria|default:"_________________" }}</p>
+                <p>Fecha: {{ ficha.fecha_evaluacion|date:"d/m/Y" }}</p>
+            </div>
+            
+            <div class="signature-box">
+                <div class="signature-line"></div>
+                <p><strong>EVALUADOR TECHO</strong></p>
+                <p>{{ ficha.evaluador.nombre }} {{ ficha.evaluador.apellido_paterno|default:"" }}</p>
+                <p>{{ ficha.evaluador.rol.nombre|default:"Evaluador" }}</p>
+                <p>Fecha: {{ ficha.fecha_evaluacion|date:"d/m/Y" }}</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="footer-note">
+        <p>
+            <strong>IMPORTANTE:</strong> Esta ficha documenta el seguimiento post-entrega de la vivienda. 
+            Es un instrumento de evaluación continua que permite monitorear el impacto y evolución del proyecto habitacional.
+        </p>
+        <p style="margin-top: 8px;">
+            Para consultas o reportar problemas urgentes, contactar a TECHO Chile 
+            o al correo info.chile@techo.org dentro de los plazos establecidos.
+        </p>
+        <p style="margin-top: 8px; font-weight: bold;">
+            Ficha generada automáticamente - N° {{ ficha.pk }} - {% now "d/m/Y H:i" %}
+        </p>
+    </div>
+</body>
+</html>

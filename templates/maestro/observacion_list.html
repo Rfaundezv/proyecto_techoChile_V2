@@ -103,9 +103,19 @@
                                             {% endif %} me-1">
                                             {{ observacion.estado.nombre }}
                                         </span>
-                                        <span class="badge {% if observacion.prioridad == 'urgente' or observacion.prioridad == 'alta' %}badge-urgente{% elif observacion.prioridad == 'media' %}bg-warning{% elif observacion.prioridad == 'baja' %}bg-success{% endif %}">
-                                            {{ observacion.get_prioridad_display }}
+                                       <span class="badge 
+                                        {% if observacion.prioridad == 'urgente' %}
+                                            badge-prioridad-urgente
+                                        {% elif observacion.prioridad == 'ALTA' %}
+                                            badge-prioridad-alta
+                                        {% elif observacion.prioridad == 'MEDIA' %}
+                                            badge-prioridad-media
+                                        {% elif observacion.prioridad == 'BAJA' %}
+                                            badge-prioridad-bajas
+                                        {% endif %}">
+                                        {{ observacion.get_prioridad_display }}
                                         </span>
+
                                     </div>
                                     <small class="text-muted d-xl-none">{{ observacion.fecha_creacion|date:"d/m/Y" }}</small>
                                 </div>
@@ -131,7 +141,17 @@
                                 </span>
                             </td>
                             <td class="d-none d-sm-table-cell">
-                                <span class="badge {% if observacion.prioridad == 'urgente' or observacion.prioridad == 'alta' %}badge-urgente{% elif observacion.prioridad == 'media' %}bg-warning{% elif observacion.prioridad == 'baja' %}bg-success{% endif %}">
+                                <span class="badge"
+                                    {% if observacion.prioridad == 'URGENTE' or observacion.es_urgente %}
+                                        style="background-color: #dc3545; color: white; font-weight: 600;"
+                                    {% elif observacion.prioridad == 'ALTA' %}
+                                        style="background-color: #ff6b6b; color: white; font-weight: 600;"
+                                    {% elif observacion.prioridad == 'MEDIA' %}
+                                        style="background-color: #ffa500; color: white;"
+                                    {% elif observacion.prioridad == 'BAJA' %}
+                                        style="background-color: #90EE90; color: #2d5016;"
+                                    {% endif %}
+                                >
                                     {{ observacion.get_prioridad_display }}
                                 </span>
                             </td>

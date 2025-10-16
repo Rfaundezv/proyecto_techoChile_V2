@@ -53,6 +53,7 @@ urlpatterns = [
     path('proyectos/', include('proyectos.urls', namespace='proyectos')),
     path('incidencias/', include('incidencias.urls', namespace='incidencias')),
     path('reportes/', include('reportes.urls', namespace='reportes')),
+    path('fichas-postventa/', include('ficha_postventa.urls', namespace='ficha_postventa')),
     path('auth/', include('django.contrib.auth.urls')),
     path('ajax/comunas/', core_views.ajax_comunas_por_region, name='ajax_comunas'),
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

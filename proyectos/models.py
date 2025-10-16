@@ -251,29 +251,23 @@ def crear_usuario_familia(sender, instance, created, **kwargs):
     - Nombre: Nombre completo del beneficiario
     """
     if created and instance.rut and instance.email:
-        # Importar aquí para evitar circular imports
         from core.models import Usuario, Rol
-        
-        # Verificar si ya existe un usuario con ese RUT
         if not Usuario.objects.filter(rut=instance.rut).exists():
             try:
-                # Obtener el rol FAMILIA
                 rol_familia = Rol.objects.get(nombre='FAMILIA')
-                
-                # Crear el usuario
                 nombre_completo = f"{instance.nombre} {instance.apellido_paterno} {instance.apellido_materno or ''}".strip()
-                
+                # Obtener los 6 últimos dígitos del RUT (sin puntos ni guion)
+                rut_limpio = instance.rut.replace('.', '').replace('-', '')
+                password = rut_limpio[-6:] if len(rut_limpio) >= 6 else rut_limpio
                 usuario = Usuario.objects.create_user(
                     email=instance.email,
-                    password='familia123',  # Contraseña por defecto
+                    password=password,
                     nombre=nombre_completo,
                     rut=instance.rut,
                     rol=rol_familia
                 )
-                
                 print(f"✓ Usuario FAMILIA creado automáticamente: {usuario.email} (RUT: {instance.rut})")
-                print(f"  Contraseña temporal: familia123")
-                
+                print(f"  Contraseña temporal: {password}")
             except Rol.DoesNotExist:
                 print(f"⚠ Error: No existe el rol FAMILIA. No se pudo crear usuario para {instance.rut}")
             except Exception as e:
