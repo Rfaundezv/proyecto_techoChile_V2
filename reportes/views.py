@@ -1,3 +1,382 @@
+from django.http import HttpResponse
+import openpyxl
+# Reporte Total: Viviendas y Beneficiarios
+from django.contrib.auth.decorators import login_required
+
+@login_required
+def reporte_total_excel(request):
+    wb = openpyxl.Workbook()
+    ws = wb.active
+    ws.title = "Reporte Total"
+    headers = ["Proyecto", "Vivienda", "Tipología", "Estado Vivienda", "Beneficiario", "RUT", "Email"]
+    ws.append(headers)
+    from proyectos.models import Proyecto, Vivienda
+    viviendas = Vivienda.objects.select_related('proyecto', 'beneficiario', 'tipologia').all()
+    for vivienda in viviendas:
+        beneficiario = vivienda.beneficiario
+        ws.append([
+            vivienda.proyecto.nombre if vivienda.proyecto else "",
+            vivienda.codigo,
+            vivienda.tipologia.nombre if hasattr(vivienda, 'tipologia') and vivienda.tipologia else "",
+            vivienda.estado,
+            beneficiario.nombre_completo if beneficiario else "",
+            beneficiario.rut if beneficiario else "",
+            beneficiario.email if beneficiario else ""
+        ])
+    response = HttpResponse(content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+    response['Content-Disposition'] = 'attachment; filename=reporte_total.xlsx'
+    wb.save(response)
+    return response
+
+from django.contrib.auth.decorators import login_required
+from proyectos.models import Proyecto, Vivienda, Beneficiario
+
+@login_required
+def reporte_beneficiarios_por_proyecto_excel(request):
+    wb = openpyxl.Workbook()
+    ws = wb.active
+    ws.title = "Beneficiarios por Proyecto"
+    headers = ["Proyecto", "Vivienda", "Beneficiario", "RUT", "Email"]
+    ws.append(headers)
+    proyectos = Proyecto.objects.filter(activo=True)
+    for proyecto in proyectos:
+        viviendas = Vivienda.objects.filter(proyecto=proyecto)
+        for vivienda in viviendas:
+            beneficiario = vivienda.beneficiario
+            if beneficiario:
+                ws.append([
+                    proyecto.nombre,
+                    vivienda.codigo,
+                    beneficiario.nombre_completo,
+                    beneficiario.rut,
+                    beneficiario.email
+                ])
+    response = HttpResponse(content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+    response['Content-Disposition'] = 'attachment; filename=beneficiarios_por_proyecto.xlsx'
+    wb.save(response)
+    return response
+
+@login_required
+def reporte_viviendas_sin_beneficiario_excel(request):
+    wb = openpyxl.Workbook()
+    ws = wb.active
+    ws.title = "Viviendas sin Beneficiario"
+    headers = ["Proyecto", "Vivienda", "Tipología", "Estado"]
+    ws.append(headers)
+    viviendas = Vivienda.objects.filter(beneficiario__isnull=True, activa=True)
+    for vivienda in viviendas:
+        ws.append([
+            vivienda.proyecto.nombre,
+            vivienda.codigo,
+            vivienda.tipologia.nombre,
+            vivienda.estado
+        ])
+    response = HttpResponse(content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+    response['Content-Disposition'] = 'attachment; filename=viviendas_sin_beneficiario.xlsx'
+    wb.save(response)
+    return response
+@login_required
+def reporte_observaciones_abiertas_urgentes_excel(request):
+    wb = openpyxl.Workbook()
+    ws = wb.active
+    ws.title = "Observaciones Abiertas Urgentes"
+    headers = ["ID", "Proyecto", "Vivienda", "Descripción", "Estado", "Urgente", "Fecha", "Usuario"]
+    ws.append(headers)
+    obs = Observacion.objects.filter(estado__nombre='Abierta', es_urgente=True)
+    for o in obs:
+        fecha = o.fecha_creacion.replace(tzinfo=None) if o.fecha_creacion else ""
+        ws.append([
+            o.id,
+            getattr(o.vivienda.proyecto, 'nombre', ''),
+            getattr(o.vivienda, 'codigo', ''),
+            o.detalle,
+            o.estado.nombre,
+            o.es_urgente,
+            fecha,
+            getattr(o.creado_por, 'username', '')
+        ])
+    response = HttpResponse(content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+    response['Content-Disposition'] = 'attachment; filename=observaciones_abiertas_urgentes.xlsx'
+    wb.save(response)
+    return response
+
+@login_required
+def reporte_observaciones_cerradas_urgentes_excel(request):
+    wb = openpyxl.Workbook()
+    ws = wb.active
+    ws.title = "Observaciones Cerradas Urgentes"
+    headers = ["ID", "Proyecto", "Vivienda", "Descripción", "Estado", "Urgente", "Fecha", "Usuario"]
+    ws.append(headers)
+    obs = Observacion.objects.filter(estado__nombre='Cerrada', es_urgente=True)
+    for o in obs:
+        fecha = o.fecha_creacion.replace(tzinfo=None) if o.fecha_creacion else ""
+        ws.append([
+            o.id,
+            getattr(o.vivienda.proyecto, 'nombre', ''),
+            getattr(o.vivienda, 'codigo', ''),
+            o.detalle,
+            o.estado.nombre,
+            o.es_urgente,
+            fecha,
+            getattr(o.creado_por, 'username', '')
+        ])
+    response = HttpResponse(content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+    response['Content-Disposition'] = 'attachment; filename=observaciones_cerradas_urgentes.xlsx'
+    wb.save(response)
+    return response
+
+from django.http import HttpResponse
+from django.contrib.auth.decorators import login_required
+from incidencias.models import Observacion
+
+import openpyxl
+from proyectos.models import Proyecto
+@login_required
+def reporte_estadisticas_region_excel(request):
+    wb = openpyxl.Workbook()
+    ws = wb.active
+    ws.title = "Estadísticas por Región"
+    headers = ["Región", "Total Proyectos"]
+    ws.append(headers)
+    # Ejemplo: contar proyectos por región
+    regiones = Proyecto.objects.values_list('region', flat=True).distinct()
+    for region in regiones:
+        total = Proyecto.objects.filter(region=region).count()
+        ws.append([region, total])
+    response = HttpResponse(content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+    response['Content-Disposition'] = 'attachment; filename=estadisticas_region.xlsx'
+    wb.save(response)
+    return response
+
+@login_required
+def reporte_observaciones_cerradas_excel(request):
+    wb = openpyxl.Workbook()
+    ws = wb.active
+    ws.title = "Observaciones Cerradas"
+    headers = ["ID", "Proyecto", "Vivienda", "Descripción", "Estado", "Urgente", "Fecha", "Usuario"]
+    ws.append(headers)
+    obs = Observacion.objects.filter(estado__nombre='Cerrada', es_urgente=False)
+    for o in obs:
+        fecha = o.fecha_creacion.replace(tzinfo=None) if o.fecha_creacion else ""
+        ws.append([
+            o.id,
+            getattr(o.vivienda.proyecto, 'nombre', ''),
+            getattr(o.vivienda, 'codigo', ''),
+            o.detalle,
+            o.estado.nombre,
+            o.es_urgente,
+            fecha,
+            getattr(o.creado_por, 'username', '')
+        ])
+    response = HttpResponse(content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+    response['Content-Disposition'] = 'attachment; filename=observaciones_cerradas.xlsx'
+    wb.save(response)
+    return response
+
+@login_required
+def reporte_observaciones_abiertas_excel(request):
+    wb = openpyxl.Workbook()
+    ws = wb.active
+    ws.title = "Observaciones Abiertas"
+    headers = ["ID", "Proyecto", "Vivienda", "Descripción", "Estado", "Urgente", "Fecha", "Usuario"]
+    ws.append(headers)
+    obs = Observacion.objects.filter(estado__nombre='Abierta', es_urgente=False)
+    for o in obs:
+        fecha = o.fecha_creacion.replace(tzinfo=None) if o.fecha_creacion else ""
+        ws.append([
+            o.id,
+            getattr(o.vivienda.proyecto, 'nombre', ''),
+            getattr(o.vivienda, 'codigo', ''),
+            o.detalle,
+            o.estado.nombre,
+            o.es_urgente,
+            fecha,
+            getattr(o.creado_por, 'username', '')
+        ])
+    response = HttpResponse(content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+    response['Content-Disposition'] = 'attachment; filename=observaciones_abiertas.xlsx'
+    wb.save(response)
+    return response
+
+@login_required
+def reporte_observaciones_en_ejecucion_excel(request):
+    wb = openpyxl.Workbook()
+    ws = wb.active
+    ws.title = "Observaciones en Ejecución"
+    headers = ["ID", "Proyecto", "Vivienda", "Detalle", "Estado", "Urgente", "Fecha Creación", "Usuario"]
+    ws.append(headers)
+    obs = Observacion.objects.filter(estado__nombre='En Ejecución')
+    for o in obs:
+        fecha = o.fecha_creacion.replace(tzinfo=None) if o.fecha_creacion else ""
+        ws.append([
+            o.id,
+            getattr(o.vivienda.proyecto, 'nombre', ''),
+            getattr(o.vivienda, 'codigo', ''),
+            o.detalle,
+            o.estado.nombre,
+            o.es_urgente,
+            fecha,
+            getattr(o.creado_por, 'username', '')
+        ])
+    response = HttpResponse(content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+    response['Content-Disposition'] = 'attachment; filename=observaciones_en_ejecucion.xlsx'
+    wb.save(response)
+    return response
+    for o in obs:
+        fecha = o.fecha_creacion.replace(tzinfo=None) if o.fecha_creacion else ""
+        ws.append([
+            o.id,
+            getattr(o.vivienda.proyecto, 'nombre', ''),
+            getattr(o.vivienda, 'codigo', ''),
+            o.detalle,
+            o.estado.nombre,
+            o.es_urgente,
+            fecha,
+            getattr(o.creado_por, 'username', '')
+        ])
+    response = HttpResponse(content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+    response['Content-Disposition'] = 'attachment; filename=observaciones_abiertas.xlsx'
+    wb.save(response)
+    return response
+
+@login_required
+def reporte_observaciones_urgentes_pendientes_excel(request):
+    wb = openpyxl.Workbook()
+    ws = wb.active
+    ws.title = "Urgentes Pendientes"
+    headers = ["ID", "Proyecto", "Vivienda", "Descripción", "Estado", "Urgente", "Fecha", "Usuario"]
+    ws.append(headers)
+    obs = Observacion.objects.filter(es_urgente=True, estado__nombre='Abierta')
+    for o in obs:
+        fecha = o.fecha_creacion.replace(tzinfo=None) if o.fecha_creacion else ""
+        ws.append([
+            o.id,
+            getattr(o.vivienda.proyecto, 'nombre', ''),
+            getattr(o.vivienda, 'codigo', ''),
+            o.detalle,
+            o.estado.nombre,
+            o.es_urgente,
+            fecha,
+            getattr(o.creado_por, 'username', '')
+        ])
+    response = HttpResponse(content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+    response['Content-Disposition'] = 'attachment; filename=urgentes_pendientes.xlsx'
+    wb.save(response)
+    return response
+
+@login_required
+def reporte_observaciones_urgentes_cerradas_excel(request):
+    wb = openpyxl.Workbook()
+    ws = wb.active
+    ws.title = "Urgentes Cerradas"
+    headers = ["ID", "Proyecto", "Vivienda", "Descripción", "Estado", "Urgente", "Fecha", "Usuario"]
+    ws.append(headers)
+    obs = Observacion.objects.filter(es_urgente=True, estado__nombre='Cerrada')
+    for o in obs:
+        fecha = o.fecha_creacion.replace(tzinfo=None) if o.fecha_creacion else ""
+        ws.append([
+            o.id,
+            getattr(o.vivienda.proyecto, 'nombre', ''),
+            getattr(o.vivienda, 'codigo', ''),
+            o.detalle,
+            o.estado.nombre,
+            o.es_urgente,
+            fecha,
+            getattr(o.creado_por, 'username', '')
+        ])
+    response = HttpResponse(content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+    response['Content-Disposition'] = 'attachment; filename=urgentes_cerradas.xlsx'
+    wb.save(response)
+    return response
+
+@login_required
+def reporte_observaciones_urgentes_abiertas_excel(request):
+    wb = openpyxl.Workbook()
+    ws = wb.active
+    ws.title = "Urgentes Abiertas"
+    headers = ["ID", "Proyecto", "Vivienda", "Descripción", "Estado", "Urgente", "Fecha", "Usuario"]
+    ws.append(headers)
+    obs = Observacion.objects.filter(es_urgente=True, estado__nombre='Abierta')
+    for o in obs:
+        fecha = o.fecha_creacion.replace(tzinfo=None) if o.fecha_creacion else ""
+        ws.append([
+            o.id,
+            getattr(o.vivienda.proyecto, 'nombre', ''),
+            getattr(o.vivienda, 'codigo', ''),
+            o.detalle,
+            o.estado.nombre,
+            o.es_urgente,
+            fecha,
+            getattr(o.creado_por, 'username', '')
+        ])
+    response = HttpResponse(content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+    response['Content-Disposition'] = 'attachment; filename=urgentes_abiertas.xlsx'
+    wb.save(response)
+    return response
+import openpyxl
+from openpyxl.utils import get_column_letter
+from django.contrib.auth.decorators import login_required
+@login_required
+def reporte_entregas_excel(request):
+    """Exporta todas las actas de entrega y estadísticas en formato Excel"""
+    wb = openpyxl.Workbook()
+    ws = wb.active
+    ws.title = "Entregas"
+
+    # Encabezados
+    headers = [
+        "N° Acta", "Fecha Entrega", "Proyecto", "Código Proyecto", "Comuna", "Región", "Beneficiario", "RUT", "Email", "Código Vivienda", "Tipología", "Estado Vivienda", "Familia Beneficiaria"
+    ]
+    ws.append(headers)
+
+    # Datos
+    # Filtros por proyecto y fechas
+    proyecto_id = request.GET.get('proyecto')
+    fecha_inicio = request.GET.get('fecha_inicio')
+    fecha_fin = request.GET.get('fecha_fin')
+
+    actas = ActaRecepcion.objects.select_related('proyecto', 'vivienda', 'beneficiario')
+    if proyecto_id:
+        actas = actas.filter(proyecto_id=proyecto_id)
+    if fecha_inicio:
+        try:
+            fecha_inicio_dt = datetime.strptime(fecha_inicio, '%Y-%m-%d')
+            actas = actas.filter(fecha_entrega__gte=fecha_inicio_dt)
+        except Exception:
+            pass
+    if fecha_fin:
+        try:
+            fecha_fin_dt = datetime.strptime(fecha_fin, '%Y-%m-%d')
+            actas = actas.filter(fecha_entrega__lte=fecha_fin_dt)
+        except Exception:
+            pass
+
+    for acta in actas:
+        ws.append([
+            acta.numero_acta,
+            acta.fecha_entrega.strftime('%d/%m/%Y') if acta.fecha_entrega else '',
+            acta.proyecto.nombre if acta.proyecto else '',
+            acta.proyecto.codigo if acta.proyecto else '',
+            acta.proyecto.comuna.nombre if acta.proyecto and acta.proyecto.comuna else '',
+            acta.proyecto.region.nombre if acta.proyecto and acta.proyecto.region else '',
+            acta.beneficiario.nombre_completo if acta.beneficiario else '',
+            acta.beneficiario.rut if acta.beneficiario else '',
+            acta.beneficiario.email if acta.beneficiario else '',
+            acta.vivienda.codigo if acta.vivienda else '',
+            acta.vivienda.tipologia.nombre if acta.vivienda and acta.vivienda.tipologia else '',
+            acta.vivienda.get_estado_display() if acta.vivienda else '',
+            acta.vivienda.familia_beneficiaria if acta.vivienda else '',
+        ])
+
+    # Ajustar ancho de columnas
+    for i, col in enumerate(headers, 1):
+        ws.column_dimensions[get_column_letter(i)].width = max(12, len(col) + 2)
+
+    # Respuesta HTTP
+    response = HttpResponse(content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+    response['Content-Disposition'] = 'attachment; filename=entregas_techo_chile.xlsx'
+    wb.save(response)
+    return response
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages

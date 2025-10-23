@@ -1,0 +1,18 @@
+ara usar WeasyPrint en Windows, necesitas instalar las librerías externas requeridas (GTK, Cairo, Pango, GDK-PixBuf).
+Sin ellas, WeasyPrint no funcionará y dará el error de "cannot load library 'libgobject-2.0-0'".
+
+Pasos para instalar WeasyPrint correctamente en Windows:
+Descarga e instala GTK3:
+
+Ve a: https://github.com/tschoonj/GTK-for-Windows-Runtime-Environment-Installer/releases
+Descarga el instalador más reciente (gtk3-runtime-...-win64.exe).
+Instala y toma nota de la ruta (ejemplo: C:\Program Files\GTK3-Runtime Win64\bin).
+Agrega GTK3 al PATH:
+
+Panel de Control → Sistema → Configuración avanzada → Variables de entorno.
+Edita la variable Path y agrega la ruta del directorio bin de GTK3.
+Reinicia tu terminal.
+
+Verifica la instalación:
+
+Ejecuta tu proyecto y prueba la generación de PDF con WeasyPrint.
