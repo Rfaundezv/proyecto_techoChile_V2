@@ -1,0 +1,96 @@
+{% extends "base.html" %}
+{% block title %}Filtrar Observaciones - {{ block.super }}{% endblock %}
+{% block content %}
+<div class="container mt-4">
+    <h2 class="mb-4"><i class="bi bi-funnel"></i> Filtrar Observaciones</h2>
+    <form method="get" class="row g-3 mb-4">
+        <div class="col-md-4">
+            <label for="proyecto" class="form-label">Proyecto</label>
+            <select name="proyecto" id="proyecto" class="form-select">
+                <option value="">-- Todos --</option>
+                {% for proyecto in proyectos %}
+                    <option value="{{ proyecto.id }}" {% if request.GET.proyecto == proyecto.id|stringformat:'s' %}selected{% endif %}>{{ proyecto.nombre }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="col-md-4">
+            <label for="vivienda" class="form-label">Vivienda</label>
+            <select name="vivienda" id="vivienda" class="form-select">
+                <option value="">-- Todas --</option>
+                {% for vivienda in viviendas %}
+                    <option value="{{ vivienda.id }}" {% if request.GET.vivienda == vivienda.id|stringformat:'s' %}selected{% endif %}>{{ vivienda.codigo }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="col-md-4">
+            <label for="rut" class="form-label">RUT Beneficiario</label>
+            <input type="text" name="rut" id="rut" class="form-control" value="{{ request.GET.rut }}" placeholder="Ej: 12345678-9">
+        </div>
+        <div class="col-12 d-flex gap-2">
+            <button type="submit" class="btn btn-primary"><i class="bi bi-search"></i> Filtrar</button>
+            {% if filtro_aplicado %}
+            <a href="{% url 'reportes:reporte_observaciones_filtradas_excel' %}?proyecto={{ request.GET.proyecto }}&vivienda={{ request.GET.vivienda }}&rut={{ request.GET.rut }}" class="btn btn-success">
+                <i class="bi bi-file-earmark-excel"></i> Exportar a Excel
+            </a>
+            {% endif %}
+                <a href="{% url 'reportes:reporte_observaciones_filtradas' %}" class="btn btn-outline-secondary"><i class="bi bi-arrow-clockwise"></i> Limpiar</a>
+        </div>
+    </form>
+    {% if filtro_aplicado %}
+        <h5 class="mt-4">Resultados:</h5>
+        {% if observaciones and observaciones|length > 0 %}
+            <div class="table-responsive">
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Proyecto</th>
+                            <th>Vivienda</th>
+                            <th>Beneficiario</th>
+                            <th>RUT</th>
+                            <th>Estado</th>
+                            <th>Detalle</th>
+                            <th>Fecha</th>
+                            <th>Urgente</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for o in observaciones %}
+                        <tr>
+                            <td>{{ o.id }}</td>
+                            <td>{{ o.vivienda.proyecto.nombre }}</td>
+                            <td>{{ o.vivienda.codigo }}</td>
+                            <td>{{ o.vivienda.beneficiario.nombre_completo }}</td>
+                            <td>{{ o.vivienda.beneficiario.rut }}</td>
+                            <td>{{ o.estado.nombre }}</td>
+                            <td>
+                                <strong>Detalle inicial:</strong> {{ o.detalle }}<br>
+                                {% if o.observaciones_seguimiento %}
+                                    <strong>Notas seguimiento:</strong> {{ o.observaciones_seguimiento }}<br>
+                                {% endif %}
+                                {% if o.seguimientos.exists %}
+                                    <strong>Historial:</strong>
+                                    <ul class="mb-0">
+                                    {% for s in o.seguimientos.all %}
+                                        <li>
+                                            <span class="text-muted">{{ s.fecha|date:'d/m/Y H:i' }}</span> - <b>{{ s.accion }}</b>
+                                            {% if s.comentario %}<br><span>{{ s.comentario }}</span>{% endif %}
+                                            {% if s.estado_anterior or s.estado_nuevo %}<br><small>Estado: {{ s.estado_anterior.nombre }} → {{ s.estado_nuevo.nombre }}</small>{% endif %}
+                                        </li>
+                                    {% endfor %}
+                                    </ul>
+                                {% endif %}
+                            </td>
+                            <td>{{ o.fecha_creacion|date:'d/m/Y' }}</td>
+                            <td>{% if o.es_urgente %}Sí{% else %}No{% endif %}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% else %}
+            <div class="alert alert-warning">No se encontraron observaciones con los filtros seleccionados.</div>
+        {% endif %}
+    {% endif %}
+</div>
+{% endblock %}

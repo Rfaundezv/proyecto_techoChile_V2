@@ -1,11 +1,14 @@
 from django.urls import path
 from . import views
+from . import views_filtrar_observaciones
 
 app_name = 'reportes'
 
 urlpatterns = [
         # Página principal de reportes
         path('', views.index, name='index'),
+        path('observaciones/filtrar/', views_filtrar_observaciones.reporte_observaciones_filtradas, name='reporte_observaciones_filtradas'),
+        path('observaciones/filtrar_excel/', views_filtrar_observaciones.reporte_observaciones_filtradas_excel, name='reporte_observaciones_filtradas_excel'),
         # Reportes Excel
         path('actas/entregas_excel/', views.reporte_entregas_excel, name='reporte_entregas_excel'),
         path('observaciones/abiertas_excel/', views.reporte_observaciones_abiertas_excel, name='reporte_observaciones_abiertas_excel'),
@@ -14,6 +17,7 @@ urlpatterns = [
         path('observaciones/cerradas_urgentes_excel/', views.reporte_observaciones_cerradas_urgentes_excel, name='reporte_observaciones_cerradas_urgentes_excel'),
         path('beneficiarios_por_proyecto_excel/', views.reporte_beneficiarios_por_proyecto_excel, name='reporte_beneficiarios_por_proyecto_excel'),
         path('viviendas_sin_beneficiario_excel/', views.reporte_viviendas_sin_beneficiario_excel, name='reporte_viviendas_sin_beneficiario_excel'),
+        path('viviendas_sin_observaciones_excel/', views.reporte_viviendas_sin_observaciones_excel, name='reporte_viviendas_sin_observaciones_excel'),
         path('reporte_total_excel/', views.reporte_total_excel, name='reporte_total_excel'),
         path('observaciones/en_ejecucion_excel/', views.reporte_observaciones_en_ejecucion_excel, name='reporte_observaciones_en_ejecucion_excel'),
         path('observaciones/urgentes_pendientes_excel/', views.reporte_observaciones_urgentes_pendientes_excel, name='reporte_observaciones_urgentes_pendientes_excel'),

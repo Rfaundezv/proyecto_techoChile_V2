@@ -125,14 +125,21 @@ body.dark-mode .modal-content-techo .btn-techo-primary {
            
         </div>
         <div class="row mt-3">
-            <div class="col-12 d-flex align-items-end gap-3">
+            <div class="col-12 d-flex align-items-end gap-3 flex-wrap">
                 <div class="form-check">
                     <input class="form-check-input" type="checkbox" name="es_urgente" id="id_es_urgente" value="1" {% if request.GET.es_urgente %}checked{% endif %}>
                     <label class="form-check-label" for="id_es_urgente">Solo urgentes</label>
                 </div>
-                <button type="submit" class="btn btn-primary me-2">
+                <button type="submit" class="btn btn-primary me-2 mb-2 mb-md-0">
                     <i class="bi bi-search"></i> Buscar
                 </button>
+            </div>
+            <div class="col-12 mt-2 d-md-none">
+                <a href="{% url 'incidencias:lista_observaciones' %}" class="btn btn-outline-secondary w-100">
+                    <i class="bi bi-arrow-clockwise"></i> Limpiar
+                </a>
+            </div>
+            <div class="col-12 mt-2 d-none d-md-block">
                 <a href="{% url 'incidencias:lista_observaciones' %}" class="btn btn-outline-secondary">
                     <i class="bi bi-arrow-clockwise"></i> Limpiar
                 </a>
@@ -294,10 +301,12 @@ body.dark-mode .modal-content-techo .btn-techo-primary {
                     <td>
                         <div class="btn-group-vertical btn-group-sm">
                             <a href="{% url 'incidencias:detalle_observacion' obs.pk %}" class="btn btn-outline-info btn-sm">Ver</a>
+                            {% if not es_familia %}
                             <button class="btn btn-outline-warning btn-sm cambiar-estado-btn" 
                                     data-obs-id="{{ obs.pk }}" data-bs-toggle="modal" data-bs-target="#modalCambioEstado">
                                 Cambiar Estado
                             </button>
+                            {% endif %}
                         </div>
                     </td>
                 </tr>
@@ -407,10 +416,12 @@ body.dark-mode .modal-content-techo .btn-techo-primary {
                     Ver detalle
                 </a>
               
+                {% if not es_familia %}
                 <button class="btn btn-sm btn-outline-warning cambiar-estado-btn" 
                         data-obs-id="{{ obs.pk }}" data-bs-toggle="modal" data-bs-target="#modalCambioEstado">
                     Cambiar Estado
                 </button>
+                {% endif %}
                
             </div>
         </div>

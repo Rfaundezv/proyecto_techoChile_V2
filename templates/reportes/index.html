@@ -40,73 +40,96 @@
     <!-- Acciones principales -->
     <div class="row g-4">
         <div class="col-lg-6">
-            <div class="chart-container">
-                <h5><i class="bi bi-file-earmark-plus"></i> Generar Documentos</h5>
-                <div class="d-grid gap-3">
-                    <a href="{% url 'reportes:acta_create' %}" class="btn btn-primary btn-lg">
-                        <i class="bi bi-file-earmark-text me-2"></i>
-                        Nueva Acta de Recepción
-                    </a>
-                    <a href="{% url 'reportes:acta_list' %}" class="btn btn-outline-primary btn-lg">
-                        <i class="bi bi-list-ul me-2"></i>
-                        Ver Todas las Actas
-                    </a>
-                        <a href="{% url 'ficha_postventa:listar' %}" class="btn btn-success btn-lg">
-                            <i class="bi bi-clipboard-check me-2"></i>
-                            Ver Fichas Postventa
-                        </a>
+            <div class="card shadow-sm rounded mb-4">
+                <div class="card-header bg-info text-white">
+                    <h5 class="mb-0"><i class="bi bi-file-earmark-plus"></i> Generar Documentos</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row row-cols-1 row-cols-md-2 g-3">
+                        <div class="col">
+                            <a href="{% url 'reportes:acta_create' %}" class="btn btn-primary btn-lg w-100 mb-2">
+                                <i class="bi bi-file-earmark-text me-2"></i> Nueva Acta de Recepción
+                            </a>
+                        </div>
+                        <div class="col">
+                            <a href="{% url 'reportes:acta_list' %}" class="btn btn-outline-primary btn-lg w-100 mb-2">
+                                <i class="bi bi-list-ul me-2"></i> Ver Todas las Actas
+                            </a>
+                        </div>
+                        <div class="col">
+                            <a href="{% url 'ficha_postventa:listar' %}" class="btn btn-success btn-lg w-100 mb-2">
+                                <i class="bi bi-clipboard-check me-2"></i> Ver Fichas Postventa
+                            </a>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
         
         <div class="col-lg-6">
-            <div class="chart-container">
-                <h5><i class="bi bi-graph-up"></i> Reportes Estadísticos</h5>
-                <div class="d-grid gap-3">
-                                        <a href="{% url 'reportes:reporte_entregas_excel' %}" class="btn btn-info btn-lg">
-                                            <i class="bi bi-bar-chart me-2"></i>
-                                            Reporte de Entregas Actas
-                                        </a>
-                                        <a href="{% url 'reportes:reporte_estadisticas_region_excel' %}" class="btn btn-outline-info btn-lg">
-                                            <i class="bi bi-pie-chart me-2"></i>
-                                            Estadísticas por Región
-                                        </a>
-                                        <a href="{% url 'reportes:reporte_observaciones_abiertas_excel' %}" class="btn btn-info btn-lg w-100">
-                                            <i class="bi bi-file-earmark-excel me-2"></i>
-                                            Reporte Observaciones Abiertas No Urgentes
-                                        </a>
-                                        <a href="{% url 'reportes:reporte_observaciones_abiertas_urgentes_excel' %}" class="btn btn-warning btn-lg w-100">
-                                            <i class="bi bi-file-earmark-excel me-2"></i>
-                                            Reporte Observaciones Abiertas Urgentes
-                                        </a>
-                                        <a href="{% url 'reportes:reporte_observaciones_cerradas_excel' %}" class="btn btn-info btn-lg w-100">
-                                            <i class="bi bi-file-earmark-excel me-2"></i>
-                                            Reporte Observaciones Cerradas No Urgentes
-                                        </a>
-                                        <a href="{% url 'reportes:reporte_observaciones_cerradas_urgentes_excel' %}" class="btn btn-warning btn-lg w-100">
-                                            <i class="bi bi-file-earmark-excel me-2"></i>
-                                            Reporte Observaciones Cerradas Urgentes
-                                        </a>
-                                        <a href="{% url 'reportes:reporte_beneficiarios_por_proyecto_excel' %}" class="btn btn-success btn-lg w-100">
-                                            <i class="bi bi-file-earmark-excel me-2"></i>
-                                            Beneficiarios por Proyecto
-                                        </a>
-                                        <a href="{% url 'reportes:reporte_viviendas_sin_beneficiario_excel' %}" class="btn btn-danger btn-lg w-100">
-                                            <i class="bi bi-file-earmark-excel me-2"></i>
-                                            Viviendas sin Beneficiario Asignado
-                                        </a>
-                                        <a href="{% url 'reportes:reporte_total_excel' %}" class="btn btn-dark btn-lg w-100">
-                                            <i class="bi bi-file-earmark-excel me-2"></i>
-                                            Reporte Total
-                                        </a>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="row g-2 mb-3">
-    
-  
-                    </form>
-    
-</div>
+            <div class="card shadow-sm rounded mb-4">
+                <div class="card-header bg-info text-white">
+                    <h5 class="mb-0"><i class="bi bi-graph-up"></i> Reportes Estadísticos</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row row-cols-1 row-cols-md-2 g-3">
+                                                                <div class="col">
+                                                                    <a href="{% url 'reportes:reporte_entregas_excel' %}" class="btn btn-info btn-lg w-100 mb-2" aria-label="Reporte de Entregas Actas">
+                                                                        <i class="bi bi-bar-chart me-2"></i> Reporte de Entregas Actas
+                                                                    </a>
+                                                                </div>
+                                                                <div class="col">
+                                                                    <a href="{% url 'reportes:reporte_estadisticas_region_excel' %}" class="btn btn-info btn-lg w-100 mb-2" aria-label="Estadísticas por Región">
+                                                                        <i class="bi bi-pie-chart me-2"></i> Estadísticas por Región
+                                                                    </a>
+                                                                </div>
+                                                                <div class="col">
+                                                                    <a href="{% url 'reportes:reporte_viviendas_sin_observaciones_excel' %}" class="btn btn-info btn-lg w-100 mb-2" aria-label="Viviendas Sin Observaciones">
+                                                                        <i class="bi bi-file-earmark-excel me-2"></i> Viviendas Sin Observaciones
+                                                                    </a>
+                                                                </div>
+                                                                <div class="col">
+                                                                    <a href="{% url 'reportes:reporte_observaciones_abiertas_excel' %}" class="btn btn-warning btn-lg w-100 mb-2" aria-label="Reporte Observaciones Abiertas No Urgentes">
+                                                                        <i class="bi bi-file-earmark-excel me-2"></i> Observaciones Abiertas No Urgentes
+                                                                    </a>
+                                                                </div>
+                                                                <div class="col">
+                                                                    <a href="{% url 'reportes:reporte_observaciones_abiertas_urgentes_excel' %}" class="btn btn-danger btn-lg w-100 mb-2" aria-label="Reporte Observaciones Abiertas Urgentes">
+                                                                        <i class="bi bi-file-earmark-excel me-2"></i> Observaciones Abiertas Urgentes
+                                                                    </a>
+                                                                </div>
+                                                                <div class="col">
+                                                                    <a href="{% url 'reportes:reporte_observaciones_cerradas_excel' %}" class="btn btn-info btn-lg w-100 mb-2" aria-label="Reporte Observaciones Cerradas No Urgentes">
+                                                                        <i class="bi bi-file-earmark-excel me-2"></i> Observaciones Cerradas No Urgentes
+                                                                    </a>
+                                                                </div>
+                                                                <div class="col">
+                                                                    <a href="{% url 'reportes:reporte_observaciones_cerradas_urgentes_excel' %}" class="btn btn-info btn-lg w-100 mb-2" aria-label="Reporte Observaciones Cerradas Urgentes">
+                                                                        <i class="bi bi-file-earmark-excel me-2"></i> Observaciones Cerradas Urgentes
+                                                                    </a>
+                                                                </div>
+                                                                <div class="col">
+                                                                    <a href="{% url 'reportes:reporte_beneficiarios_por_proyecto_excel' %}" class="btn btn-success btn-lg w-100 mb-2" aria-label="Beneficiarios por Proyecto">
+                                                                        <i class="bi bi-file-earmark-excel me-2"></i> Beneficiarios por Proyecto
+                                                                    </a>
+                                                                </div>
+                                                                <div class="col">
+                                                                    <a href="{% url 'reportes:reporte_viviendas_sin_beneficiario_excel' %}" class="btn btn-info btn-lg w-100 mb-2" aria-label="Viviendas sin Beneficiario Asignado">
+                                                                        <i class="bi bi-file-earmark-excel me-2"></i> Viviendas sin Beneficiario Asignado
+                                                                    </a>
+                                                                </div>
+                                                                <div class="col">
+                                                                    <a href="{% url 'reportes:reporte_observaciones_filtradas' %}" class="btn btn-secondary btn-lg w-100 mb-2" aria-label="Filtrar Observaciones">
+                                                                        <i class="bi bi-funnel me-2"></i> Filtrar Observaciones
+                                                                    </a>
+                                                                    <a href="{% url 'reportes:reporte_total_excel' %}" class="btn btn-dark btn-lg w-100 mb-2" aria-label="Reporte Total">
+                                                                        <i class="bi bi-file-earmark-excel me-2"></i> Reporte Total
+                                                                    </a>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+    </div>
 {% endblock %}

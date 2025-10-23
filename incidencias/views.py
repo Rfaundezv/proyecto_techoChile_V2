@@ -79,7 +79,7 @@ def lista_observaciones(request):
 
         if form.cleaned_data.get('numero_vivienda'):
             observaciones = observaciones.filter(
-                vivienda__numero_vivienda__icontains=form.cleaned_data['numero_vivienda']
+                vivienda__codigo__icontains=form.cleaned_data['numero_vivienda']
             )
 
         if form.cleaned_data.get('estado'):

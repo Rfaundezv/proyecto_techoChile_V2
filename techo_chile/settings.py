@@ -15,7 +15,7 @@ DEBUG = os.getenv('DEBUG', 'True').lower() == 'true'
 ALLOWED_HOSTS = [
     "127.0.0.1",
     "localhost",
-    "officially-single-compute-myth.trycloudflare.com"
+    "tuner-native-simpson-conducting.trycloudflare.com"
 ]
 
 CSRF_TRUSTED_ORIGINS = [

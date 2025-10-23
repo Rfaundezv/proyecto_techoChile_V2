@@ -1,7 +1,41 @@
 from django.http import HttpResponse
 import openpyxl
-# Reporte Total: Viviendas y Beneficiarios
 from django.contrib.auth.decorators import login_required
+
+@login_required
+def reporte_viviendas_sin_observaciones_excel(request):
+    wb = openpyxl.Workbook()
+    ws = wb.active
+    ws.title = "Viviendas sin Observaciones"
+    headers = [
+        "Proyecto", "Código Vivienda", "Tipología", "Estado", "Beneficiario", "RUT", "Email", "Constructora", "Región", "Comuna"
+    ]
+    ws.append(headers)
+    from proyectos.models import Vivienda
+    viviendas = Vivienda.objects.select_related('proyecto', 'beneficiario', 'tipologia', 'proyecto__constructora', 'proyecto__region', 'proyecto__comuna')\
+        .filter(observaciones__isnull=True, activa=True)
+    for vivienda in viviendas:
+        beneficiario = vivienda.beneficiario
+        proyecto = vivienda.proyecto
+        ws.append([
+            proyecto.nombre if proyecto else "",
+            vivienda.codigo,
+            vivienda.tipologia.nombre if vivienda.tipologia else "",
+            vivienda.estado,
+            beneficiario.nombre_completo if beneficiario else "",
+            beneficiario.rut if beneficiario else "",
+            beneficiario.email if beneficiario else "",
+            proyecto.constructora.nombre if proyecto and proyecto.constructora else "",
+            proyecto.region.nombre if proyecto and proyecto.region else "",
+            proyecto.comuna.nombre if proyecto and proyecto.comuna else ""
+        ])
+    response = HttpResponse(content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+    response['Content-Disposition'] = 'attachment; filename=viviendas_sin_observaciones.xlsx'
+    wb.save(response)
+    return response
+
+
+# Reporte Total: Viviendas y Beneficiarios
 
 @login_required
 def reporte_total_excel(request):
@@ -133,18 +167,72 @@ import openpyxl
 from proyectos.models import Proyecto
 @login_required
 def reporte_estadisticas_region_excel(request):
+    import openpyxl
+    from openpyxl.chart import BarChart, Reference
+    from openpyxl.styles import Font
     wb = openpyxl.Workbook()
     ws = wb.active
     ws.title = "Estadísticas por Región"
-    headers = ["Región", "Total Proyectos"]
+    headers = [
+        "Región", "Proyecto", "Constructora", "Total Casas", "Casas con Observaciones", "Observaciones Abiertas", "Observaciones Urgentes", "Observaciones Cerradas", "% Abiertas", "% Urgentes", "% Cerradas"
+    ]
     ws.append(headers)
-    # Ejemplo: contar proyectos por región
+
+    from proyectos.models import Proyecto, Vivienda
+    from incidencias.models import Observacion
     regiones = Proyecto.objects.values_list('region', flat=True).distinct()
-    for region in regiones:
-        total = Proyecto.objects.filter(region=region).count()
-        ws.append([region, total])
+    for region_id in regiones:
+        region_obj = None
+        try:
+            from core.models import Region
+            region_obj = Region.objects.get(pk=region_id)
+            region_nombre = region_obj.nombre
+        except Exception:
+            region_nombre = str(region_id)
+        proyectos = Proyecto.objects.filter(region=region_id)
+        for proyecto in proyectos:
+            constructora = proyecto.constructora.nombre if proyecto.constructora else "-"
+            total_casas = Vivienda.objects.filter(proyecto=proyecto).count()
+            casas_con_obs = Vivienda.objects.filter(proyecto=proyecto, observaciones__isnull=False).distinct().count()
+            obs = Observacion.objects.filter(vivienda__proyecto=proyecto)
+            total_obs = obs.count()
+            abiertas = obs.filter(estado__nombre='Abierta').count()
+            urgentes = obs.filter(es_urgente=True, estado__nombre='Abierta').count()
+            cerradas = obs.filter(estado__nombre='Cerrada').count()
+            porc_abiertas = round((abiertas / total_obs) * 100, 1) if total_obs else 0
+            porc_urgentes = round((urgentes / total_obs) * 100, 1) if total_obs else 0
+            porc_cerradas = round((cerradas / total_obs) * 100, 1) if total_obs else 0
+            ws.append([
+                region_nombre,
+                proyecto.nombre,
+                constructora,
+                total_casas,
+                casas_con_obs,
+                abiertas,
+                urgentes,
+                cerradas,
+                porc_abiertas,
+                porc_urgentes,
+                porc_cerradas
+            ])
+
+    # Crear gráfico de barras para observaciones por región
+    chart = BarChart()
+    chart.title = "Observaciones por Región"
+    chart.y_axis.title = "Cantidad"
+    chart.x_axis.title = "Región"
+    data = Reference(ws, min_col=3, max_col=5, min_row=1, max_row=ws.max_row)
+    cats = Reference(ws, min_col=1, min_row=2, max_row=ws.max_row)
+    chart.add_data(data, titles_from_data=True)
+    chart.set_categories(cats)
+    ws.add_chart(chart, "N2")
+
+    # Mejorar formato de encabezados
+    for cell in ws[1]:
+        cell.font = Font(bold=True)
+
     response = HttpResponse(content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
-    response['Content-Disposition'] = 'attachment; filename=estadisticas_region.xlsx'
+    response['Content-Disposition'] = 'attachment; filename=estadisticas_region_completo.xlsx'
     wb.save(response)
     return response
 
