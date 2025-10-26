@@ -3,6 +3,24 @@ from incidencias.models import ArchivoAdjuntoObservacion
 from django.views.generic import View
 from django.utils.decorators import method_decorator
 from django.contrib.auth.decorators import login_required
+
+from django.shortcuts import get_object_or_404, render, redirect
+from django.contrib.auth.decorators import login_required
+from django.contrib.auth.mixins import LoginRequiredMixin
+from django.http import JsonResponse
+from django.db.models import Count, Q, F, Func
+from django.contrib import messages
+from .models import Comuna, Region, Rol
+from .decorators import rol_requerido, RolRequiredMixin
+from proyectos.models import Proyecto, Vivienda
+from incidencias.models import ArchivoAdjuntoObservacion, Observacion
+from datetime import datetime, timedelta
+import logging
+from .models import Constructora, Usuario
+from proyectos.models import Beneficiario
+
+logger = logging.getLogger(__name__)
+
 class ObservacionArchivosView(View):
     @method_decorator(login_required)
     def get(self, request, pk):
@@ -13,194 +31,227 @@ class ObservacionArchivosView(View):
             'archivos': archivos,
             'titulo': f"Archivos de Observación #{observacion.pk}"
         })
-from django.shortcuts import render, redirect
-from django.contrib.auth.decorators import login_required
-from django.contrib.auth.mixins import LoginRequiredMixin
-from django.http import JsonResponse
-from django.db.models import Count, Q, F, Func
-from django.contrib import messages
-from .models import Comuna, Region
-from .decorators import rol_requerido, RolRequiredMixin
-from proyectos.models import Proyecto, Vivienda
-from incidencias.models import ArchivoAdjuntoObservacion, Observacion
-from datetime import datetime, timedelta
-import logging
-
-logger = logging.getLogger(__name__)
-
 @login_required
 def dashboard(request):
-    user = request.user
 
-    # Determinar si el usuario es familia beneficiaria mediante grupo "FAMILIA"
-    # Beneficiarios pueden detectarse por grupo o por rol asignado en modelo
-    es_familia = user.rol and user.rol.nombre == 'FAMILIA'
+    # --- Filtros desde GET ---
+    region_id = request.GET.get('region')
+    estado_id = request.GET.get('estado')
+    fecha_inicio = request.GET.get('fecha_inicio')
+    fecha_fin = request.GET.get('fecha_fin')
+
+    # Listas para el filtro
+    regiones = Region.objects.filter(activo=True).order_by('codigo')
+    from incidencias.models import EstadoObservacion
+    estados = list(EstadoObservacion.objects.filter(activo=True).values_list('id', 'nombre'))
+
+    # Cumplimiento de plazos por constructora
+    from core.utils.cumplimiento_constructora import get_cumplimiento_plazos_por_constructora
+    cumplimiento_constructoras = get_cumplimiento_plazos_por_constructora(region_id=region_id)
+
+    # Comunas de Valparaíso con viviendas (sin filtro)
+    comuna_objs = []
+    try:
+        region_valpo = Region.objects.get(nombre__icontains='valparaiso')
+        comunas_valpo = region_valpo.comunas.all()
+        for comuna in comunas_valpo:
+            total_viv = Vivienda.objects.filter(proyecto__comuna=comuna).count()
+            if total_viv > 0:
+                comuna_objs.append({'nombre': comuna.nombre, 'total_viviendas': total_viv})
+    except Region.DoesNotExist:
+        comuna_objs = []
+
+    # --- Métricas por región (usando utilitario compartido) ---
+    from core.utils.region_metrics import get_region_metrics
+    metrics_region = get_region_metrics(region_id=region_id, estado_id=estado_id, fecha_inicio=fecha_inicio, fecha_fin=fecha_fin)
+    for region in metrics_region:
+        region['estado'] = 'Bueno'  # Puedes agregar lógica de estado si lo necesitas
+
+    # Determinar si el usuario es familia
+    user = request.user
+    es_familia = (
+        user.groups.filter(name='FAMILIA').exists() or 
+        (hasattr(user, 'rol') and user.rol and user.rol.nombre == 'FAMILIA')
+    )
     mi_vivienda = None
     sin_vivienda = False
-    if es_familia:
-        # Buscar vivienda asignada al beneficiario
-        if getattr(request.user, 'rut', None):
-            mi_vivienda = Vivienda.objects.filter(beneficiario__rut=request.user.rut).first()
-        else:
-            mi_vivienda = Vivienda.objects.filter(
-                Q(beneficiario__nombre__icontains=request.user.nombre) |
-                Q(beneficiario__apellido_paterno__icontains=request.user.nombre) |
-                Q(familia_beneficiaria__icontains=request.user.nombre)
-            ).first()
-        if not mi_vivienda:
-            sin_vivienda = True
-
+    proyectos_user = None
     # **CASO ESPECIAL PARA FAMILIA**
     if es_familia:
+        # Buscar el beneficiario asociado al usuario por RUT
+        beneficiario = Beneficiario.objects.filter(rut=user.rut).first() if user.rut else None
+        mi_vivienda = Vivienda.objects.filter(beneficiario=beneficiario, activa=True).first() if beneficiario else None
         # Observaciones SOLO de su vivienda
-        mis_observaciones = Observacion.objects.filter(vivienda=mi_vivienda)
-        
-        obs_total = mis_observaciones.count()
-        obs_abiertas = mis_observaciones.filter(estado__nombre='Abierta').count()
-        obs_cerradas = mis_observaciones.filter(estado__nombre='Cerrada').count()
-        obs_urgentes = mis_observaciones.filter(es_urgente=True, estado__nombre='Abierta').count()
-        obs_vencidas = mis_observaciones.filter(fecha_vencimiento__lt=datetime.now().date(), estado__nombre='Abierta').count()
-        
-        # Últimas 5 observaciones de SU vivienda
-        ultimas_observaciones = mis_observaciones.select_related(
-            'proyecto', 'vivienda', 'estado'
-        ).order_by('-fecha_creacion')[:5]
-        
-        # Cálculos de porcentajes
+        if mi_vivienda:
+            mis_observaciones = Observacion.objects.filter(vivienda=mi_vivienda)
+            obs_total = mis_observaciones.count()
+            obs_abiertas = mis_observaciones.filter(estado__nombre='Abierta').count()
+            obs_cerradas = mis_observaciones.filter(estado__nombre='Cerrada').count()
+            obs_urgentes = mis_observaciones.filter(es_urgente=True, estado__nombre='Abierta').count()
+            obs_vencidas = mis_observaciones.filter(fecha_vencimiento__lt=datetime.now().date(), estado__nombre='Abierta').count()
+            ultimas_observaciones = mis_observaciones.select_related('vivienda__proyecto', 'vivienda', 'estado').order_by('-fecha_creacion')[:5]
+        else:
+            obs_total = obs_abiertas = obs_cerradas = obs_urgentes = obs_vencidas = 0
+            ultimas_observaciones = []
         if obs_total > 0:
             porc_cerradas = round((obs_cerradas / obs_total) * 100, 1)
             porc_abiertas = round((obs_abiertas / obs_total) * 100, 1)
             porc_vencidas = round((obs_vencidas / obs_total) * 100, 1)
         else:
             porc_cerradas = porc_abiertas = porc_vencidas = 0
-        
-        context = {
-            'es_familia': True,
-            'mi_vivienda': mi_vivienda,
-            'sin_vivienda': sin_vivienda,
-            'total_proyectos': 1,  # Solo su proyecto
-            'viviendas_total': 1,  # Solo su vivienda
-            'viviendas_entregadas': 1 if mi_vivienda and mi_vivienda.estado == 'entregada' else 0,
-            'obs_total': obs_total,
-            'obs_abiertas': obs_abiertas,
-            'obs_cerradas': obs_cerradas,
-            'obs_vencidas': obs_vencidas,
-            'obs_urgentes': obs_urgentes,
-            'porc_cerradas': porc_cerradas,
-            'porc_abiertas': porc_abiertas,
-            'porc_vencidas': porc_vencidas,
-            'ultimas_observaciones': ultimas_observaciones,
-            'is_admin': False,
-        }
+        viviendas_asignadas = 1 if mi_vivienda and mi_vivienda.beneficiario else 0
+        total_proyectos = 1
+        viviendas_total = 1
+        viviendas_entregadas = 1 if mi_vivienda and mi_vivienda.estado == 'entregada' else 0
+        is_admin = False
+        sin_vivienda = mi_vivienda is None
     else:
-        # **PARA OTROS ROLES (ADMIN, TECHO, SERVIU, CONSTRUCTORA)**
-        # Obtener proyectos relacionados al usuario
+        proyectos_qs = Proyecto.objects.all()
+        if region_id:
+            proyectos_qs = proyectos_qs.filter(region_id=region_id)
+        if estado_id:
+            proyectos_qs = proyectos_qs.filter(estado_id=estado_id)
+        if fecha_inicio:
+            proyectos_qs = proyectos_qs.filter(fecha_creacion__date__gte=fecha_inicio)
+        if fecha_fin:
+            proyectos_qs = proyectos_qs.filter(fecha_creacion__date__lte=fecha_fin)
+
         if user.is_superuser or (user.rol and user.rol.nombre == 'ADMINISTRADOR'):
-            proyectos_user = Proyecto.objects.all()
+            proyectos_user = proyectos_qs
         elif user.rol and user.rol.nombre == 'CONSTRUCTORA':
-            # CONSTRUCTORA solo ve sus proyectos
             if getattr(user, 'constructora', None):
-                proyectos_user = Proyecto.objects.filter(constructora=user.constructora)
+                proyectos_user = proyectos_qs.filter(constructora=user.constructora)
             elif getattr(user, 'empresa', None):
-                # Fallback al campo legacy
                 empresa_usuario = user.empresa.strip().lower()
-                proyectos_user = Proyecto.objects.filter(constructora__nombre__icontains=empresa_usuario)
+                proyectos_user = proyectos_qs.filter(constructora__nombre__icontains=empresa_usuario)
             else:
                 proyectos_user = Proyecto.objects.none()
         else:
-            proyectos_user = Proyecto.objects.filter(
+            proyectos_user = proyectos_qs.filter(
                 Q(creado_por=user) | 
                 Q(region=user.region) if user.region else Q()
             ).distinct()
-
-        # Métricas básicas
-        total_proyectos = proyectos_user.count()
-
-        # Viviendas
-        viviendas_total = Vivienda.objects.filter(proyecto__in=proyectos_user).count()
-        viviendas_entregadas = Vivienda.objects.filter(
-            proyecto__in=proyectos_user, 
-            estado='entregada'
-        ).count()
-
-        # Observaciones para dashboard
-        obs_total = Observacion.objects.filter(vivienda__proyecto__in=proyectos_user).count()
-        obs_abiertas = Observacion.objects.filter(
-            vivienda__proyecto__in=proyectos_user,
-            estado__nombre='Abierta'
-        ).count()
-        obs_cerradas = Observacion.objects.filter(
-            vivienda__proyecto__in=proyectos_user,
-            estado__nombre='Cerrada'
-        ).count()
-        obs_urgentes = Observacion.objects.filter(
-            vivienda__proyecto__in=proyectos_user,
-            es_urgente=True,
-            estado__nombre='Abierta'
-        ).count()
-
-        obs_vencidas = max(0, obs_total - obs_abiertas - obs_cerradas)
-
-        # Cálculos de porcentajes
-        if obs_total > 0:
-            porc_cerradas = round((obs_cerradas / obs_total) * 100, 1)
-            porc_abiertas = round((obs_abiertas / obs_total) * 100, 1)
-            porc_vencidas = round((obs_vencidas / obs_total) * 100, 1)
+        if proyectos_user is not None:
+            total_proyectos = proyectos_user.count()
+            viviendas_total = Vivienda.objects.filter(proyecto__in=proyectos_user).count()
+            viviendas_entregadas = Vivienda.objects.filter(
+                proyecto__in=proyectos_user, 
+                estado='entregada'
+            ).count()
+            obs_qs = Observacion.objects.filter(vivienda__proyecto__in=proyectos_user)
+            if estado_id:
+                obs_qs = obs_qs.filter(estado_id=estado_id)
+            if fecha_inicio:
+                obs_qs = obs_qs.filter(fecha_creacion__date__gte=fecha_inicio)
+            if fecha_fin:
+                obs_qs = obs_qs.filter(fecha_creacion__date__lte=fecha_fin)
+            obs_total = obs_qs.count()
+            obs_abiertas = obs_qs.filter(estado__nombre='Abierta').count()
+            obs_cerradas = obs_qs.filter(estado__nombre='Cerrada').count()
+            obs_urgentes = obs_qs.filter(es_urgente=True, estado__nombre='Abierta').count()
+            obs_vencidas = obs_qs.filter(fecha_vencimiento__lt=datetime.now().date(), estado__nombre='Abierta').count()
+            if obs_total > 0:
+                porc_cerradas = round((obs_cerradas / obs_total) * 100, 1)
+                porc_abiertas = round((obs_abiertas / obs_total) * 100, 1)
+                porc_vencidas = round((obs_vencidas / obs_total) * 100, 1)
+            else:
+                porc_cerradas = porc_abiertas = porc_vencidas = 0
+            ultimas_observaciones = obs_qs.select_related('vivienda__proyecto', 'vivienda', 'estado').order_by('-fecha_creacion')[:5]
+            viviendas_asignadas = Vivienda.objects.filter(proyecto__in=proyectos_user, activa=True).exclude(beneficiario__isnull=True).count()
+            is_admin = user.rol and user.rol.nombre == 'ADMINISTRADOR'
         else:
-            porc_cerradas = porc_abiertas = porc_vencidas = 0
+            total_proyectos = viviendas_total = viviendas_entregadas = obs_total = obs_abiertas = obs_cerradas = obs_urgentes = obs_vencidas = porc_cerradas = porc_abiertas = porc_vencidas = 0
+            ultimas_observaciones = []
+            viviendas_asignadas = 0
+            is_admin = False
 
-        # Obtener las últimas 5 observaciones
-        ultimas_observaciones = Observacion.objects.filter(
-            vivienda__proyecto__in=proyectos_user
-        ).select_related(
-            'vivienda__proyecto', 'vivienda', 'estado'
-        ).order_by('-fecha_creacion')[:5]
+    # Datos para gráfico de observaciones por tipo
+    if es_familia and mi_vivienda:
+        datos_tipo = (
+            Observacion.objects.filter(vivienda=mi_vivienda)
+            .values('tipo__nombre')
+            .annotate(total=Count('id'))
+            .order_by('-total')
+        )
+    else:
+        if proyectos_user is not None:
+            obs_tipo_qs = Observacion.objects.filter(vivienda__proyecto__in=proyectos_user)
+            if estado_id:
+                obs_tipo_qs = obs_tipo_qs.filter(estado_id=estado_id)
+            if fecha_inicio:
+                obs_tipo_qs = obs_tipo_qs.filter(fecha_creacion__date__gte=fecha_inicio)
+            if fecha_fin:
+                obs_tipo_qs = obs_tipo_qs.filter(fecha_creacion__date__lte=fecha_fin)
+            datos_tipo = (
+                obs_tipo_qs
+                .values('tipo__nombre')
+                .annotate(total=Count('id'))
+                .order_by('-total')
+            )
+        else:
+            datos_tipo = []
+    labels = [d['tipo__nombre'] for d in datos_tipo]
+    values = [d['total'] for d in datos_tipo]
 
-        context = {
-            'total_proyectos': total_proyectos,
-            'viviendas_total': viviendas_total,
-            'viviendas_entregadas': viviendas_entregadas,
-            'obs_total': obs_total,
-            'obs_abiertas': obs_abiertas,
-            'obs_cerradas': obs_cerradas,
-            'obs_vencidas': obs_vencidas,
-            'obs_urgentes': obs_urgentes,
-            'porc_cerradas': porc_cerradas,
-            'porc_abiertas': porc_abiertas,
-            'porc_vencidas': porc_vencidas,
-            'ultimas_observaciones': ultimas_observaciones,
-            # Variables para vista de familia y admin
-            'es_familia': es_familia,
-            'is_admin': user.rol and user.rol.nombre == 'ADMINISTRADOR',
-            'mi_vivienda': mi_vivienda,
-            'sin_vivienda': sin_vivienda,
-            'timestamp': int(datetime.now().timestamp()),
-        }
+    # --- Agregación de casos cerrados por mes ---
+    from django.db.models.functions import TruncMonth
+    if es_familia and mi_vivienda:
+        cerradas_qs = Observacion.objects.filter(vivienda=mi_vivienda, estado__nombre='Cerrada')
+    elif proyectos_user is not None:
+        cerradas_qs = Observacion.objects.filter(vivienda__proyecto__in=proyectos_user, estado__nombre='Cerrada')
+        if estado_id:
+            cerradas_qs = cerradas_qs.filter(estado_id=estado_id)
+        if fecha_inicio:
+            cerradas_qs = cerradas_qs.filter(fecha_creacion__date__gte=fecha_inicio)
+        if fecha_fin:
+            cerradas_qs = cerradas_qs.filter(fecha_creacion__date__lte=fecha_fin)
+    else:
+        cerradas_qs = Observacion.objects.none()
+
+    cerradas_por_mes = (
+        cerradas_qs
+        .annotate(mes=TruncMonth('fecha_cierre'))
+        .values('mes')
+        .annotate(total=Count('id'))
+        .order_by('mes')
+    )
+    meses_cerrados = [d['mes'].strftime('%b %Y') if d['mes'] else 'Sin fecha' for d in cerradas_por_mes]
+    valores_cerrados = [d['total'] for d in cerradas_por_mes]
+
+    context = {
+        'total_proyectos': total_proyectos,
+        'viviendas_total': viviendas_total,
+        'viviendas_entregadas': viviendas_entregadas,
+        'obs_total': obs_total,
+        'obs_abiertas': obs_abiertas,
+        'obs_cerradas': obs_cerradas,
+        'obs_vencidas': obs_vencidas,
+        'obs_urgentes': obs_urgentes,
+        'porc_cerradas': porc_cerradas,
+        'porc_abiertas': porc_abiertas,
+        'porc_vencidas': porc_vencidas,
+        'ultimas_observaciones': ultimas_observaciones,
+        'viviendas_asignadas': viviendas_asignadas,
+        'es_familia': es_familia,
+        'is_admin': is_admin,
+        'mi_vivienda': mi_vivienda,
+        'sin_vivienda': sin_vivienda,
+        'timestamp': int(datetime.now().timestamp()),
+        'labels': labels,
+        'values': values,
+        'meses_cerrados': meses_cerrados,
+        'valores_cerrados': valores_cerrados,
+        'metrics_region': metrics_region,
+        'comunas_valparaiso': comuna_objs,
+        'cumplimiento_constructoras': cumplimiento_constructoras,
+        'regiones': regiones,
+        'estados': estados,
+    }
 
     return render(request, 'dashboard/index.html', context)
 
 def ajax_comunas_por_region(request):
     region_id = request.GET.get('region_id')
-    comunas = []
-    if region_id:
-        try:
-            comunas = list(Comuna.objects.filter(region_id=region_id).values('id', 'nombre'))
-        except Exception as e:
-            logger.error(f"Error obteniendo comunas: {e}")
-    return JsonResponse({'comunas': comunas})
-
-from django.shortcuts import render, redirect
-from django.contrib.auth.decorators import login_required
-from django.http import JsonResponse
-from django.db.models import Count, Q
-from django.contrib import messages
-from django.core.paginator import Paginator
-from django.views import View
-from django.shortcuts import get_object_or_404
-from .models import Comuna, Region, Rol, Constructora, Usuario
-from proyectos.models import Proyecto, Vivienda, TipologiaVivienda, Recinto, Beneficiario, Telefono
-from incidencias.models import TipoObservacion, EstadoObservacion, Observacion, SeguimientoObservacion
-from datetime import datetime, timedelta
 import logging
 
 logger = logging.getLogger(__name__)

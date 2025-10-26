@@ -1,3 +1,48 @@
+/* KPIs compactos en una sola línea */
+.kpi-row-mini {
+    display: flex;
+    flex-wrap: nowrap;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+    justify-content: flex-start;
+    align-items: center;
+}
+.kpi-mini {
+    background: #fff;
+    border-radius: 8px;
+    border: 1px solid #e5e7eb;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.35rem 0.7rem;
+    min-width: 90px;
+    max-width: 120px;
+    transition: box-shadow 0.2s, transform 0.2s;
+    color: #222;
+    font-size: 0.85rem;
+}
+.kpi-mini .kpi-icon {
+    font-size: 1.1rem;
+    border-radius: 6px;
+    width: 1.5rem;
+    height: 1.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 0.2rem;
+}
+.kpi-mini .kpi-icon.blue { background: #dbeafe; color: #2563eb; }
+.kpi-mini .kpi-icon.purple { background: #ede9fe; color: #7c3aed; }
+.kpi-mini .kpi-icon.orange { background: #fef3c7; color: #f59e0b; }
+.kpi-mini .kpi-icon.red { background: #fee2e2; color: #ef4444; }
+.kpi-mini .kpi-icon.green { background: #dcfce7; color: #22c55e; }
+.kpi-mini .kpi-number { font-size: 1rem; font-weight: 700; margin-bottom: 0; color: #222; }
+.kpi-mini .kpi-label { font-size: 0.75rem; color: #666; margin-bottom: 0; }
+.kpi-mini:hover {
+    box-shadow: 0 4px 12px rgba(0,0,0,0.10);
+    transform: translateY(-2px) scale(1.03);
+}
 /* Estilos específicos para las métricas del dashboard */
 .metric-number {
     font-size: 2rem !important;

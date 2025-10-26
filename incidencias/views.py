@@ -66,9 +66,13 @@ def lista_observaciones(request):
             observaciones = observaciones.filter(vivienda=mi_vivienda)
 
     # Filtros desde URL (para enlaces del dashboard)
-    if request.GET.get('estado'):
+    if request.GET.get('estado_id'):
+        observaciones = observaciones.filter(estado_id=request.GET.get('estado_id'))
+    elif request.GET.get('estado'):
         observaciones = observaciones.filter(estado=request.GET.get('estado'))
-    
+    elif request.GET.get('estado_nombre'):
+        observaciones = observaciones.filter(estado__nombre=request.GET.get('estado_nombre'))
+
     if request.GET.get('es_urgente') == '1':
         observaciones = observaciones.filter(es_urgente=True)
 
@@ -752,7 +756,6 @@ def ajax_recintos_por_proyecto(request):
             recintos = list(Recinto.objects.filter(tipologia__in=tipologias).values('id', 'nombre'))
         except Exception as e:
             pass
-    return JsonResponse({'recintos': recintos})
 
 @login_required
 def ajax_recintos_por_vivienda(request):
@@ -814,3 +817,23 @@ def eliminar_archivo_observacion(request, pk):
         messages.error(request, 'No tienes permiso para eliminar este archivo.')
     
     return redirect('incidencias:detalle_observacion', pk=observacion_pk)
+
+from django.db.models import Count
+from incidencias.models import Observacion, TipoObservacion
+from django.contrib.auth.decorators import login_required
+
+@login_required
+def grafico_observaciones_por_tipo(request):
+    # Agrupar y contar observaciones por tipo
+    datos = (
+        Observacion.objects.values('tipo__nombre')
+        .annotate(total=Count('id'))
+        .order_by('-total')
+    )
+    labels = [d['tipo__nombre'] for d in datos]
+    values = [d['total'] for d in datos]
+    context = {
+        'labels': labels,
+        'values': values,
+    }
+    return render(request, 'incidencias/grafico_observaciones_tipo.html', context)

@@ -1,5 +1,5 @@
 // Service Worker para caché y funcionalidad offline básica
-const CACHE_NAME = 'techo-observaciones-v1';
+const CACHE_NAME = 'techo-observaciones-v2';
 const urlsToCache = [
     '/incidencias/movil/',
     '/static/css/bootstrap.min.css',
@@ -12,6 +12,21 @@ self.addEventListener('install', function(event) {
             .then(function(cache) {
                 return cache.addAll(urlsToCache);
             })
+    );
+});
+
+// Limpiar caches antiguos al activar
+self.addEventListener('activate', function(event) {
+    event.waitUntil(
+        caches.keys().then(function(cacheNames) {
+            return Promise.all(
+                cacheNames.filter(function(cacheName) {
+                    return cacheName !== CACHE_NAME;
+                }).map(function(cacheName) {
+                    return caches.delete(cacheName);
+                })
+            );
+        })
     );
 });
 

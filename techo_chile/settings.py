@@ -15,7 +15,7 @@ DEBUG = os.getenv('DEBUG', 'True').lower() == 'true'
 ALLOWED_HOSTS = [
     "127.0.0.1",
     "localhost",
-    "tuner-native-simpson-conducting.trycloudflare.com"
+    "intellectual-titans-hobbies-returns.trycloudflare.com"
 ]
 
 CSRF_TRUSTED_ORIGINS = [
@@ -36,6 +36,7 @@ INSTALLED_APPS = [
     'reportes',
     'ficha_postventa',
     "django_extensions",
+    'livereload',
 ]
 
 MIDDLEWARE = [
@@ -46,6 +47,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'livereload.middleware.LiveReloadScript',
 ]
 
 ROOT_URLCONF = 'techo_chile.urls'
@@ -73,21 +75,21 @@ WSGI_APPLICATION = 'techo_chile.wsgi.application'
 # DATABASES = {
 #     'default': {
 #         'ENGINE': 'django.db.backends.postgresql',
-#         'NAME': 'techo_chile_db',
-#         'USER': 'postgres',
-#         'PASSWORD': 'admin',
-#         'HOST': 'localhost',
-#         'PORT': '5432',
+#         'NAME': 'proyecto_techo_chile_9650',
+#      'USER': 'proyecto_techo_chile_9650_user',
+#       'PASSWORD': 'DSvRyHTvF11ei6t4DBC93ysCIuVK984h',
+#        'HOST': 'dpg-d3tdnpgdl3ps73ebdu00-a.virginia-postgres.render.com',
+#       'PORT': '5432',
 #     }
 # }
 
-# Para SQLite (descomentar esto)
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
         'NAME': BASE_DIR / 'db.sqlite3',
     }
 }
+
 
 AUTH_PASSWORD_VALIDATORS = [
     {

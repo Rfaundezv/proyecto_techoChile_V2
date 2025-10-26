@@ -16,3 +16,6 @@ Reinicia tu terminal.
 Verifica la instalación:
 
 Ejecuta tu proyecto y prueba la generación de PDF con WeasyPrint.
+
+# En lugar de python manage.py runserver, usa:
+python manage.py livereload

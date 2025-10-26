@@ -1,0 +1,28 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container mt-4">
+    <h2>Listado de Viviendas</h2>
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Código</th>
+                <th>Proyecto</th>
+                <th>Dirección</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for vivienda in viviendas %}
+            <tr>
+                <td>{{ vivienda.codigo }}</td>
+                <td>{{ vivienda.proyecto.nombre }}</td>
+                <td>{{ vivienda.direccion }}</td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="3" class="text-center">No hay viviendas registradas.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

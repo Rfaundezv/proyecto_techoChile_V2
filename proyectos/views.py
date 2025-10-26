@@ -256,3 +256,19 @@ def buscar_beneficiario_por_rut(request):
             return JsonResponse({'error': 'Error en la búsqueda'}, status=500)
     
     return JsonResponse({'error': 'Método no permitido'}, status=405)
+
+@login_required
+@rol_requerido('ADMINISTRADOR', 'TECHO', 'SERVIU', 'CONSTRUCTORA')
+def lista_viviendas(request, proyecto_pk):
+    """Lista todas las viviendas de un proyecto específico"""
+    proyecto = get_object_or_404(Proyecto, pk=proyecto_pk)
+    # Verificar permisos de visualización
+    if not puede_ver_proyecto_func(request.user, proyecto):
+        messages.error(request, 'No tienes permisos para ver las viviendas de este proyecto.')
+        return redirect('proyectos:lista')
+    viviendas = proyecto.viviendas.all().order_by('codigo')
+    context = {
+        'proyecto': proyecto,
+        'viviendas': viviendas,
+    }
+    return render(request, 'proyectos/lista_viviendas.html', context)

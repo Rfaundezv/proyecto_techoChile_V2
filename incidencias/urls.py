@@ -1,7 +1,5 @@
-
 from django.urls import path
-from . import views
-from . import views_movil
+from . import views, views_movil
 
 app_name = 'incidencias'
 
@@ -28,4 +26,5 @@ urlpatterns = [
     path('movil/comentarios/<int:observacion_id>/', views_movil.obtener_comentarios_movil, name='obtener_comentarios_movil'),
     path('movil/detalle/<int:observacion_id>/', views_movil.observacion_detalle_movil, name='observacion_detalle_movil'),
     path('movil/crear_observacion/', views_movil.crear_observacion_movil, name='crear_observacion_movil'),
+    path('grafico-observaciones-tipo/', views.grafico_observaciones_por_tipo, name='grafico_observaciones_tipo'),
 ]
