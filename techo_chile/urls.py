@@ -2,11 +2,17 @@ from django.contrib import admin
 from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
+
 from core import views as core_views
+from core.views_dashboard_pdf import dashboard_pdf_report, generando_reporte
+from core.views_dashboard_excel import dashboard_excel_report
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', core_views.dashboard, name='dashboard'),
+    path('dashboard/reporte-pdf/', dashboard_pdf_report, name='dashboard_reporte_pdf'),
+    path('dashboard/reporte-excel/', dashboard_excel_report, name='dashboard_reporte_excel'),
+    path('dashboard/generando-reporte/', generando_reporte, name='dashboard_generando_reporte'),
     path('maestro/', core_views.maestro, name='maestro_index'),
     # CRUD Maestro
     path('maestro/regiones/', core_views.RegionList.as_view(), name='maestro_region_list'),

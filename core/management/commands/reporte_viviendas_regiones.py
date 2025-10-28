@@ -11,8 +11,9 @@ class Command(BaseCommand):
         from core.utils.region_metrics import get_region_metrics
         metrics = get_region_metrics()
         for region in metrics:
-            self.stdout.write(f"\n--- {region['region']} ---")
-            self.stdout.write(f"Total viviendas: {region['total_viviendas']}")
-            self.stdout.write(f"Entregadas: {region['entregadas']}")
-            self.stdout.write(f"Observaciones: {region['casos_postventa']}")
-            self.stdout.write(f"Tiempo promedio de solución: {region['promedio_dias']} días" if region['promedio_dias'] != '-' else "Tiempo promedio de solución: -")
+            if region['total_viviendas'] > 0:
+                self.stdout.write(f"\n--- {region['region']} ---")
+                self.stdout.write(f"Total viviendas: {region['total_viviendas']}")
+                self.stdout.write(f"Entregadas: {region['entregadas']}")
+                self.stdout.write(f"Observaciones: {region['casos_postventa']}")
+                self.stdout.write(f"Tiempo promedio de solución: {region['promedio_dias']} días" if region['promedio_dias'] != '-' else "Tiempo promedio de solución: -")

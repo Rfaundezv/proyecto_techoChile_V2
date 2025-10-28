@@ -1,0 +1,137 @@
+{% extends 'base.html' %}
+{% block content %}
+<h2 class="mb-4">Reportes generados</h2>
+<form method="get" class="row g-2 align-items-end mb-3" id="filtro-fechas-reportes">
+  <div class="col-12 col-md-5">
+    <label for="fecha_select" class="form-label mb-1">Fechas disponibles</label>
+    <select id="fecha_select" class="form-select" onchange="document.getElementById('fecha_input').value=this.value;">
+      <option value="">-- Todas --</option>
+      {% for f in fechas_unicas %}
+        <option value="{{ f|date:'Y-m-d' }}" {% if fecha_filtro and f|date:'Y-m-d' == fecha_filtro %}selected{% endif %}>{{ f|date:'d/m/Y' }}</option>
+      {% endfor %}
+    </select>
+  </div>
+  <div class="col-12 col-md-4">
+    <label for="fecha_input" class="form-label mb-1">Buscar por fecha</label>
+    <input type="date" id="fecha_input" name="fecha" class="form-control" value="{{ fecha_filtro }}">
+  </div>
+  <div class="col-12 col-md-3 d-flex gap-2">
+    <button type="submit" class="btn btn-primary flex-fill">Filtrar</button>
+    <a href="?" class="btn btn-outline-secondary flex-fill">Limpiar</a>
+  </div>
+</form>
+<div class="table-responsive">
+    <table class="table table-bordered align-middle">
+        <thead class="table-light">
+            <tr>
+                <th scope="col">Fecha</th>
+                <th scope="col">Usuario</th>
+                <th scope="col">Nombre archivo</th>
+                <th scope="col">Filtros</th>
+                <th scope="col">Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for r in reportes %}
+            <tr>
+                <td data-label="Fecha">{{ r.obj.fecha_generacion|date:'d/m/Y H:i' }}</td>
+                <td data-label="Usuario">{{ r.obj.usuario }}</td>
+                <td data-label="Nombre archivo">{{ r.obj.nombre_archivo }}</td>
+                <td data-label="Filtros">
+                  {% if not r.mostrar_sin_filtro %}
+                    {% for k,v in r.filtros_validos %}
+                      {% if k == 'region' and v == '' %}
+                        <b>región</b>: todas<br>
+                      {% elif k == 'region' %}
+                        <b>región</b>: {{ v }}<br>
+                      {% elif k == 'fecha_inicio' and v == '' %}
+                        <b>fecha inicio</b>: todas<br>
+                      {% elif k == 'fecha_fin' and v == '' %}
+                        <b>fecha fin</b>: todas<br>
+                      {% else %}
+                        <b>{{ k }}</b>: {{ v }}<br>
+                      {% endif %}
+                    {% endfor %}
+                  {% else %}
+                    <span class="text-muted">Sin filtro: incluye todas las fechas</span>
+                  {% endif %}
+                </td>
+                <td data-label="Acciones">
+                    <a href="{% url 'reportes:descargar_reporte_generado' r.obj.id %}" class="btn btn-primary btn-sm">Descargar</a>
+                </td>
+            </tr>
+        {% empty %}
+            <tr><td colspan="5">No hay reportes generados.</td></tr>
+        {% endfor %}
+        </tbody>
+    </table>
+</div>
+<style>
+@media (max-width: 900px) {
+  #filtro-fechas-reportes .form-label {
+    font-size: 0.95rem;
+  }
+  #filtro-fechas-reportes .form-select,
+  #filtro-fechas-reportes .form-control {
+    font-size: 0.98rem;
+    padding: 0.35rem 0.5rem;
+  }
+  #filtro-fechas-reportes .btn {
+    font-size: 0.98rem;
+    padding: 0.35rem 0.7rem;
+  }
+}
+@media (max-width: 600px) {
+  #filtro-fechas-reportes {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+  #filtro-fechas-reportes > div {
+    width: 100%;
+    margin-bottom: 0.5rem;
+  }
+  .table-responsive table thead {
+    display: none;
+  }
+  .table-responsive table tr {
+    display: block;
+    margin-bottom: 1rem;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+    background: #fff;
+  }
+  [data-theme="dark"] .table-responsive table tr {
+    background: #232a36;
+  }
+  .table-responsive table td {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 0.45rem 0.5rem;
+    border: none;
+    border-bottom: 1px solid #e5e7eb;
+    font-size: 0.98rem;
+    word-break: break-word;
+    white-space: normal;
+  }
+  .table-responsive table td:before {
+    content: attr(data-label) ": ";
+    font-weight: 600;
+    color: #2563eb;
+    flex-shrink: 0;
+    margin-bottom: 0.1rem;
+    margin-right: 0;
+    align-self: flex-start;
+    white-space: pre-line;
+  }
+  .table-responsive .btn {
+    font-size: 0.95rem;
+    padding: 0.3rem 0.7rem;
+    min-width: 100%;
+    box-sizing: border-box;
+    margin-top: 0.2rem;
+    word-break: break-word;
+  }
+}
+</style>
+{% endblock %}

@@ -1,0 +1,321 @@
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reporte de Gestión DS-49 - TECHO Chile</title>
+    <style>
+        @page {
+            size: A4;
+            margin: 2cm;
+        }
+        body {
+            font-family: 'Arial', sans-serif;
+            font-size: 11px;
+            line-height: 1.4;
+            color: #333;
+            max-width: 17cm;
+            margin: 0 auto;
+        }
+        .header {
+            text-align: center;
+            border-bottom: 2px solid #1976d2;
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+        }
+        .header h1 {
+            color: #1976d2;
+            font-size: 13px;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        .header h2 {
+            color: #2c3e50;
+            font-size: 11px;
+            margin-top: 0;
+            font-weight: bold;
+        }
+        .section {
+            margin-bottom: 18px;
+            page-break-inside: avoid;
+        }
+        .section-title {
+            background-color: #1976d2;
+            color: white;
+            padding: 6px 12px;
+            font-weight: bold;
+            font-size: 11px;
+            margin-bottom: 10px;
+        }
+        .kpi {
+            font-size: 11px;
+            margin-bottom: 0.7rem;
+        }
+        .icon { font-size: 1em; margin-right: 0.3em; }
+        .table-responsive {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 10px 0 18px 0;
+            font-size: 11px;
+            table-layout: fixed;
+        }
+        .table-responsive th,
+        .table-responsive td {
+            border: 1px solid #bdc3c7;
+            padding: 6px;
+            text-align: left;
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+            font-size: 11px;
+        }
+        .table-responsive th {
+            background-color: #e3f2fd;
+            color: #1976d2;
+            font-weight: bold;
+            font-size: 11px;
+        }
+        .page-break {
+            display: none;
+        }
+        .footer-note {
+            font-size: 9px;
+            color: #7f8c8d;
+            text-align: center;
+            margin-top: 20px;
+            border-top: 1px solid #bdc3c7;
+            padding-top: 10px;
+        }
+        .alerta { color: #e53935; font-weight: bold; }
+        .mejora { color: #fbc02d; font-weight: bold; }
+        .fortaleza { color: #43a047; font-weight: bold; }
+        .img-grafico { display: block; margin: 1.5rem auto; max-width: 80%; max-height: 320px; border: 1px solid #b0bec5; background: #fff; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <img src="https://techo.org/wp-content/uploads/2021/09/techo-logo-azul.png" alt="Logo TECHO Chile" width="180" style="margin-bottom: 10px;"/>
+        <h1>Reporte de Gestión DS-49</h1>
+        <h2>Recepción, Observaciones y Postventa</h2>
+        <p><strong>Periodo del reporte:</strong> {{ periodo_reporte }} | <strong>Generado:</strong> {{ fecha_reporte }}</p>
+        <p><strong>Usuario:</strong> {{ usuario_reporte }}</p>
+        <p><strong>Filtros:</strong> Región: <b>{{ region_nombre }}</b> | Fecha inicio: <b>{% if fecha_inicio %}{{ fecha_inicio }}{% else %}Todas{% endif %}</b> | Fecha fin: <b>{% if fecha_fin %}{{ fecha_fin }}{% else %}Todas{% endif %}</b></p>
+    </div>
+
+    <div class="section">
+        <div class="section-title">Resumen Ejecutivo</div>
+        {% if kpi.total_viviendas %}<div class="kpi"><span class="icon">🏠</span>Total de viviendas gestionadas: <strong>{{ kpi.total_viviendas }}</strong></div>{% endif %}
+        {% if kpi.viviendas_entregadas %}<div class="kpi"><span class="icon">✅</span>Viviendas entregadas: <strong>{{ kpi.viviendas_entregadas }}</strong> ({{ kpi.porc_viviendas_entregadas }}%)</div>{% endif %}
+        {% if kpi.casos_postventa_abiertos %}<div class="kpi"><span class="icon">⚠️</span>Casos de postventa abiertos: <strong>{{ kpi.casos_postventa_abiertos }}</strong></div>{% endif %}
+        {% if kpi.tiempo_promedio_resolucion %}<div class="kpi"><span class="icon">⏱️</span>Tiempo promedio de resolución: <strong>{{ kpi.tiempo_promedio_resolucion }}</strong> días</div>{% endif %}
+        {% if kpi.familias_acompañadas %}<div class="kpi"><span class="icon">👨‍👩‍👧‍👦</span>Familias acompañadas: <strong>{{ kpi.familias_acompañadas }}</strong> ({{ kpi.porc_familias_acompañadas }}%)</div>{% endif %}
+        {% if kpi.tasa_cumplimiento %}<div class="kpi"><span class="icon">📈</span>Tasa de cumplimiento de plazos: <strong>{{ kpi.tasa_cumplimiento }}%</strong></div>{% endif %}
+    </div>
+
+    {% if tabla_estado_vivienda and tabla_estado_vivienda|length > 0 %}
+    <div class="section">
+        <div class="section-title">Análisis de Estados de Vivienda</div>
+        {% if grafico_estado_vivienda %}<img src="{{ grafico_estado_vivienda }}" alt="Gráfico circular de estados" class="img-grafico"/>{% endif %}
+        <table class="table-responsive">
+            <thead>
+                <tr>
+                    <th>Estado</th>
+                    <th>Cantidad</th>
+                    <th>Porcentaje</th>
+                </tr>
+            </thead>
+            <tbody>
+            {% for estado in tabla_estado_vivienda %}
+                <tr>
+                    <td>{{ estado.nombre }}</td>
+                    <td>{{ estado.cantidad }}</td>
+                    <td>{{ estado.porcentaje }}%</td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% endif %}
+
+    {% if tabla_observaciones and tabla_observaciones|length > 0 %}
+    <div class="section">
+        <div class="section-title">Diagnóstico Técnico - Observaciones</div>
+        {% if grafico_observaciones_tipo %}<img src="{{ grafico_observaciones_tipo }}" alt="Gráfico de barras de observaciones" class="img-grafico"/>{% endif %}
+        <table class="table-responsive">
+            <thead>
+                <tr>
+                    <th>Tipo de Observación</th>
+                    <th>Casos Totales</th>
+                    <th>Casos Cerrados</th>
+                    <th>Pendientes</th>
+                    <th>Tiempo Promedio</th>
+                </tr>
+            </thead>
+            <tbody>
+            {% for obs in tabla_observaciones %}
+                <tr>
+                    <td>{{ obs.tipo }}</td>
+                    <td>{{ obs.totales }}</td>
+                    <td>{{ obs.cerrados }}</td>
+                    <td>{{ obs.pendientes }}</td>
+                    <td>{{ obs.tiempo_promedio }}</td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% endif %}
+
+    {% if tabla_tendencia_mensual and tabla_tendencia_mensual|length > 0 %}
+    <div class="section">
+        <div class="section-title">Análisis de Tendencias Temporales</div>
+        {% if grafico_tendencia_mensual %}<img src="{{ grafico_tendencia_mensual }}" alt="Gráfico de líneas de evolución mensual" class="img-grafico"/>{% endif %}
+        <table class="table-responsive">
+            <thead>
+                <tr>
+                    <th>Mes</th>
+                    <th>Casos Abiertos</th>
+                    <th>Casos Cerrados</th>
+                    <th>Variación</th>
+                </tr>
+            </thead>
+            <tbody>
+            {% for mes in tabla_tendencia_mensual %}
+                <tr>
+                    <td>{{ mes.nombre }}</td>
+                    <td>{{ mes.abiertos }}</td>
+                    <td>{{ mes.cerrados }}</td>
+                    <td>{{ mes.variacion }}</td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% endif %}
+
+    {% if tabla_regional and tabla_regional|length > 0 %}
+    <div class="section">
+        <div class="section-title">Desempeño Regional</div>
+        {% if grafico_mapa_calor %}<img src="{{ grafico_mapa_calor }}" alt="Mapa de calor regional" class="img-grafico"/>{% endif %}
+        <table class="table-responsive">
+            <thead>
+                <tr>
+                    <th>Región</th>
+                    <th>Total</th>
+                    <th>Entregadas</th>
+                    <th>Casos</th>
+                    <th>Tiempo</th>
+                    <th>Estado</th>
+                </tr>
+            </thead>
+            <tbody>
+            {% for reg in tabla_regional %}
+                <tr>
+                    <td>{{ reg.region }}</td>
+                    <td>{{ reg.total }}</td>
+                    <td>{{ reg.entregadas }}</td>
+                    <td>{{ reg.casos }}</td>
+                    <td>{{ reg.tiempo }}</td>
+                    <td>{{ reg.estado }}</td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% endif %}
+
+    {% if tabla_equipo and tabla_equipo|length > 0 %}
+    <div class="section">
+        <div class="section-title">Desempeño del Equipo</div>
+        <table class="table-responsive">
+            <thead>
+                <tr>
+                    <th>Técnico</th>
+                    <th>Casos Asignados</th>
+                    <th>Casos Cerrados</th>
+                    <th>Tasa Cierre</th>
+                    <th>Tiempo Promedio</th>
+                </tr>
+            </thead>
+            <tbody>
+            {% for t in tabla_equipo %}
+                <tr>
+                    <td>{{ t.nombre }}</td>
+                    <td>{{ t.asignados }}</td>
+                    <td>{{ t.cerrados }}</td>
+                    <td>{{ t.tasa_cierre }}</td>
+                    <td>{{ t.tiempo_promedio }}</td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% endif %}
+
+
+    {% if conclusiones_str %}
+    <div class="section">
+        <div class="section-title">Conclusiones Ejecutivas</div>
+        <div style="font-size:1.08rem; color:#1976d2; font-weight:bold; margin-bottom:1.2rem;">
+            {{ conclusiones_str|linebreaksbr }}
+        </div>
+    </div>
+    {% endif %}
+
+    {% if alertas_criticas or areas_mejora or fortalezas %}
+    <div class="section">
+        <div class="section-title">Alertas, Áreas de Mejora y Fortalezas</div>
+        {% if alertas_criticas %}<div class="alerta">🔴 ALERTAS CRÍTICAS:<br>{{ alertas_criticas|linebreaksbr }}</div>{% endif %}
+        {% if areas_mejora %}<div class="mejora" style="margin-top:1.2rem;">🟡 ÁREAS DE MEJORA:<br>{{ areas_mejora|linebreaksbr }}</div>{% endif %}
+        {% if fortalezas %}<div class="fortaleza" style="margin-top:1.2rem;">🟢 FORTALEZAS:<br>{{ fortalezas|linebreaksbr }}</div>{% endif %}
+    </div>
+    {% endif %}
+
+    {% if recomendaciones and recomendaciones|length > 0 %}
+    <div class="section">
+        <div class="section-title">Recomendaciones</div>
+        <ol style="margin-top:0.8rem; font-size:11px;">
+        {% for rec in recomendaciones %}
+            {% if rec %}
+            <li>{{ rec }}</li>
+            {% endif %}
+        {% endfor %}
+        </ol>
+    </div>
+    {% endif %}
+
+    {% if recomendaciones_str %}
+    <div class="section">
+        <div class="section-title">Recomendaciones Ejecutivas</div>
+        <div style="font-size:1.1rem; color:#388e3c; font-weight:bold;">
+            {{ recomendaciones_str|linebreaksbr }}
+        </div>
+    </div>
+    {% endif %}
+
+    {% if proyeccion_casos or metas_trimestre or recursos_estimados %}
+    <div class="section">
+        <div class="section-title">Proyecciones y Metas</div>
+        {% if proyeccion_casos %}<div class="kpi"><span class="icon">🔮</span>Proyección de casos esperados próximo mes: <strong>{{ proyeccion_casos }}</strong></div>{% endif %}
+        {% if metas_trimestre %}<div class="kpi"><span class="icon">🎯</span>Metas del siguiente trimestre: <strong>{{ metas_trimestre }}</strong></div>{% endif %}
+        {% if recursos_estimados %}<div class="kpi"><span class="icon">💰</span>Recursos necesarios estimados: <strong>{{ recursos_estimados }}</strong></div>{% endif %}
+    </div>
+    {% endif %}
+
+    {% if anexos_casos_criticos or anexos_datos_complementarios or anexos_metodologia %}
+    <div class="section">
+        <div class="section-title">Anexos Técnicos</div>
+        {% if anexos_casos_criticos %}<div><strong>Listado detallado de casos críticos:</strong></div>
+        <div>{{ anexos_casos_criticos|linebreaksbr }}</div>{% endif %}
+        {% if anexos_datos_complementarios %}<div style="margin-top:1.2rem;"><strong>Datos estadísticos complementarios:</strong></div>
+        <div>{{ anexos_datos_complementarios|linebreaksbr }}</div>{% endif %}
+        {% if anexos_metodologia %}<div style="margin-top:1.2rem;"><strong>Metodología de cálculo de indicadores:</strong></div>
+        <div>{{ anexos_metodologia|linebreaksbr }}</div>{% endif %}
+    </div>
+    {% endif %}
+
+    <div class="footer-note">
+        Reporte generado automáticamente por el Sistema de Gestión TECHO Chile - {{ fecha_reporte }}
+    </div>
+</body>
+</html>

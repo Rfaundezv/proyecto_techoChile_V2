@@ -1,3 +1,66 @@
+from django.shortcuts import render, get_object_or_404
+from django.contrib.auth.decorators import login_required
+from .models import ReporteGenerado
+from django.http import FileResponse, Http404
+import os
+
+# Vista para listar reportes generados
+@login_required
+def listar_reportes_generados(request):
+    from django.db.models.functions import TruncDate
+    # Obtener todas las fechas únicas (solo día)
+    fechas_unicas = ReporteGenerado.objects.annotate(fecha_dia=TruncDate('fecha_generacion'))\
+        .values_list('fecha_dia', flat=True).distinct().order_by('-fecha_dia')
+
+    # Filtro por fecha (YYYY-MM-DD)
+    fecha_filtro = request.GET.get('fecha')
+    reportes = ReporteGenerado.objects.all()
+    if fecha_filtro:
+        # Buscar reportes de ese día
+        reportes = reportes.filter(fecha_generacion__date=fecha_filtro)
+
+    # Para cada reporte, calcular filtros válidos (sin 'estado' vacío)
+    reportes_list = []
+    from core.models import Region
+    for r in reportes:
+        filtros_validos = []
+        if hasattr(r, 'filtros') and isinstance(r.filtros, dict):
+            for k, v in r.filtros.items():
+                # Ocultar 'estado' siempre
+                if k == 'estado':
+                    continue
+                # Si es region y tiene valor, buscar el nombre
+                if k == 'region' and v:
+                    try:
+                        region_obj = Region.objects.get(pk=int(v))
+                        v = region_obj.nombre
+                    except Exception:
+                        pass
+                filtros_validos.append((k, v))
+        # Si los únicos filtros son fecha_inicio y/o fecha_fin y ambos vacíos, considerar como sin filtro
+        solo_fechas = all(k in ['fecha_inicio', 'fecha_fin'] for k, v in filtros_validos)
+        fechas_vacias = all(v == '' for k, v in filtros_validos if k in ['fecha_inicio', 'fecha_fin'])
+        mostrar_sin_filtro = (filtros_validos == [] or (solo_fechas and fechas_vacias))
+        reportes_list.append({
+            'obj': r,
+            'filtros_validos': filtros_validos,
+            'mostrar_sin_filtro': mostrar_sin_filtro,
+        })
+
+    return render(request, 'reportes/listar_reportes_generados.html', {
+        'reportes': reportes_list,
+        'fechas_unicas': fechas_unicas,
+        'fecha_filtro': fecha_filtro or '',
+    })
+
+# Vista para descargar un reporte generado
+@login_required
+def descargar_reporte_generado(request, reporte_id):
+    reporte = get_object_or_404(ReporteGenerado, id=reporte_id)
+    ruta = os.path.join(os.path.dirname(os.path.dirname(__file__)), reporte.ruta_archivo)
+    if not os.path.exists(ruta):
+        raise Http404('Archivo no encontrado')
+    return FileResponse(open(ruta, 'rb'), as_attachment=True, filename=reporte.nombre_archivo)
 from django.http import HttpResponse
 import openpyxl
 from django.contrib.auth.decorators import login_required

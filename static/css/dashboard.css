@@ -1,56 +1,78 @@
+/* Forzar fondo y texto oscuros en tarjetas ejecutivas en modo dark */
+[data-theme="dark"] .dashboard-dark-card,
+[data-theme="dark"] .dashboard-card-header,
+[data-theme="dark"] .dashboard-card-title,
+[data-theme="dark"] .dashboard-card-text,
+[data-theme="dark"] .dashboard-dark-table,
+[data-theme="dark"] .chart-container {
+    background: #232a36 !important;
+    color: #f3f4f6 !important;
+    border-color: #374151 !important;
+}
+[data-theme="dark"] .dashboard-dark-table th,
+[data-theme="dark"] .dashboard-dark-table td {
+    background: #232a36 !important;
+    color: #f3f4f6 !important;
+    border-color: #374151 !important;
+}
+[data-theme="dark"] .dashboard-dark-table tr.table-active > * {
+    background: #1a202c !important;
+    color: #f3f4f6 !important;
+}
+
 /* Estilos específicos para las métricas del dashboard */
+.metric-card {
+    background: var(--dashboard-card-bg, #fff);
+    color: var(--text-color, #1f2937);
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+    padding: 1.2rem 0.7rem 1rem 0.7rem;
+    margin-bottom: 0.5rem;
+    transition: background 0.3s, color 0.3s, box-shadow 0.3s;
+}
 .metric-number {
     font-size: 2rem !important;
     font-weight: bold !important;
     margin: 0 !important;
     line-height: 1 !important;
 }
-
+.metric-label {
+    font-size: 1rem;
+    opacity: 0.85;
+}
+.metric-card.success {
+    border-left: 5px solid var(--techo-success);
+}
+.metric-card.warning {
+    border-left: 5px solid var(--techo-warning);
+}
+.metric-card.danger {
+    border-left: 5px solid var(--techo-danger);
+}
 .metric-card:hover {
-    transform: translateY(-5px) !important;
-    box-shadow: 0 8px 25px rgba(0,0,0,0.1) !important;
+    box-shadow: 0 8px 25px rgba(0,0,0,0.13) !important;
+    background: var(--techo-light-blue, #dbeafe);
+    color: var(--techo-dark, #1f2937);
 }
-
-/* Efectos hover específicos por color */
-.metric-card.success:hover { 
-    background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%) !important;
-    color: white !important;
+[data-theme="dark"] .metric-card {
+    background: #232a36;
+    color: #f3f4f6;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.25);
 }
-.metric-card.warning:hover { 
-    background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%) !important;
-    color: white !important;
+[data-theme="dark"] .metric-card:hover {
+    background: #1a202c;
+    color: #fbbf24;
 }
-.metric-card.danger:hover { 
-    background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%) !important;
-    color: white !important;
+.chart-container {
+    background: var(--dashboard-card-bg, #fff);
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+    padding: 1.2rem 1.2rem 1rem 1.2rem;
+    margin-bottom: 1.2rem;
+    transition: background 0.3s, color 0.3s;
 }
-.metric-card:hover { 
-    background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%) !important;
-    color: white !important;
-}
-
-/* Hover para tarjetas enlazadas */
-a .metric-card.success:hover { 
-    background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%) !important;
-    color: white !important;
-}
-a .metric-card.warning:hover { 
-    background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%) !important;
-    color: white !important;
-}
-a .metric-card.danger:hover { 
-    background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%) !important;
-    color: white !important;
-}
-a .metric-card:hover { 
-    background: linear-gradient(135deg, #2563eb 0, #1d4ed8 100%) !important;
-    color: white !important;
-}
-
-/* Texto en hover */
-.metric-card:hover .metric-number,
-.metric-card:hover .metric-label,
-a .metric-card:hover .metric-number,
-a .metric-card:hover .metric-label {
-    color: white !important;
+[data-theme="dark"] .chart-container {
+    background: #232a36;
+    color: #f3f4f6;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.25);
 }

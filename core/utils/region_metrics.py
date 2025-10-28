@@ -3,7 +3,7 @@ from core.models import Region
 from proyectos.models import Proyecto, Vivienda
 from incidencias.models import Observacion
 
-def get_region_metrics(region_id=None, estado_id=None, fecha_inicio=None, fecha_fin=None):
+def get_region_metrics(region_id=None, estado=None, fecha_inicio=None, fecha_fin=None):
     regiones_qs = Region.objects.filter(activo=True)
     if region_id:
         regiones_qs = regiones_qs.filter(id=region_id)
@@ -12,21 +12,26 @@ def get_region_metrics(region_id=None, estado_id=None, fecha_inicio=None, fecha_
     for region in regiones:
         # Solo proyectos activos de la región actual
         proyectos_objs = Proyecto.objects.filter(region=region, activo=True)
-        if estado_id:
-            proyectos_objs = proyectos_objs.filter(estado_id=estado_id)
         if fecha_inicio:
             proyectos_objs = proyectos_objs.filter(fecha_creacion__date__gte=fecha_inicio)
         if fecha_fin:
             proyectos_objs = proyectos_objs.filter(fecha_creacion__date__lte=fecha_fin)
         viviendas_qs = Vivienda.objects.filter(proyecto__in=proyectos_objs, activa=True)
+        if estado:
+            # Si estado es numérico (id de EstadoObservacion), no filtrar viviendas
+            try:
+                int_estado = int(estado)
+                # Si es un id, no filtrar viviendas por estado
+            except (ValueError, TypeError):
+                viviendas_qs = viviendas_qs.filter(estado=estado)
         viviendas_ids = viviendas_qs.values_list('id', flat=True)
         total_viviendas = viviendas_qs.count()
         entregadas = viviendas_qs.filter(estado='entregada').count()
         if total_viviendas == 0:
             continue
         obs_region = Observacion.objects.filter(vivienda_id__in=viviendas_ids, activo=True)
-        if estado_id:
-            obs_region = obs_region.filter(estado_id=estado_id)
+        if estado:
+            obs_region = obs_region.filter(estado_id=estado)
         if fecha_inicio:
             obs_region = obs_region.filter(fecha_creacion__date__gte=fecha_inicio)
         if fecha_fin:

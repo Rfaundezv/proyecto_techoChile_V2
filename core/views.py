@@ -36,18 +36,22 @@ def dashboard(request):
 
     # --- Filtros desde GET ---
     region_id = request.GET.get('region')
-    estado_id = request.GET.get('estado')
+    # estado_id = request.GET.get('estado')  # Eliminado filtro por estado
     fecha_inicio = request.GET.get('fecha_inicio')
     fecha_fin = request.GET.get('fecha_fin')
 
     # Listas para el filtro
     regiones = Region.objects.filter(activo=True).order_by('codigo')
-    from incidencias.models import EstadoObservacion
-    estados = list(EstadoObservacion.objects.filter(activo=True).values_list('id', 'nombre'))
+    # from incidencias.models import EstadoObservacion
+    # estados = list(EstadoObservacion.objects.filter(activo=True).values_list('id', 'nombre'))
 
     # Cumplimiento de plazos por constructora
     from core.utils.cumplimiento_constructora import get_cumplimiento_plazos_por_constructora
-    cumplimiento_constructoras = get_cumplimiento_plazos_por_constructora(region_id=region_id)
+    cumplimiento_constructoras = get_cumplimiento_plazos_por_constructora(
+        region_id=region_id,
+        fecha_inicio=fecha_inicio,
+        fecha_fin=fecha_fin
+    )
 
     # Comunas de Valparaíso con viviendas (sin filtro)
     comuna_objs = []
@@ -63,7 +67,7 @@ def dashboard(request):
 
     # --- Métricas por región (usando utilitario compartido) ---
     from core.utils.region_metrics import get_region_metrics
-    metrics_region = get_region_metrics(region_id=region_id, estado_id=estado_id, fecha_inicio=fecha_inicio, fecha_fin=fecha_fin)
+    metrics_region = get_region_metrics(region_id=region_id, fecha_inicio=fecha_inicio, fecha_fin=fecha_fin)
     for region in metrics_region:
         region['estado'] = 'Bueno'  # Puedes agregar lógica de estado si lo necesitas
 
@@ -106,15 +110,17 @@ def dashboard(request):
         is_admin = False
         sin_vivienda = mi_vivienda is None
     else:
+
         proyectos_qs = Proyecto.objects.all()
         if region_id:
             proyectos_qs = proyectos_qs.filter(region_id=region_id)
-        if estado_id:
-            proyectos_qs = proyectos_qs.filter(estado_id=estado_id)
+        # El modelo Proyecto no tiene campo 'estado', el filtro de estado debe aplicarse sobre Vivienda o Observacion
+        # Solo filtrar por fechas en proyectos
         if fecha_inicio:
             proyectos_qs = proyectos_qs.filter(fecha_creacion__date__gte=fecha_inicio)
         if fecha_fin:
             proyectos_qs = proyectos_qs.filter(fecha_creacion__date__lte=fecha_fin)
+        # Nunca filtrar proyectos por estado
 
         if user.is_superuser or (user.rol and user.rol.nombre == 'ADMINISTRADOR'):
             proyectos_user = proyectos_qs
@@ -133,14 +139,14 @@ def dashboard(request):
             ).distinct()
         if proyectos_user is not None:
             total_proyectos = proyectos_user.count()
-            viviendas_total = Vivienda.objects.filter(proyecto__in=proyectos_user).count()
+            viviendas_total = Vivienda.objects.filter(proyecto__in=proyectos_user, activa=True).count()
             viviendas_entregadas = Vivienda.objects.filter(
                 proyecto__in=proyectos_user, 
                 estado='entregada'
             ).count()
             obs_qs = Observacion.objects.filter(vivienda__proyecto__in=proyectos_user)
-            if estado_id:
-                obs_qs = obs_qs.filter(estado_id=estado_id)
+            # if estado_id:
+            #     obs_qs = obs_qs.filter(estado_id=estado_id)
             if fecha_inicio:
                 obs_qs = obs_qs.filter(fecha_creacion__date__gte=fecha_inicio)
             if fecha_fin:
@@ -176,8 +182,8 @@ def dashboard(request):
     else:
         if proyectos_user is not None:
             obs_tipo_qs = Observacion.objects.filter(vivienda__proyecto__in=proyectos_user)
-            if estado_id:
-                obs_tipo_qs = obs_tipo_qs.filter(estado_id=estado_id)
+            # if estado_id:
+            #     obs_tipo_qs = obs_tipo_qs.filter(estado_id=estado_id)
             if fecha_inicio:
                 obs_tipo_qs = obs_tipo_qs.filter(fecha_creacion__date__gte=fecha_inicio)
             if fecha_fin:
@@ -199,8 +205,8 @@ def dashboard(request):
         cerradas_qs = Observacion.objects.filter(vivienda=mi_vivienda, estado__nombre='Cerrada')
     elif proyectos_user is not None:
         cerradas_qs = Observacion.objects.filter(vivienda__proyecto__in=proyectos_user, estado__nombre='Cerrada')
-        if estado_id:
-            cerradas_qs = cerradas_qs.filter(estado_id=estado_id)
+        # if estado_id:
+        #     cerradas_qs = cerradas_qs.filter(estado_id=estado_id)
         if fecha_inicio:
             cerradas_qs = cerradas_qs.filter(fecha_creacion__date__gte=fecha_inicio)
         if fecha_fin:
@@ -245,7 +251,7 @@ def dashboard(request):
         'comunas_valparaiso': comuna_objs,
         'cumplimiento_constructoras': cumplimiento_constructoras,
         'regiones': regiones,
-        'estados': estados,
+    # 'estados': estados,  # Eliminado del contexto
     }
 
     return render(request, 'dashboard/index.html', context)
@@ -830,7 +836,7 @@ class ObservacionList(LoginRequiredMixin, RolRequiredMixin, SoftDeleteMixin, Vie
             )
         
         if filtro_estado:
-            observaciones_list = observaciones_list.filter(estado_id=filtro_estado)
+            observaciones_list = observaciones_list.filter(estado=filtro_estado)
         
         if filtro_prioridad:
             observaciones_list = observaciones_list.filter(prioridad=filtro_prioridad)

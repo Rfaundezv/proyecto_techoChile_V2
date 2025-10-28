@@ -1,3 +1,22 @@
+
+from django.db import models
+from django.contrib.auth import get_user_model
+import json
+
+class ReporteGenerado(models.Model):
+    usuario = models.ForeignKey(get_user_model(), on_delete=models.SET_NULL, null=True, blank=True)
+    nombre_archivo = models.CharField(max_length=255)
+    ruta_archivo = models.CharField(max_length=255)
+    fecha_generacion = models.DateTimeField(auto_now_add=True)
+    filtros = models.JSONField(default=dict, blank=True)
+
+    def __str__(self):
+        return f"{self.nombre_archivo} ({self.fecha_generacion:%d/%m/%Y %H:%M})"
+
+    class Meta:
+        verbose_name = "Reporte generado"
+        verbose_name_plural = "Reportes generados"
+        ordering = ['-fecha_generacion']
 from django.db import models
 from django.conf import settings
 from proyectos.models import Proyecto, Vivienda, Beneficiario

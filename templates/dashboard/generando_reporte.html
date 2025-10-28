@@ -1,0 +1,38 @@
+{% extends 'base.html' %}
+{% block title %}Generando reporte PDF...{% endblock %}
+{% block content %}
+<div class="container py-5 text-center">
+    <div class="spinner-border text-primary mb-3" role="status" style="width: 4rem; height: 4rem;"></div>
+    <h3 class="mb-3">Generando reporte PDF</h3>
+    <p>Por favor espera unos segundos mientras se genera el reporte.<br>Serás redirigido automáticamente cuando esté listo.</p>
+</div>
+<script>
+// Extrae los parámetros de la URL
+function getQueryParams() {
+    const params = {};
+    window.location.search.replace(/[?&]+([^=&]+)=([^&]*)/gi, function(m,key,value) {
+        params[key] = decodeURIComponent(value);
+    });
+    return params;
+}
+// Construye la URL del PDF con los mismos parámetros
+function buildPDFUrl() {
+    const params = window.location.search;
+    return '/dashboard/reporte-pdf/' + params;
+}
+// Intenta cargar el PDF cada 2 segundos
+function pollPDF() {
+    const url = buildPDFUrl();
+    fetch(url, { method: 'HEAD' })
+        .then(resp => {
+            if (resp.ok && resp.headers.get('content-type') === 'application/pdf') {
+                window.location.href = url;
+            } else {
+                setTimeout(pollPDF, 2000);
+            }
+        })
+        .catch(() => setTimeout(pollPDF, 2000));
+}
+document.addEventListener('DOMContentLoaded', pollPDF);
+</script>
+{% endblock %}

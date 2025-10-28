@@ -1,3 +1,26 @@
+@media (max-width: 600px) {
+    .header-stats {
+        gap: 0.2rem;
+        flex-wrap: wrap;
+        width: 100%;
+        justify-content: center;
+    }
+    .stat-item {
+        padding: 0.15rem 0.3rem;
+        min-width: 48px;
+        font-size: 0.8rem;
+        margin: 0 1px;
+        border-radius: 6px;
+    }
+    .stat-label {
+        font-size: 0.65rem;
+        line-height: 1.05;
+    }
+    .stat-value {
+        font-size: 0.95rem;
+        line-height: 1.05;
+    }
+}
 :root {
     --techo-blue: #2563eb;
     --techo-orange: #f97316;
@@ -244,30 +267,50 @@ body {
 }
 
 /* Estadísticas móviles compactas en el nav */
-.mobile-stats {
-    display: flex;
-    gap: 0.4rem;
-    flex-wrap: wrap;
+/* Header stats compactos en móvil */
+.header-stats {
+        display: flex;
+        gap: 1.5rem;
+        justify-content: flex-end;
+        align-items: center;
 }
-
-.mobile-stat-badge {
-    background: linear-gradient(135deg, var(--techo-blue) 0%, var(--techo-dark-blue) 100%);
-    color: white;
-    padding: 0.5rem 0.8rem;
-    border-radius: 8px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    font-size: 0.75rem;
-    box-shadow: 0 2px 6px rgba(37, 99, 235, 0.3);
-    min-width: 70px;
-    transition: all 0.3s ease;
+.stat-item {
+        display: flex;
+        flex-direction: column;
+        text-align: center;
+        background: rgba(255,255,255,0.15);
+        padding: 0.5rem 1rem;
+        border-radius: 8px;
+        -webkit-backdrop-filter: blur(10px);
+        backdrop-filter: blur(10px);
+        min-width: 80px;
 }
-
-.mobile-stat-badge:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 10px rgba(37, 99, 235, 0.4);
+.stat-label {
+        font-size: 0.8rem;
+        opacity: 0.9;
+        line-height: 1.1;
+}
+.stat-value {
+        font-size: 1.3rem;
+        font-weight: bold;
+        line-height: 1.1;
+}
+@media (max-width: 600px) {
+    .header-stats {
+        gap: 0.5rem;
+    }
+    .stat-item {
+        padding: 0.25rem 0.5rem;
+        min-width: 60px;
+        font-size: 0.9rem;
+    }
+    .stat-label {
+        font-size: 0.7rem;
+    }
+    .stat-value {
+        font-size: 1.05rem;
+    }
+}
 }
 
 .mobile-stat-label {

@@ -197,8 +197,9 @@
 
 <!-- Formulario de filtro para dashboard -->
 <form id="dashboardFilterForm" method="get" class="mb-4 p-3 rounded shadow-sm" style="background:var(--dashboard-card-bg);border:1.5px solid var(--dashboard-border);">
-    <div class="row g-2 align-items-end">
-        <div class="col-md-3">
+
+    <div class="row g-2 align-items-end flex-nowrap">
+        <div class="col-auto" style="min-width:220px;">
             <label for="region" class="form-label mb-1">Región</label>
             <select name="region" id="region" class="form-select">
                 <option value="">Todas</option>
@@ -207,29 +208,34 @@
                 {% endfor %}
             </select>
         </div>
-        <div class="col-md-3">
-            <label for="estado" class="form-label mb-1">Estado</label>
-            <select name="estado" id="estado" class="form-select">
-                <option value="">Todos</option>
-                {% for est in estados %}
-                    <option value="{{ est.0 }}" {% if request.GET.estado == est.0|stringformat:'s' %}selected{% endif %}>{{ est.1 }}</option>
-                {% endfor %}
-            </select>
-        </div>
-        <div class="col-md-3">
+        <div class="col-auto" style="min-width:180px;">
             <label for="fecha_inicio" class="form-label mb-1">Desde</label>
             <input type="date" name="fecha_inicio" id="fecha_inicio" class="form-control" value="{{ request.GET.fecha_inicio }}">
         </div>
-        <div class="col-md-3">
+        <div class="col-auto" style="min-width:180px;">
             <label for="fecha_fin" class="form-label mb-1">Hasta</label>
             <input type="date" name="fecha_fin" id="fecha_fin" class="form-control" value="{{ request.GET.fecha_fin }}">
         </div>
-        <div class="col-md-2 mt-2 mt-md-0">
-            <button type="submit" class="btn btn-primary w-100"><i class="bi bi-funnel"></i> Filtrar</button>
+        <div class="col d-flex align-items-end justify-content-end gap-2 flex-nowrap">
+            <button type="submit" class="btn btn-primary btn-sm" style="min-width: 110px;"><i class="bi bi-funnel"></i> Filtrar</button>
+            <button type="button" class="btn btn-outline-secondary btn-sm" style="min-width: 110px;" onclick="window.print()"><i class="bi bi-printer"></i> Imprimir</button>
+            <a id="btnDescargarPDF" class="btn btn-outline-danger btn-sm" style="min-width: 110px;" href="#" target="_blank"><i class="bi bi-file-earmark-pdf"></i> PDF</a>
+            <a id="btnDescargarExcel" class="btn btn-outline-success btn-sm" style="min-width: 110px;" href="#" target="_blank"><i class="bi bi-file-earmark-excel"></i> Excel</a>
         </div>
     </div>
 </form>
 
+<script>
+// Actualiza los links de los botones de descarga según los filtros
+function updateDashboardLinks() {
+    const form = document.getElementById('dashboardFilterForm');
+    const params = new URLSearchParams(new FormData(form)).toString();
+    document.getElementById('btnDescargarPDF').href = '/dashboard/generando-reporte/?' + params;
+    document.getElementById('btnDescargarExcel').href = '/dashboard/reporte-excel/?' + params;
+}
+document.getElementById('dashboardFilterForm').addEventListener('change', updateDashboardLinks);
+document.addEventListener('DOMContentLoaded', updateDashboardLinks);
+</script>
 <div class="row g-4 align-items-stretch mb-4">
     <div class="col-12 col-xl-6 d-flex">
         <div class="chart-container flex-fill w-100 h-100 d-flex flex-column justify-content-between" style="border-radius: 0 0 6px 6px; margin-top: 0;">
@@ -239,9 +245,9 @@
                     <span class="dashboard-title dashboard-h5 dynamic-title d-none d-md-inline ms-3" style="font-weight: normal; font-size: 1.1rem;">Métricas de Techo Chile</span>
                 </h2>
             </div>
-            <div class="d-flex flex-row flex-wrap gap-3 justify-content-start align-items-stretch mb-2" style="width:100%;">
+            <div class="row g-2 mb-2">
                 <!-- Tarjetas de métricas de Techo Chile -->
-                <div class="flex-fill" style="min-width:150px;max-width:200px;">
+                <div class="col-6 col-md-3 d-flex">
                     <a href="{% url 'viviendas:lista' %}" class="text-decoration-none">
                         <div class="metric-card text-center h-100" style="cursor: pointer; transition: transform 0.2s;">
                             <h3 class="metric-number display-2">{{ viviendas_total|default:"0" }}</h3>
@@ -249,7 +255,7 @@
                         </div>
                     </a>
                 </div>
-                <div class="flex-fill" style="min-width:150px;max-width:200px;">
+                <div class="col-6 col-md-3 d-flex">
                     <a href="{% url 'incidencias:lista_observaciones' %}?estado_nombre=Abierta" class="text-decoration-none">
                         <div class="metric-card warning text-center h-100" style="cursor: pointer; transition: transform 0.2s;">
                             <h3 class="metric-number display-2">{{ obs_abiertas|default:"0" }}</h3>
@@ -257,7 +263,7 @@
                         </div>
                     </a>
                 </div>
-                <div class="flex-fill" style="min-width:150px;max-width:200px;">
+                <div class="col-6 col-md-3 d-flex">
                     <a href="{% url 'incidencias:lista_observaciones' %}?es_urgente=1&estado_nombre=Abierta" class="text-decoration-none">
                         <div class="metric-card danger text-center h-100" style="cursor: pointer; transition: transform 0.2s;">
                             <h3 class="metric-number display-2">{{ obs_urgentes|default:"0" }}</h3>
@@ -265,7 +271,7 @@
                         </div>
                     </a>
                 </div>
-                <div class="flex-fill" style="min-width:150px;max-width:200px;">
+                <div class="col-6 col-md-3 d-flex">
                     <a href="{% url 'incidencias:lista_observaciones' %}?estado_nombre=Cerrada" class="text-decoration-none">
                         <div class="metric-card success text-center h-100" style="cursor: pointer; transition: transform 0.2s;">
                             <h3 class="metric-number display-2">{{ obs_cerradas|default:"0" }}</h3>
@@ -297,7 +303,7 @@
         </div>
     </div>
     <div class="col-12 col-xl-4 d-flex flex-grow-1" style="flex:1 1 0;">
-        <div class="card flex-fill w-100 h-100 d-flex flex-column justify-content-between" style="min-width:0;">
+    <div class="card flex-fill w-100 h-100 d-flex flex-column justify-content-between dashboard-dark-card">
             <div class="card-body d-flex flex-column justify-content-between h-100 p-3">
                 <h5 class="dashboard-title dashboard-h5 mb-2">Observaciones por Tipo</h5>
                 <canvas id="graficoObservacionesTipo" style="width:100% !important; min-width:0; height:300px; min-height:180px; display:block;" height="300"></canvas>
@@ -483,11 +489,11 @@
 <div class="row mb-6 dashboard-executive-row">
     <!-- Gauge a la izquierda -->
     <div class="col-lg-4">
-    <div class="card shadow-lg p-3 p-md-4 w-100" style="background:var(--dashboard-card-bg);border-radius:var(--dashboard-radius);box-shadow:var(--dashboard-shadow);border:1.5px solid var(--dashboard-border);color:var(--dashboard-title);">
-            <div class="d-flex flex-column flex-md-row justify-content-between align-items-center mb-2 gap-2">
+    <div class="card shadow-lg p-3 p-md-4 w-100 dashboard-dark-card">
+            <div class="d-flex flex-column flex-md-row justify-content-between align-items-center mb-2 gap-2 dashboard-card-header">
+                <h5 class="mb-0 text-start w-100 dashboard-card-title">Cumplimiento de Plazos</h5>
                 <div class="d-flex flex-row align-items-center justify-content-between w-100" style="gap:1rem; padding-top:0.75rem;">
-                    <h5 class="mb-0 text-start" style="font-size:1.18rem; font-weight:600; color:var(--dashboard-title);">Cumplimiento de Plazos por Constructora</h5>
-                    <select id="selectConstructora" class="form-select form-select-sm" style="min-width:180px; height:2.3rem; border:2px solid #16c7e5; font-weight:600; background:var(--dashboard-bg); color:var(--dashboard-title);">
+                    <select id="selectConstructora" class="form-select form-select-sm" style="min-width:180px; height:2.3rem; border:2px solid #16c7e5; font-weight:600;">
                         {% for nombre in cumplimiento_constructoras.keys %}
                             <option value="{{ nombre }}">{{ nombre }}</option>
                         {% endfor %}
@@ -496,33 +502,48 @@
                 <hr style="margin:0.5rem 0 0.7rem 0; border-top:2px solid #e0e7ef;"> 
             </div>
             <div class="gauge-responsive-container position-relative mx-auto d-flex flex-column align-items-center justify-content-center" style="width:100%;max-width:320px;min-width:180px;aspect-ratio:2.2/1;padding-bottom:0.5rem;background:var(--dashboard-card-bg);border-radius:var(--dashboard-radius);">
-                <canvas id="gaugeConstructora" style="width:100%!important;height:180px!important;display:block;margin:auto;"></canvas>
-                <div id="gaugeLabel" class="position-absolute top-50 start-50 translate-middle fs-1 fw-bold" style="color:#234;">0%</div>
-                <div id="gaugeNivel" class="position-absolute start-50 translate-middle-x" style="top:72%;font-size:1.2rem;font-weight:600;">-</div>
+                <canvas id="gaugeConstructora" class="dashboard-dark-bg" style="width:100%!important;height:180px!important;display:block;margin:auto;"></canvas>
+                <div id="gaugeLabel" class="position-absolute top-50 start-50 translate-middle fs-1 fw-bold dashboard-card-text">0%</div>
+                <div id="gaugeNivel" class="position-absolute start-50 translate-middle-x dashboard-card-text" style="top:72%;font-size:1.2rem;font-weight:600;">-</div>
             </div>
             <div id="nombreConstructoraElegida" class="text-center mt-2 mb-1" style="font-size:1.08rem;font-weight:500;color:#16c7e5;letter-spacing:0.5px;line-height:1.2;background:transparent;"> </div>
         </div>
     </div>
     <!-- Casos cerrados por mes al centro -->
     <div class="col-lg-4">
-        <div class="card flex-fill w-100 h-100 d-flex flex-column justify-content-between" style="min-width:0;">
+    <div class="card flex-fill w-100 h-100 d-flex flex-column justify-content-between dashboard-dark-card">
             <div class="card-body d-flex flex-column justify-content-between h-100 p-3" style="padding:1rem!important;">
                 <h5 class="dashboard-title dashboard-h5 mb-2 text-start" style="padding-top:1.25rem;">Casos cerrados por mes</h5>
                 <canvas id="graficoCerradosMes" style="width:100% !important; min-width:0; height:180px !important; min-height:100px; display:block;" height="180"></canvas>
+<script>
+// Forzar color de texto blanco en modo dark para el gráfico de Casos cerrados por mes
+document.addEventListener('DOMContentLoaded', function() {
+    if (document.body.classList.contains('theme-dark')) {
+        if (window.graficoCerradosMesChart) {
+            graficoCerradosMesChart.options.scales.x.ticks.color = '#f3f4f6';
+            graficoCerradosMesChart.options.scales.y.ticks.color = '#f3f4f6';
+            graficoCerradosMesChart.options.plugins.legend.labels.color = '#f3f4f6';
+            graficoCerradosMesChart.options.plugins.title.color = '#f3f4f6';
+            graficoCerradosMesChart.update();
+        }
+    }
+});
+</script>
             </div>
         </div>
     </div>
     <!-- Avance por estado a la derecha -->
     <div class="col-lg-4">
-    <div class="avance-panel flex-fill w-100 d-flex flex-column align-items-center justify-content-center" style="background:var(--dashboard-card-bg);border-radius:var(--dashboard-radius);box-shadow:var(--dashboard-shadow);border:1.5px solid var(--dashboard-border);min-height:340px;padding:1.5rem 0 1.2rem 0;color:var(--dashboard-title);">
-            <h5 class="dashboard-title dashboard-h5 w-100 text-center" style="padding-top:0.5rem;margin-bottom:1.2rem;">Avance por estado</h5>
+    <div class="avance-panel flex-fill w-100 d-flex flex-column align-items-center justify-content-center dashboard-dark-card" style="min-height:340px;padding:1.5rem 0 1.2rem 0;">
+            <h5 class="dashboard-title dashboard-h5 w-100 text-center dashboard-card-title" style="padding-top:0.5rem;margin-bottom:1.2rem;">Avance por estado</h5>
+            <div class="d-flex flex-row align-items-center justify-content-center w-100 dashboard-card-text" style="flex:1;min-height:200px;min-width:220px;gap:2.5rem;">
             <div class="d-flex flex-row align-items-center justify-content-center w-100" style="flex:1;min-height:200px;min-width:220px;gap:2.5rem;">
                 <!-- Columna izquierda: Cerradas -->
                 <div class="text-end d-flex flex-column align-items-end justify-content-center" style="min-width:120px;color:var(--dashboard-title);">
-                    <div class="avance-percentage" style="font-size:1.35rem;font-weight:700;">{{ porc_cerradas|default:"0" }}%</div>
-                    <div class="avance-description" style="font-size:1rem;">Observaciones cerradas</div>
-                    <div class="small">Llevas <strong>{{ obs_cerradas|default:"0" }} de {{ obs_total|default:"0" }}</strong></div>
-                    <div class="small text-success">Observaciones del plan</div>
+                    <div class="avance-percentage dashboard-card-text" style="font-size:1.35rem;font-weight:700;">{{ porc_cerradas|default:"0" }}%</div>
+                    <div class="avance-description dashboard-card-text" style="font-size:1rem;">Observaciones cerradas</div>
+                    <div class="small dashboard-card-text">Llevas <strong>{{ obs_cerradas|default:"0" }} de {{ obs_total|default:"0" }}</strong></div>
+                    <div class="small text-success dashboard-card-text">Observaciones del plan</div>
                 </div>
                 <!-- Centro: Círculo -->
                 <div style="display:flex;align-items:center;justify-content:center;background:transparent;">
@@ -534,10 +555,10 @@
                 </div>
                 <!-- Columna derecha: Abiertas -->
                 <div class="text-start d-flex flex-column align-items-start justify-content-center" style="min-width:120px;color:var(--dashboard-title);">
-                    <div class="avance-percentage" style="font-size:1.35rem;font-weight:700;">{{ porc_abiertas|default:"0" }}%</div>
-                    <div class="avance-description" style="font-size:1rem;">Observaciones abiertas</div>
-                    <div class="small">Llevas <strong>{{ obs_abiertas|default:"0" }} de {{ obs_total|default:"0" }}</strong></div>
-                    <div class="small text-warning">Observaciones pendientes</div>
+                    <div class="avance-percentage dashboard-card-text" style="font-size:1.35rem;font-weight:700;">{{ porc_abiertas|default:"0" }}%</div>
+                    <div class="avance-description dashboard-card-text" style="font-size:1rem;">Observaciones abiertas</div>
+                    <div class="small dashboard-card-text">Llevas <strong>{{ obs_abiertas|default:"0" }} de {{ obs_total|default:"0" }}</strong></div>
+                    <div class="small text-warning dashboard-card-text">Observaciones pendientes</div>
                 </div>
             </div>
         </div>
@@ -637,40 +658,32 @@
 
 <!-- Métricas por Región (al lado de Casos cerrados por mes, color claro) -->
 <div class="col-lg-4 d-flex">
-    {% if request.GET.region and regiones %}
-        {% for reg in regiones %}
-            {% if reg.id|stringformat:'s' == request.GET.region %}
-                <div class="mb-2 text-center">
-                    <span class="badge bg-primary fs-6 px-3 py-2">Región: {{ reg.nombre }}</span>
-                </div>
-            {% endif %}
-        {% endfor %}
-    {% endif %}
-    <div class="card flex-fill w-100 h-100 d-flex flex-column justify-content-between" style="min-width:0;">
-        <div class="card-header bg-light text-dark">
+    {# Eliminado mensaje de región seleccionada para evitar mensajes de debug o alertas innecesarias #}
+    <div class="card flex-fill w-100 h-100 d-flex flex-column justify-content-between dashboard-dark-card">
+        <div class="card-header dashboard-dark-card">
             <strong>Métricas por Región</strong>
         </div>
         <div class="table-responsive">
-            <table class="table table-light table-striped align-middle mb-0">
-                <thead>
+            <table class="table align-middle mb-0 dashboard-dark-table">
+                <thead class="table-light">
                     <tr>
-                        <th>Región</th>
-                        <th>Viviendas por Región</th>
-                        <th>Entregadas</th>
-                        <th>Casos Postventa</th>
-                        <th>Tiempo Promedio</th>
-                        <th>Estado</th>
+                        <th scope="col">Región</th>
+                        <th scope="col">Viviendas por Región</th>
+                        <th scope="col">Entregadas</th>
+                        <th scope="col">Casos Postventa</th>
+                        <th scope="col">Tiempo Promedio</th>
+                        <th scope="col">Estado</th>
                     </tr>
                 </thead>
                 <tbody>
                     {% for reg in metrics_region %}
                     <tr{% if forloop.counter0|divisibleby:2 %} class="table-active"{% endif %}>
-                        <td><strong>{{ reg.region }}</strong></td>
-                        <td>{{ reg.total_viviendas }}</td>
-                        <td>{{ reg.entregadas }}</td>
-                        <td>{{ reg.casos_postventa }}</td>
-                        <td>{% if reg.promedio_dias != '-' %}{{ reg.promedio_dias }} días{% else %}-{% endif %}</td>
-                        <td>
+                        <td data-label="Región"><strong>{{ reg.region }}</strong></td>
+                        <td data-label="Viviendas por Región">{{ reg.total_viviendas }}</td>
+                        <td data-label="Entregadas">{{ reg.entregadas }}</td>
+                        <td data-label="Casos Postventa">{{ reg.casos_postventa }}</td>
+                        <td data-label="Tiempo Promedio">{% if reg.promedio_dias != '-' %}{{ reg.promedio_dias }} días{% else %}-{% endif %}</td>
+                        <td data-label="Estado">
                             {% if reg.estado == 'Crítico' %}
                                 <span class="badge bg-danger"><i class="bi bi-exclamation-triangle"></i> Crítico</span>
                             {% elif reg.estado == 'Regular' %}
@@ -683,6 +696,39 @@
                     {% endfor %}
                 </tbody>
             </table>
+            <style>
+            @media (max-width: 600px) {
+              .table-responsive table thead {
+                display: none;
+              }
+              .table-responsive table tr {
+                display: block;
+                margin-bottom: 1rem;
+                border-radius: 8px;
+                box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+                background: #fff;
+              }
+              [data-theme="dark"] .table-responsive table tr {
+                background: #232a36;
+              }
+              .table-responsive table td {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                padding: 0.75rem 1rem;
+                border: none;
+                border-bottom: 1px solid #e5e7eb;
+                font-size: 1rem;
+              }
+              .table-responsive table td:before {
+                content: attr(data-label) ": ";
+                font-weight: 600;
+                color: #2563eb;
+                flex-shrink: 0;
+                margin-right: 0.5rem;
+              }
+            }
+            </style>
         </div>
     </div>
 </div>
@@ -770,35 +816,7 @@
 
 
 
-            <!-- Vista de tarjetas para móvil -->
-            <div class="d-md-none">
-                {% for obs in ultimas_observaciones %}
-                <div class="obs-card-mobile mb-3">
-                    <div class="d-flex justify-content-between align-items-start mb-2">
-                        <div>
-                            <strong class="text-primary">{{ obs.proyecto.codigo }}</strong>
-                            <span class="text-muted ms-2">Viv. {{ obs.vivienda.codigo }}</span>
-                        </div>
-                        <span class="badge badge-{{ obs.estado.nombre|lower }}" style="{% if obs.estado.nombre == 'En Proceso' %}background: linear-gradient(45deg, #f97316, #ea580c) !important; color: #fff !important; border: 2px solid #ea580c !important; font-weight: 700 !important;{% endif %}">{{ obs.estado.nombre }}</span>
-                    </div>
-                    <div class="mb-2">
-                        <i class="bi bi-tools text-muted"></i>
-                        <strong>{{ obs.elemento }}</strong>
-                    </div>
-                    <div class="d-flex justify-content-between align-items-center">
-                        <small class="text-muted">
-                            <i class="bi bi-calendar3"></i> {{ obs.fecha_creacion|date:"d/m/Y" }}
-                        </small>
-                        <a href="{% url 'incidencias:detalle_observacion' obs.pk %}" class="btn btn-sm btn-techo-primary"
-                           style="background: linear-gradient(45deg, #2563eb, #1e40af) !important; color: white !important; border: none !important; box-shadow: 0 2px 8px rgba(37, 99, 235, 0.3) !important; font-weight: 600 !important; text-decoration: none !important; display: inline-flex !important; align-items: center !important; justify-content: center !important; gap: 0.5rem !important; transition: all 0.3s ease !important;">
-                            Ver detalle
-                        </a>
-                    </div>
-                </div>
-                {% empty %}
-                <div class="text-center text-muted py-4">No hay observaciones recientes</div>
-                {% endfor %}
-            </div>
+            
 
            
         </div>

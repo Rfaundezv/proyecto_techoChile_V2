@@ -26,6 +26,7 @@ class TipologiaVivienda(models.Model):
         ordering = ['codigo']
 
 class Proyecto(models.Model):
+    # Eliminado campo 'estado' (el estado se gestiona por observaciones o viviendas)
     id = models.AutoField(primary_key=True)
     codigo = models.CharField(max_length=20, unique=True, help_text="Código único del proyecto (ej: LC1, COP8)")
     siglas = models.CharField(max_length=10, help_text="Siglas del proyecto")

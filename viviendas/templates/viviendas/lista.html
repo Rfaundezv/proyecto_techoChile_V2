@@ -1,28 +1,63 @@
 {% extends 'base.html' %}
 {% block content %}
 <div class="container mt-4">
-    <h2>Listado de Viviendas</h2>
-    <table class="table table-striped">
-        <thead>
-            <tr>
-                <th>Código</th>
-                <th>Proyecto</th>
-                <th>Dirección</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for vivienda in viviendas %}
-            <tr>
-                <td>{{ vivienda.codigo }}</td>
-                <td>{{ vivienda.proyecto.nombre }}</td>
-                <td>{{ vivienda.direccion }}</td>
-            </tr>
-            {% empty %}
-            <tr>
-                <td colspan="3" class="text-center">No hay viviendas registradas.</td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+    <h2 class="mb-4">Listado de Viviendas</h2>
+    <div class="table-responsive">
+        <table class="table table-striped align-middle">
+            <thead class="table-light">
+                <tr>
+                    <th scope="col">Código</th>
+                    <th scope="col">Proyecto</th>
+                    <th scope="col">Dirección</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for vivienda in viviendas %}
+                <tr>
+                    <td data-label="Código">{{ vivienda.codigo }}</td>
+                    <td data-label="Proyecto">{{ vivienda.proyecto.nombre }}</td>
+                    <td data-label="Dirección">{{ vivienda.direccion }}</td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="3" class="text-center">No hay viviendas registradas.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
 </div>
+<style>
+@media (max-width: 600px) {
+  .table-responsive table thead {
+    display: none;
+  }
+  .table-responsive table tr {
+    display: block;
+    margin-bottom: 1rem;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+    background: #fff;
+  }
+  [data-theme="dark"] .table-responsive table tr {
+    background: #232a36;
+  }
+  .table-responsive table td {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.75rem 1rem;
+    border: none;
+    border-bottom: 1px solid #e5e7eb;
+    font-size: 1rem;
+  }
+  .table-responsive table td:before {
+    content: attr(data-label) ": ";
+    font-weight: 600;
+    color: #2563eb;
+    flex-shrink: 0;
+    margin-right: 0.5rem;
+  }
+}
+</style>
 {% endblock %}

@@ -131,11 +131,18 @@
                     </li>
                     {% endif %}
                     
+
                     {% if not es_familia %}
                     <li class="nav-item">
-                        <a class="nav-link {% if 'reportes' in request.resolver_match.namespace %}active{% endif %}" 
+                        <a class="nav-link {% if 'reportes' in request.resolver_match.namespace and request.resolver_match.url_name == 'index' %}active{% endif %}" 
                            href="{% url 'reportes:index' %}">
-                            <i class="bi bi-file-earmark-text"></i> Reportes
+                            <i class="bi bi-file-earmark-text"></i> Documentación
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link {% if request.resolver_match.url_name == 'listar_reportes_generados' %}active{% endif %}"
+                           href="{% url 'reportes:listar_reportes_generados' %}">
+                            <i class="bi bi-file-earmark-pdf"></i> Reportes PDF generados
                         </a>
                     </li>
                     {% endif %}

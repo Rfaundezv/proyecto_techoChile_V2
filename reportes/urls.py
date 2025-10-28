@@ -1,3 +1,4 @@
+ 
 from django.urls import path
 from . import views
 from . import views_filtrar_observaciones
@@ -35,4 +36,8 @@ urlpatterns = [
         path('ajax/buscar-beneficiario/', views.buscar_beneficiario_ajax, name='buscar_beneficiario_ajax'),
         path('api/viviendas-por-proyecto/', views.get_viviendas_by_proyecto, name='viviendas_por_proyecto'),
         path('api/datos-vivienda/', views.get_vivienda_data, name='datos_vivienda'),
-]
+
+        # Reportes PDF generados
+        path('reportes-generados/', views.listar_reportes_generados, name='listar_reportes_generados'),
+        path('reportes-generados/<int:reporte_id>/descargar/', views.descargar_reporte_generado, name='descargar_reporte_generado'),
+        ]
