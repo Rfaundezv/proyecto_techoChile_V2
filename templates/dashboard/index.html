@@ -1,5 +1,6 @@
 {% extends 'base.html' %}
 {% load static %}
+{% load region_filters %}
 
 {% block title %}Mi Dashboard - TECHO CHILE{% endblock %}
 
@@ -221,7 +222,7 @@
         <div class="col d-flex align-items-end justify-content-end gap-2 flex-nowrap">
             <button type="submit" class="btn btn-primary btn-sm" style="min-width: 110px;"><i class="bi bi-funnel"></i> Filtrar</button>
             <button type="button" class="btn btn-outline-secondary btn-sm" style="min-width: 110px;" onclick="window.print()"><i class="bi bi-printer"></i> Imprimir</button>
-            <a id="btnDescargarPDF" class="btn btn-outline-danger btn-sm" style="min-width: 110px;" href="#" target="_blank"><i class="bi bi-file-earmark-pdf"></i> PDF</a>
+            <a id="btnDescargarPDF" class="btn btn-outline-danger btn-sm" style="min-width: 110px;" href="#" target="_blank"><i class="bi bi-file-earmark-pdf"></i> Gerenar Reporte PDF</a>
             <a id="btnDescargarExcel" class="btn btn-outline-success btn-sm" style="min-width: 110px;" href="#" target="_blank"><i class="bi bi-file-earmark-excel"></i> Excel</a>
         </div>
     </div>
@@ -494,13 +495,7 @@ document.addEventListener('DOMContentLoaded', updateDashboardLinks);
     <div class="card shadow-lg p-3 p-md-4 w-100 dashboard-dark-card">
             <div class="d-flex flex-column flex-md-row justify-content-between align-items-center mb-2 gap-2 dashboard-card-header">
                 <h5 class="mb-0 text-start w-100 dashboard-card-title">Cumplimiento de Plazos</h5>
-                <div class="d-flex flex-row align-items-center justify-content-between w-100" style="gap:1rem; padding-top:0.75rem;">
-                    <select id="selectConstructora" class="form-select form-select-sm" style="min-width:180px; height:2.3rem; border:2px solid #16c7e5; font-weight:600;">
-                        {% for nombre in cumplimiento_constructoras.keys %}
-                            <option value="{{ nombre }}">{{ nombre }}</option>
-                        {% endfor %}
-                    </select>
-                </div>
+                <!-- Eliminado select de constructora, solo se muestra el gauge y la región/global -->
                 <hr style="margin:0.5rem 0 0.7rem 0; border-top:2px solid #e0e7ef;"> 
             </div>
             <div class="gauge-responsive-container position-relative mx-auto d-flex flex-column align-items-center justify-content-center" style="width:100%;max-width:320px;min-width:180px;aspect-ratio:2.2/1;padding-bottom:0.5rem;background:var(--dashboard-card-bg);border-radius:var(--dashboard-radius);">
@@ -508,7 +503,13 @@ document.addEventListener('DOMContentLoaded', updateDashboardLinks);
                 <div id="gaugeLabel" class="position-absolute top-50 start-50 translate-middle fs-1 fw-bold dashboard-card-text">0%</div>
                 <div id="gaugeNivel" class="position-absolute start-50 translate-middle-x dashboard-card-text" style="top:72%;font-size:1.2rem;font-weight:600;">-</div>
             </div>
-            <div id="nombreConstructoraElegida" class="text-center mt-2 mb-1" style="font-size:1.08rem;font-weight:500;color:#16c7e5;letter-spacing:0.5px;line-height:1.2;background:transparent;"> </div>
+            <div class="text-center mt-2 mb-1" style="font-size:1.08rem;font-weight:500;color:#38bdf8;letter-spacing:0.5px;line-height:1.2;background:transparent;">
+                {% if request.GET.region %}
+                    {{ regiones|get_region_nombre:request.GET.region }}
+                {% else %}
+                    global
+                {% endif %}
+            </div>
         </div>
     </div>
     <!-- Casos cerrados por mes al centro -->
@@ -574,81 +575,67 @@ document.addEventListener('DOMContentLoaded', function() {
             // Datos de cumplimiento por constructora desde Django
             const cumplimientoData = {{ cumplimiento_constructoras|safe }};
             let currentValue = Object.values(cumplimientoData)[0] || 0;
-            let currentLabel = Object.keys(cumplimientoData)[0] || '';
 
             // Gauge exacto como la foto: fondo con bandas gruesas, indicador celeste encima
-                const canvas = document.getElementById('gaugeConstructora');
-                // Ajustar tamaño dinámico
-                function resizeGaugeCanvas() {
-                    const parent = canvas.parentElement;
-                    canvas.width = parent.offsetWidth;
-                    canvas.height = parent.offsetWidth / 2.2;
-                }
-                resizeGaugeCanvas();
-                window.addEventListener('resize', resizeGaugeCanvas);
-                const ctxGauge = canvas.getContext('2d');
-                let gaugeChart = new Chart(ctxGauge, {
-                    type: 'doughnut',
-                    data: {
-                        datasets: [
-                            {
-                                // Fondo bandas
-                                data: [60, 25, 15],
-                                backgroundColor: ['#ff4747', '#ffb31a', '#10b981'],
-                                borderWidth: 6,
-                                cutout: '65%',
-                                circumference: 180,
-                                rotation: 270,
-                            },
-                            {
-                                // Indicador valor (línea celeste)
-                                data: [currentValue, 100-currentValue],
-                                backgroundColor: ['#16c7e5', 'rgba(0,0,0,0)'],
-                                borderWidth: 8, // más grueso
-                                borderColor: ['#16c7e5', 'rgba(0,0,0,0)'],
-                                cutout: '78%',
-                                circumference: 180,
-                                rotation: 270,
-                            }
-                        ]
-                    },
-                    options: {
-                        responsive: false,
-                        plugins: {
-                            legend: { display: false },
-                            tooltip: { enabled: false }
-                        }
-                    }
-                });
-                // Actualizar gauge, label y nivel
-                function updateGauge(value) {
-                    gaugeChart.data.datasets[1].data = [value, 100-value];
-                    gaugeChart.update();
-                    document.getElementById('gaugeLabel').textContent = value + '%';
-                    // Etiqueta textual de nivel
-                    let nivel = '-';
-                    let color = '#222';
-                    if (value < 60) { nivel = 'Bajo'; color = '#ff4747'; }
-                    else if (value < 85) { nivel = 'Medio'; color = '#ffb31a'; }
-                    else { nivel = 'Alto'; color = '#10b981'; }
-                    let nivelDiv = document.getElementById('gaugeNivel');
-                    nivelDiv.textContent = nivel;
-                    nivelDiv.style.color = color;
-                }
-            // Cambiar constructora
-            const selectConstructora = document.getElementById('selectConstructora');
-            const nombreConstructoraElegida = document.getElementById('nombreConstructoraElegida');
-            function mostrarNombreConstructora(nombre) {
-                nombreConstructoraElegida.textContent = nombre ? nombre : '';
+            const canvas = document.getElementById('gaugeConstructora');
+            function resizeGaugeCanvas() {
+                const parent = canvas.parentElement;
+                canvas.width = parent.offsetWidth;
+                canvas.height = parent.offsetWidth / 2.2;
             }
-            selectConstructora.addEventListener('change', function() {
-                const val = cumplimientoData[this.value] || 0;
-                updateGauge(val);
-                mostrarNombreConstructora(this.value);
+            resizeGaugeCanvas();
+            window.addEventListener('resize', resizeGaugeCanvas);
+            const ctxGauge = canvas.getContext('2d');
+            let gaugeChart = new Chart(ctxGauge, {
+                type: 'doughnut',
+                data: {
+                    datasets: [
+                        {
+                            // Fondo bandas
+                            data: [60, 25, 15],
+                            backgroundColor: ['#ff4747', '#ffb31a', '#10b981'],
+                            borderWidth: 6,
+                            cutout: '65%',
+                            circumference: 180,
+                            rotation: 270,
+                        },
+                        {
+                            // Indicador valor (línea celeste)
+                            data: [currentValue, 100-currentValue],
+                            backgroundColor: ['#16c7e5', 'rgba(0,0,0,0)'],
+                            borderWidth: 8, // más grueso
+                            borderColor: ['#16c7e5', 'rgba(0,0,0,0)'],
+                            cutout: '78%',
+                            circumference: 180,
+                            rotation: 270,
+                        }
+                    ]
+                },
+                options: {
+                    responsive: false,
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: { enabled: false }
+                    }
+                }
             });
+            // Actualizar gauge, label y nivel
+            function updateGauge(value) {
+                gaugeChart.data.datasets[1].data = [value, 100-value];
+                gaugeChart.update();
+                document.getElementById('gaugeLabel').textContent = value + '%';
+                // Etiqueta textual de nivel
+                let nivel = '-';
+                let color = '#222';
+                if (value < 60) { nivel = 'Bajo'; color = '#ff4747'; }
+                else if (value < 85) { nivel = 'Medio'; color = '#ffb31a'; }
+                else { nivel = 'Alto'; color = '#10b981'; }
+                let nivelDiv = document.getElementById('gaugeNivel');
+                nivelDiv.textContent = nivel;
+                nivelDiv.style.color = color;
+            }
             // Inicial
             updateGauge(currentValue);
-            mostrarNombreConstructora(currentLabel);
         </script>
   
 </div>
