@@ -1,7 +1,11 @@
 {% extends 'base.html' %}
 {% block content %}
 <div class="container mt-4">
-    <h2 class="mb-4">Listado de Viviendas</h2>
+  <h2 class="mb-4">Listado de Viviendas</h2>
+  <div class="stat-item mb-3">
+    <span class="stat-label">Viviendas activas:</span>
+    <span class="stat-value">{{ total_viviendas }}</span>
+  </div>
     <div class="table-responsive">
         <table class="table table-striped align-middle">
             <thead class="table-light">

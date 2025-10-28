@@ -64,9 +64,9 @@ def global_stats_context(request):
                 
                 # Viviendas de esos proyectos
                 viviendas_constructora = Vivienda.objects.filter(
-                    proyecto__in=proyectos_constructora
+                    proyecto__in=proyectos_constructora,
+                    activa=True
                 )
-                
                 return {
                     'total_proyectos': proyectos_constructora.count(),
                     'viviendas_total': viviendas_constructora.count(),
@@ -84,9 +84,8 @@ def global_stats_context(request):
         
         # **PARA OTROS ROLES**: Estadísticas globales
         total_proyectos = Proyecto.objects.count()
-        viviendas_total = Vivienda.objects.count()
+        viviendas_total = Vivienda.objects.filter(activa=True).count()
         obs_total = Observacion.objects.count()
-        
         return {
             'total_proyectos': total_proyectos,
             'viviendas_total': viviendas_total,

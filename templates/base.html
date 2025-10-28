@@ -11,6 +11,66 @@
     <script src="{% static 'js/chart.js' %}"></script>
 </head>
 <body>
+    <!-- Botón minimalista de modo oscuro -->
+    <style>
+    #theme-toggle-main {
+        position: fixed;
+        top: 14px;
+        right: 14px;
+        z-index: 9999;
+        width: 36px;
+        height: 36px;
+        font-size: 1.35rem;
+        background: transparent;
+        border: none;
+        outline: none;
+        box-shadow: none;
+        color: #fff;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: background 0.2s, color 0.2s;
+        cursor: pointer;
+    }
+    #theme-toggle-main:hover {
+        background: rgba(0,0,0,0.10);
+        color: #ffd700;
+    }
+    </style>
+    <button id="theme-toggle-main" title="Alternar modo oscuro" aria-label="Alternar modo oscuro">🌙</button>
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const btn = document.getElementById('theme-toggle-main');
+        const html = document.documentElement;
+        const body = document.body;
+        // Leer tema guardado
+        const savedTheme = localStorage.getItem('theme') || 'light';
+        html.setAttribute('data-theme', savedTheme);
+        if (savedTheme === 'dark') {
+            body.classList.add('theme-dark');
+            if (btn) btn.innerHTML = '☀️';
+        } else {
+            body.classList.remove('theme-dark');
+            if (btn) btn.innerHTML = '🌙';
+        }
+        if (btn) {
+            btn.addEventListener('click', function() {
+                const currentTheme = html.getAttribute('data-theme') || 'light';
+                const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+                html.setAttribute('data-theme', newTheme);
+                if (newTheme === 'dark') {
+                    body.classList.add('theme-dark');
+                    btn.innerHTML = '☀️';
+                } else {
+                    body.classList.remove('theme-dark');
+                    btn.innerHTML = '🌙';
+                }
+                localStorage.setItem('theme', newTheme);
+            });
+        }
+    });
+    </script>
+  
     <!-- Header Principal -->
     {% if user.is_authenticated %}
     <header class="techo-header sticky-top">
@@ -38,7 +98,7 @@
                         {% else %}
                             <div class="stat-item">
                                 <span class="stat-label">Proyectos:</span>
-                                <span class="stat-value">{{ total_proyectos }}</span>
+                                <span class="stat-value">{{ total_proyectos|default:0  }}</span>
                             </div>
                             <div class="stat-item">
                                 <span class="stat-label">Observaciones:</span>
@@ -46,24 +106,16 @@
                             </div>
                             <div class="stat-item">
                                 <span class="stat-label">Viviendas:</span>
-                                <span class="stat-value">{{ viviendas_total }}</span>
+                                <span class="stat-value">{{ viviendas_total|default:0  }}</span>
                             </div>
                         {% endif %}
                     </div>
                     
-                    <!-- Toggle de tema oscuro/claro -->
-                    <button id="theme-toggle" class="btn btn-sm btn-outline-light flex-shrink-0" title="Cambiar tema" style="min-width: 40px;">
-                        🌙
-                    </button>
                 </div>
             </div>
         </div>
     </header>
     {% else %}
-    <!-- Toggle de tema para página de login -->
-    <button id="theme-toggle" class="theme-toggle" title="Cambiar tema">
-        🌙
-    </button>
     {% endif %}
 
     <!-- Navigation Tabs (solo visible después de login) -->

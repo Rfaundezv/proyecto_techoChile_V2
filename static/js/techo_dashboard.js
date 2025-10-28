@@ -17,22 +17,30 @@ function initializeThemeToggle() {
 
     // Aplicar tema guardado
     document.documentElement.setAttribute('data-theme', currentTheme);
+    if (currentTheme === 'dark') {
+        document.body.classList.add('theme-dark');
+    } else {
+        document.body.classList.remove('theme-dark');
+    }
     updateToggleIcon(currentTheme);
 
     if (themeToggle) {
+        // Unificar comportamiento con el botón de prueba
         themeToggle.addEventListener('click', function() {
-            const currentTheme = document.documentElement.getAttribute('data-theme');
+            const html = document.documentElement;
+            const body = document.body;
+            const currentTheme = html.getAttribute('data-theme') || 'light';
             const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
-
-            document.documentElement.setAttribute('data-theme', newTheme);
+            html.setAttribute('data-theme', newTheme);
+            if (newTheme === 'dark') {
+                body.classList.add('theme-dark');
+            } else {
+                body.classList.remove('theme-dark');
+            }
             localStorage.setItem('theme', newTheme);
             updateToggleIcon(newTheme);
-
-            // Animar transición
-            document.body.style.transition = 'all 0.3s ease';
-            setTimeout(() => {
-                document.body.style.transition = '';
-            }, 300);
+            themeToggle.innerHTML = newTheme === 'dark' ? '☀️' : '🌙';
+            themeToggle.title = newTheme === 'dark' ? 'Cambiar a modo claro' : 'Cambiar a modo oscuro';
         });
     }
 }

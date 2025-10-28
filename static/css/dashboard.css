@@ -1,24 +1,4 @@
-/* Forzar fondo y texto oscuros en tarjetas ejecutivas en modo dark */
-[data-theme="dark"] .dashboard-dark-card,
-[data-theme="dark"] .dashboard-card-header,
-[data-theme="dark"] .dashboard-card-title,
-[data-theme="dark"] .dashboard-card-text,
-[data-theme="dark"] .dashboard-dark-table,
-[data-theme="dark"] .chart-container {
-    background: #232a36 !important;
-    color: #f3f4f6 !important;
-    border-color: #374151 !important;
-}
-[data-theme="dark"] .dashboard-dark-table th,
-[data-theme="dark"] .dashboard-dark-table td {
-    background: #232a36 !important;
-    color: #f3f4f6 !important;
-    border-color: #374151 !important;
-}
-[data-theme="dark"] .dashboard-dark-table tr.table-active > * {
-    background: #1a202c !important;
-    color: #f3f4f6 !important;
-}
+
 
 /* Estilos específicos para las métricas del dashboard */
 .metric-card {
@@ -54,15 +34,8 @@
     background: var(--techo-light-blue, #dbeafe);
     color: var(--techo-dark, #1f2937);
 }
-[data-theme="dark"] .metric-card {
-    background: #232a36;
-    color: #f3f4f6;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.25);
-}
-[data-theme="dark"] .metric-card:hover {
-    background: #1a202c;
-    color: #fbbf24;
-}
+
+
 .chart-container {
     background: var(--dashboard-card-bg, #fff);
     border-radius: 12px;
@@ -70,9 +43,4 @@
     padding: 1.2rem 1.2rem 1rem 1.2rem;
     margin-bottom: 1.2rem;
     transition: background 0.3s, color 0.3s;
-}
-[data-theme="dark"] .chart-container {
-    background: #232a36;
-    color: #f3f4f6;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.25);
 }

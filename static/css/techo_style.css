@@ -1,3 +1,21 @@
+/* Forzar color de texto en el gráfico de Observaciones por Tipo */
+#graficoObservacionesTipo, #graficoObservacionesTipo * {
+    color: #1f2937 !important;
+    fill: #1f2937 !important;
+}
+[data-theme="dark"] #graficoObservacionesTipo, [data-theme="dark"] #graficoObservacionesTipo * {
+    color: #fafafa !important;
+    fill: #f9fafb !important;
+}
+/* Refuerzo: textos claros en observaciones modo oscuro */
+[data-theme="dark"] .obs-card-mobile,
+[data-theme="dark"] .obs-card-mobile *,
+[data-theme="dark"] .table-techo,
+[data-theme="dark"] .table-techo *,
+[data-theme="dark"] .table,
+[data-theme="dark"] .table * {
+    color: #f9fafb !important;
+}
 @media (max-width: 600px) {
     .header-stats {
         gap: 0.2rem;
@@ -311,7 +329,7 @@ body {
         font-size: 1.05rem;
     }
 }
-}
+
 
 .mobile-stat-label {
     font-weight: 500;
@@ -783,7 +801,7 @@ a .metric-card.info:hover .metric-label { color: rgba(255,255,255,0.9); }
     background: var(--techo-white);
     border-radius: 12px;
     overflow: hidden;
-    box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+    box-shadow: 0 4px 6px rgba(163, 143, 143, 0.05);
     border: none;
 }
 

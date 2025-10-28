@@ -14,6 +14,8 @@
 
 {% block content %}
 
+
+
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 
@@ -735,6 +737,21 @@ document.addEventListener('DOMContentLoaded', function() {
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
     const ctx = document.getElementById('graficoObservacionesTipo').getContext('2d');
+    function getAxisColor() {
+        // Intenta usar la variable CSS, si no, fallback por tema
+        const theme = document.documentElement.getAttribute('data-theme');
+        if (theme === 'dark') return '#f8fafc';
+        if (theme === 'light') return '#222';
+        // fallback
+        return getComputedStyle(document.body).getPropertyValue('--bs-body-color') || '#222';
+    }
+
+    function getGridColor() {
+        const theme = document.documentElement.getAttribute('data-theme');
+        if (theme === 'dark') return 'rgba(255,255,255,0.08)';
+        if (theme === 'light') return 'rgba(0,0,0,0.08)';
+        return 'rgba(0,0,0,0.08)';
+    }
     const chart = new Chart(ctx, {
         type: 'bar',
         data: {
@@ -759,17 +776,52 @@ document.addEventListener('DOMContentLoaded', function() {
             scales: {
                 x: {
                     ticks: {
-                        color: getComputedStyle(document.body).getPropertyValue('--bs-body-color') || (window.matchMedia('(prefers-color-scheme: dark)').matches ? '#fff' : '#222')
+                        color: getAxisColor(),
+                        font: { weight: 'bold', size: 14 }
+                    },
+                    grid: {
+                        color: getGridColor(),
+                        borderColor: getGridColor()
                     }
                 },
                 y: {
                     ticks: {
-                        color: getComputedStyle(document.body).getPropertyValue('--bs-body-color') || (window.matchMedia('(prefers-color-scheme: dark)').matches ? '#fff' : '#222')
+                        color: getAxisColor(),
+                        font: { weight: 'bold', size: 14 }
+                    },
+                    grid: {
+                        color: getGridColor(),
+                        borderColor: getGridColor()
                     }
                 }
             }
         }
     });
+
+    // Actualiza el color de los ejes del gráfico cuando cambia el tema
+    function updateChartAxisColors() {
+        const color = getAxisColor();
+        const gridColor = getGridColor();
+        chart.options.scales.x.ticks.color = color;
+        chart.options.scales.y.ticks.color = color;
+        chart.options.scales.x.ticks.font = { weight: 'bold', size: 14 };
+        chart.options.scales.y.ticks.font = { weight: 'bold', size: 14 };
+        chart.options.scales.x.grid.color = gridColor;
+        chart.options.scales.x.grid.borderColor = gridColor;
+        chart.options.scales.y.grid.color = gridColor;
+        chart.options.scales.y.grid.borderColor = gridColor;
+        chart.update();
+    }
+
+    // Observa cambios en el atributo data-theme del html
+    const themeObserver = new MutationObserver(function(mutations) {
+        mutations.forEach(function(mutation) {
+            if (mutation.type === 'attributes' && mutation.attributeName === 'data-theme') {
+                updateChartAxisColors();
+            }
+        });
+    });
+    themeObserver.observe(document.documentElement, { attributes: true });
 
     // Gráfico de casos cerrados por mes (tipo línea)
     const ctxCerrados = document.getElementById('graficoCerradosMes').getContext('2d');
@@ -799,18 +851,53 @@ document.addEventListener('DOMContentLoaded', function() {
             scales: {
                 x: {
                     ticks: {
-                        color: getComputedStyle(document.body).getPropertyValue('--bs-body-color') || (window.matchMedia('(prefers-color-scheme: dark)').matches ? '#fff' : '#222')
+                        color: getAxisColor(),
+                        font: { weight: 'bold', size: 14 }
+                    },
+                    grid: {
+                        color: getGridColor(),
+                        borderColor: getGridColor()
                     }
                 },
                 y: {
                     beginAtZero: true,
                     ticks: {
-                        color: getComputedStyle(document.body).getPropertyValue('--bs-body-color') || (window.matchMedia('(prefers-color-scheme: dark)').matches ? '#fff' : '#222')
+                        color: getAxisColor(),
+                        font: { weight: 'bold', size: 14 }
+                    },
+                    grid: {
+                        color: getGridColor(),
+                        borderColor: getGridColor()
                     }
                 }
             }
         }
     });
+
+    // Actualiza el color de los ejes del gráfico de cerrados cuando cambia el tema
+    function updateChartCerradosAxisColors() {
+        const color = getAxisColor();
+        const gridColor = getGridColor();
+        chartCerrados.options.scales.x.ticks.color = color;
+        chartCerrados.options.scales.y.ticks.color = color;
+        chartCerrados.options.scales.x.ticks.font = { weight: 'bold', size: 14 };
+        chartCerrados.options.scales.y.ticks.font = { weight: 'bold', size: 14 };
+        chartCerrados.options.scales.x.grid.color = gridColor;
+        chartCerrados.options.scales.x.grid.borderColor = gridColor;
+        chartCerrados.options.scales.y.grid.color = gridColor;
+        chartCerrados.options.scales.y.grid.borderColor = gridColor;
+        chartCerrados.update();
+    }
+
+    // Observa cambios en el atributo data-theme del html para el gráfico de cerrados
+    const themeObserverCerrados = new MutationObserver(function(mutations) {
+        mutations.forEach(function(mutation) {
+            if (mutation.type === 'attributes' && mutation.attributeName === 'data-theme') {
+                updateChartCerradosAxisColors();
+            }
+        });
+    });
+    themeObserverCerrados.observe(document.documentElement, { attributes: true });
 </script>
 
 
