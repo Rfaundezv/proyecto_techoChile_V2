@@ -1,3 +1,80 @@
+@media print {
+    /* ...existing reglas... */
+    /* Forzar que las métricas se apilen en una columna y no se corten */
+    .row, .row.g-2, .row.g-3, .row.g-4 {
+        display: block !important;
+    }
+    .col-6, .col-md-3, .col-md-2, .col-lg-3, .col-xl-6, .col-xl-4, .col-auto {
+        display: block !important;
+        width: 100% !important;
+        max-width: 100% !important;
+        float: none !important;
+        margin: 0 0 12px 0 !important;
+    }
+    .metric-card {
+        margin-bottom: 12px !important;
+        page-break-inside: avoid !important;
+    }
+}
+/* --------- IMPRESIÓN --------- */
+@media print {
+    body, html {
+        background: #fff !important;
+        color: #000 !important;
+    }
+    .techo-header, .navbar, .sidebar, .footer, #theme-toggle-main {
+        display: none !important;
+    }
+    .container, .container-fluid, .row, .col, .col-12, .col-md-3, .col-md-2, .col-md-6, .col-xl-6, .col-xl-4, .col-lg-3, .col-auto, .chart-container, .metric-card {
+        float: none !important;
+        width: 100% !important;
+        max-width: 100% !important;
+        box-shadow: none !important;
+        border-radius: 0 !important;
+        background: #fff !important;
+        color: #000 !important;
+        page-break-inside: avoid !important;
+    }
+    .dashboard-title, .dashboard-h2, .dashboard-h3, .dashboard-h4, .dashboard-h5, .dashboard-h6 {
+        color: #000 !important;
+        background: none !important;
+        box-shadow: none !important;
+        text-shadow: none !important;
+        border: none !important;
+        padding: 0 !important;
+    }
+    .btn, .btn-sm, .btn-outline-danger, .btn-outline-success, .btn-outline-secondary, .btn-primary {
+        display: none !important;
+    }
+    .form-label, .form-control, select, input[type="date"] {
+        color: #000 !important;
+        background: #fff !important;
+        border: 1px solid #ccc !important;
+        box-shadow: none !important;
+    }
+    .shadow-sm, .rounded {
+        box-shadow: none !important;
+        border-radius: 0 !important;
+    }
+    .mb-4, .mb-3, .mb-2, .mb-1, .mt-2, .mt-3, .mt-4, .mt-5, .mt-12 {
+        margin: 0 !important;
+    }
+    .g-2, .g-3, .g-4, .gap-2, .gap-3, .gap-4 {
+        gap: 0 !important;
+    }
+    .d-none, .d-print-none {
+        display: none !important;
+    }
+    .d-flex, .flex-wrap, .align-items-end, .justify-content-end, .align-items-center, .justify-content-between {
+        display: block !important;
+        flex-wrap: unset !important;
+        align-items: unset !important;
+        justify-content: unset !important;
+    }
+    /* Asegura que los gráficos canvas se impriman como imágenes */
+    canvas { display: none !important; }
+    img, .img-grafico { display: block !important; max-width: 100% !important; height: auto !important; }
+}
 
 
 /* Estilos específicos para las métricas del dashboard */

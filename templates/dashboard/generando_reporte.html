@@ -6,8 +6,25 @@
     <h3 class="mb-3">Generando reporte PDF</h3>
     <p>Por favor espera unos segundos mientras se genera el reporte.<br>Serás redirigido automáticamente cuando esté listo.</p>
 </div>
+<style>
+.toast-pdf {
+  position: fixed;
+  bottom: 30px;
+  right: 30px;
+  background: #1976d2;
+  color: #fff;
+  padding: 1rem 1.5rem;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+  font-size: 1.1rem;
+  z-index: 9999;
+  display: none;
+}
+.toast-pdf.show { display: block; animation: fadein 0.5s; }
+@keyframes fadein { from { opacity: 0; } to { opacity: 1; } }
+</style>
+<div id="toastPDF" class="toast-pdf">¡El reporte PDF está listo! Redirigiendo...</div>
 <script>
-// Extrae los parámetros de la URL
 function getQueryParams() {
     const params = {};
     window.location.search.replace(/[?&]+([^=&]+)=([^&]*)/gi, function(m,key,value) {
@@ -15,18 +32,21 @@ function getQueryParams() {
     });
     return params;
 }
-// Construye la URL del PDF con los mismos parámetros
 function buildPDFUrl() {
     const params = window.location.search;
     return '/dashboard/reporte-pdf/' + params;
 }
-// Intenta cargar el PDF cada 2 segundos
+function showToastAndRedirect(url) {
+    const toast = document.getElementById('toastPDF');
+    toast.classList.add('show');
+    setTimeout(() => { window.location.href = url; }, 1800);
+}
 function pollPDF() {
     const url = buildPDFUrl();
     fetch(url, { method: 'HEAD' })
         .then(resp => {
             if (resp.ok && resp.headers.get('content-type') === 'application/pdf') {
-                window.location.href = url;
+                showToastAndRedirect(url);
             } else {
                 setTimeout(pollPDF, 2000);
             }
