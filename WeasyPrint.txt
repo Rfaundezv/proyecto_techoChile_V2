@@ -1,21 +1,26 @@
-ara usar WeasyPrint en Windows, necesitas instalar las librerías externas requeridas (GTK, Cairo, Pango, GDK-PixBuf).
-Sin ellas, WeasyPrint no funcionará y dará el error de "cannot load library 'libgobject-2.0-0'".
+Generación de PDFs con xhtml2pdf
+==================================
 
-Pasos para instalar WeasyPrint correctamente en Windows:
-Descarga e instala GTK3:
+El sistema ahora usa xhtml2pdf en lugar de WeasyPrint para generar reportes PDF.
+xhtml2pdf es 100% compatible con Windows y no requiere dependencias externas.
 
-Ve a: https://github.com/tschoonj/GTK-for-Windows-Runtime-Environment-Installer/releases
-Descarga el instalador más reciente (gtk3-runtime-...-win64.exe).
-Instala y toma nota de la ruta (ejemplo: C:\Program Files\GTK3-Runtime Win64\bin).
-Agrega GTK3 al PATH:
+Instalación:
+-----------
+pip install xhtml2pdf
 
-Panel de Control → Sistema → Configuración avanzada → Variables de entorno.
-Edita la variable Path y agrega la ruta del directorio bin de GTK3.
-Reinicia tu terminal.
+Ventajas de xhtml2pdf:
+----------------------
+1. Funciona en Windows sin dependencias externas
+2. No requiere GTK, Cairo o librerías nativas
+3. Instalación simple con pip
+4. Compatible con HTML y CSS básico
+5. Genera PDFs de calidad profesional
 
-Verifica la instalación:
+Uso en el proyecto:
+-------------------
+- Dashboard PDF: core/views_dashboard_pdf.py
+- Actas de recepción: reportes/views.py
+- Fichas postventa: ficha_postventa/views.py
 
-Ejecuta tu proyecto y prueba la generación de PDF con WeasyPrint.
-
-# En lugar de python manage.py runserver, usa:
-python manage.py livereload
+Todos los reportes mantienen el mismo formato visual pero ahora se generan
+con xhtml2pdf para compatibilidad total con Windows.

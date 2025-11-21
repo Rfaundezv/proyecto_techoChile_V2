@@ -14,9 +14,8 @@ from .forms import FichaPostventaForm, FiltroFichasForm, ArchivoFichaForm, Busqu
 from proyectos.models import Vivienda, Proyecto
 from core.decorators import rol_requerido
 from core.models import Usuario
-from weasyprint import HTML
-
 import json
+from io import BytesIO
 
 
 @login_required
@@ -334,14 +333,22 @@ def subir_archivo(request, ficha_pk):
 @require_http_methods(["GET"])
 def generar_pdf(request, pk):
     """
-    Generar PDF de la ficha de postventa usando WeasyPrint
+    Generar PDF de la ficha de postventa usando xhtml2pdf
     """
     ficha = get_object_or_404(FichaPostventa, pk=pk, activa=True)
     # Renderizar el template HTML para PDF
     html_string = render_to_string('ficha_postventa/pdf_template.html', {'ficha': ficha})
-    # Generar PDF
-    html = HTML(string=html_string, base_url=request.build_absolute_uri(request.path))
-    pdf_file = html.write_pdf()
+    # Generar PDF con xhtml2pdf
+    from xhtml2pdf import pisa
+    pdf_buffer = BytesIO()
+    pisa_status = pisa.CreatePDF(html_string, dest=pdf_buffer)
+    
+    if pisa_status.err:
+        return HttpResponse('Error al generar el PDF', status=500)
+    
+    pdf_file = pdf_buffer.getvalue()
+    pdf_buffer.close()
+    
     # Crear respuesta con PDF
     response = HttpResponse(pdf_file, content_type='application/pdf')
     # Establecer Content-Disposition

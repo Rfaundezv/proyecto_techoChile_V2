@@ -312,13 +312,21 @@ def dashboard_pdf_report(request):
         from django.http import HttpResponse
         return HttpResponse(html_string)
 
-    from weasyprint import HTML
-    html = HTML(string=html_string, base_url=request.build_absolute_uri('/'))
-    pdf = html.write_pdf()
+    # Usar xhtml2pdf en lugar de WeasyPrint para compatibilidad con Windows
     from django.http import HttpResponse
+    from io import BytesIO
+    from xhtml2pdf import pisa
     import os
     from datetime import datetime, timedelta
     from reportes.models import ReporteGenerado
+    
+    # Generar PDF con xhtml2pdf
+    pdf_buffer = BytesIO()
+    pisa_status = pisa.CreatePDF(html_string, dest=pdf_buffer)
+    if pisa_status.err:
+        return HttpResponse('Error al generar el PDF', status=500)
+    pdf = pdf_buffer.getvalue()
+    pdf_buffer.close()
 
     # Definir filtros relevantes para identificar duplicados
     filtros_dict = {

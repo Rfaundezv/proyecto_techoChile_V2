@@ -540,8 +540,8 @@ import os
 from django.conf import settings
 from io import BytesIO
 
-# Indicador de disponibilidad de WeasyPrint (se comprueba solo cuando se necesita)
-WEASYPRINT_AVAILABLE = False  # reservado para uso futuro si queremos memoizar la comprobación
+# El sistema ahora usa xhtml2pdf en lugar de WeasyPrint para compatibilidad con Windows
+# WEASYPRINT_AVAILABLE = False  # deprecado - ahora se usa xhtml2pdf
 
 # Fallback a ReportLab
 try:
@@ -557,7 +557,7 @@ except ImportError:
     inch = 72
     cm = 28.35
 
-# Usaremos WeasyPrint si está instalado; de lo contrario, caemos a ReportLab
+# Usaremos xhtml2pdf para generar PDFs (compatible con Windows); si falla, usamos ReportLab
 
 from .models import ActaRecepcion, FamiliarBeneficiario  # , ConstructorActa
 from proyectos.models import Vivienda, Proyecto, Beneficiario
@@ -684,9 +684,9 @@ def acta_pdf(request, pk):
                 return response
             except Exception as e:
                 print(f"ERROR PDF minimal: {e}")
-        # 1) Intentar con WeasyPrint primero para replicar el HTML/CSS
+        # 1) Usar xhtml2pdf para compatibilidad con Windows
         try:
-            import weasyprint  # type: ignore
+            from xhtml2pdf import pisa
             context = {
                 'acta': acta,
                 'proyecto': acta.proyecto,
@@ -698,14 +698,19 @@ def acta_pdf(request, pk):
                 'para_pdf': True,
             }
             html_content = render_to_string('reportes/acta_template.html', context, request=request)
-            pdf_file = weasyprint.HTML(string=html_content, base_url=request.build_absolute_uri('/')).write_pdf()
-            response = HttpResponse(pdf_file, content_type='application/pdf')
-            response['Content-Disposition'] = f'attachment; filename="Acta de Recepción - {acta.numero_acta}.pdf"'
-            response['X-PDF-Engine'] = 'weasyprint'
-            return response
+            pdf_buffer = BytesIO()
+            pisa_status = pisa.CreatePDF(html_content, dest=pdf_buffer)
+            if not pisa_status.err:
+                pdf_file = pdf_buffer.getvalue()
+                pdf_buffer.close()
+                response = HttpResponse(pdf_file, content_type='application/pdf')
+                response['Content-Disposition'] = f'attachment; filename="Acta de Recepción - {acta.numero_acta}.pdf"'
+                response['X-PDF-Engine'] = 'xhtml2pdf'
+                return response
+            pdf_buffer.close()
         except Exception:
             import traceback
-            print("ERROR PDF WeasyPrint:\n" + traceback.format_exc())
+            print("ERROR PDF xhtml2pdf:\n" + traceback.format_exc())
         # 2) Intentar con ReportLab (estable en Windows)
         # Usar ReportLab si está disponible a nivel de módulo
 
@@ -915,7 +920,7 @@ def acta_pdf(request, pk):
                 import traceback
                 print("ERROR PDF ReportLab:\n" + traceback.format_exc())
 
-        # (WeasyPrint ya fue intentado arriba)
+        # (xhtml2pdf y ReportLab ya fueron intentados arriba)
 
         # 3) Si ambos fallaron, generar un PDF mínimo como último recurso
         try:
