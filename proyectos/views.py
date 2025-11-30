@@ -229,17 +229,19 @@ def buscar_beneficiario_por_rut(request):
     
     if request.method == 'GET' and request.headers.get('X-Requested-With') == 'XMLHttpRequest':
         rut_original = request.GET.get('rut', '').strip()
-        
+
         if not rut_original:
             return JsonResponse({'error': 'RUT no proporcionado'}, status=400)
         
-        # Limpiar RUT para la búsqueda: remover puntos y espacios
-        rut_limpio = rut_original.replace('.', '').replace(' ', '')
+        numero, dv = rut_original.split("-")
+        numero_formateado = f"{int(numero):,}".replace(",", ".")
+        rut_formateado = f"{numero_formateado}-{dv}"
         
         try:
             # Buscar beneficiario por RUT (con o sin puntos)
             beneficiario = Beneficiario.objects.filter(
-                Q(rut=rut_original) | Q(rut=rut_limpio),
+                rut=rut_formateado,
+                # Q(rut=rut_original) | Q(rut=rut_limpio),
                 activo=True
             ).first()
             
@@ -263,4 +265,4 @@ def buscar_beneficiario_por_rut(request):
         except Exception as e:
             return JsonResponse({'error': 'Error en la búsqueda'}, status=500)
     
-    return JsonResponse({'error': 'Método no permitido'}, status=405)
+    return JsonResoponse({'error': 'Método no permitido'}, status=405)

@@ -258,6 +258,9 @@ def dashboard(request):
 
 def ajax_comunas_por_region(request):
     region_id = request.GET.get('region_id')
+    comunas = Comuna.objects.filter(region_id=region_id).values('id', 'nombre')
+    return JsonResponse({'comunas': list(comunas)})
+    
 import logging
 
 logger = logging.getLogger(__name__)
